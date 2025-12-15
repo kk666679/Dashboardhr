@@ -331,7 +331,7 @@ export function AnimatedDashboard({ onNavigate }: AnimatedDashboardProps) {
                     <Target className="w-6 h-6 text-purple-600" />
                   </motion.div>
                 </div>
-                <div className="h-64 sm:h-80">
+                <div style={{ width: '100%', height: '320px' }}>
                   <ResponsiveContainer width="100%" height="100%">
                     <LineChart data={headcountData}>
                       <defs>
@@ -377,7 +377,7 @@ export function AnimatedDashboard({ onNavigate }: AnimatedDashboardProps) {
                   </div>
                   <Users className="w-6 h-6 text-pink-600" />
                 </div>
-                <div className="h-64 sm:h-80">
+                <div style={{ width: '100%', height: '320px' }}>
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
                       <Pie
@@ -424,7 +424,7 @@ export function AnimatedDashboard({ onNavigate }: AnimatedDashboardProps) {
                 </div>
                 <UserCheck className="w-6 h-6 text-purple-600" />
               </div>
-              <div className="h-64 sm:h-80">
+              <div style={{ width: '100%', height: '320px' }}>
                 <ResponsiveContainer width="100%" height="100%">
                   <AreaChart data={attendanceData}>
                     <defs>

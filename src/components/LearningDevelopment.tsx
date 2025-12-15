@@ -1,1114 +1,926 @@
 import React, { useState } from 'react';
-import { 
-  GraduationCap,
+import { motion, AnimatePresence } from 'motion/react';
+import {
   BookOpen,
-  Video,
-  FileText,
+  GraduationCap,
+  Target,
   Award,
   TrendingUp,
   Users,
-  Calendar,
   Clock,
-  Star,
-  Play,
+  Calendar,
+  Video,
+  FileText,
   CheckCircle,
   XCircle,
-  AlertCircle,
-  Plus,
-  Search,
-  Filter,
+  Star,
+  Play,
   Download,
   Upload,
-  Edit,
-  Trash2,
+  Search,
+  Filter,
+  Plus,
   Eye,
+  Edit,
   BarChart3,
-  Target,
-  BookMarked,
-  Lightbulb,
-  Briefcase,
-  Trophy,
   Brain,
-  Rocket,
-  MapPin,
   Zap,
-  Shield,
-  Globe,
-  HeartHandshake,
-  Sparkles,
-  ChevronRight,
-  TrendingDown,
-  Settings,
-  DollarSign,
-  MessageSquare,
-  UserCheck,
-  Layers,
-  LineChart,
-  PieChart,
+  Trophy,
   Activity,
-  LayoutDashboard
+  UserCheck,
+  Briefcase,
+  Share2,
+  MessageSquare,
+  ArrowRight,
 } from 'lucide-react';
+import {
+  GlassmorphicCard,
+  StaggerContainer,
+  StaggerItem,
+  SlideIn,
+  GlassButton,
+  AnimatedCounter,
+  GlassInput,
+} from './GlassmorphicCard';
+import {
+  BarChart,
+  Bar,
+  LineChart,
+  Line,
+  PieChart,
+  Pie,
+  Cell,
+  AreaChart,
+  Area,
+  RadarChart,
+  Radar,
+  PolarGrid,
+  PolarAngleAxis,
+  PolarRadiusAxis,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from 'recharts';
 
-type Tab = 
-  | 'overview' 
-  | 'courses' 
-  | 'my-learning' 
-  | 'certifications' 
-  | 'development-programs'
-  | 'upskilling'
-  | 'skills-assessment'
-  | 'learning-paths'
-  | 'training-calendar'
-  | 'analytics'
-  | 'mentoring'
-  | 'budget';
+type ViewMode = 'dashboard' | 'courses' | 'employees' | 'certifications' | 'analytics';
+
+interface Course {
+  id: string;
+  title: string;
+  category: string;
+  instructor: string;
+  duration: string;
+  level: 'Beginner' | 'Intermediate' | 'Advanced';
+  enrolled: number;
+  completed: number;
+  rating: number;
+  type: 'Video' | 'Reading' | 'Interactive' | 'Workshop';
+  status: 'active' | 'draft' | 'archived';
+  thumbnail: string;
+  skills: string[];
+}
+
+interface EmployeeProgress {
+  id: string;
+  name: string;
+  department: string;
+  coursesEnrolled: number;
+  coursesCompleted: number;
+  certificationsEarned: number;
+  hoursLearned: number;
+  averageScore: number;
+  currentCourses: string[];
+  skillsAcquired: string[];
+}
+
+interface Certification {
+  id: string;
+  name: string;
+  issuer: string;
+  category: string;
+  validityPeriod: string;
+  employeesEarned: number;
+  icon: string;
+}
 
 export function LearningDevelopment() {
-  const [activeTab, setActiveTab] = useState<Tab>('overview');
+  const [viewMode, setViewMode] = useState<ViewMode>('dashboard');
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
 
-  // Enhanced Stats
-  const stats = [
-    { label: 'Total Courses', value: '247', icon: BookOpen, color: 'blue', trend: '+23%', subtext: '52 new this month' },
-    { label: 'Active Learners', value: '1,456', icon: Users, color: 'green', trend: '+18%', subtext: '95% engagement rate' },
-    { label: 'Certifications', value: '842', icon: Award, color: 'purple', trend: '+31%', subtext: '156 this quarter' },
-    { label: 'Completion Rate', value: '87%', icon: TrendingUp, color: 'orange', trend: '+12%', subtext: 'Above industry avg' },
-    { label: 'Skill Gaps Closed', value: '156', icon: Target, color: 'pink', trend: '+45%', subtext: '78% target achieved' },
-    { label: 'Training Budget', value: 'RM 2.4M', icon: DollarSign, color: 'cyan', trend: '-8%', subtext: '68% utilized' },
-  ];
-
-  // Development Programs
-  const developmentPrograms = [
+  const courses: Course[] = [
     {
-      id: 1,
-      name: 'Future Leaders Programme',
-      type: 'Leadership Development',
-      duration: '12 months',
-      participants: 24,
-      status: 'Active',
-      modules: 16,
-      completionRate: 78,
-      budget: 'RM 240,000',
-      startDate: '2024-01-15',
-      coordinator: 'Dato\' Ahmad Rahman',
-      description: 'Comprehensive leadership development for high-potential managers',
-      tracks: ['Strategic Thinking', 'Team Leadership', 'Change Management', 'Executive Communication']
-    },
-    {
-      id: 2,
-      name: 'Tech Excellence Program',
-      type: 'Technical Upskilling',
-      duration: '6 months',
-      participants: 45,
-      status: 'Active',
-      modules: 24,
-      completionRate: 92,
-      budget: 'RM 180,000',
-      startDate: '2024-03-01',
-      coordinator: 'Dr. Sarah Chen',
-      description: 'Advanced technical training for engineering and IT teams',
-      tracks: ['Cloud Architecture', 'AI/ML', 'DevOps', 'Cybersecurity']
-    },
-    {
-      id: 3,
-      name: 'Sales Mastery Bootcamp',
-      type: 'Sales & Marketing',
-      duration: '3 months',
-      participants: 32,
-      status: 'Enrolling',
-      modules: 12,
-      completionRate: 0,
-      budget: 'RM 95,000',
-      startDate: '2025-01-10',
-      coordinator: 'Lee Mei Ling',
-      description: 'Intensive sales training with real-world simulations',
-      tracks: ['Consultative Selling', 'Negotiation', 'Account Management', 'Digital Sales']
-    },
-    {
-      id: 4,
-      name: 'HR Professional Certification',
-      type: 'Professional Certification',
-      duration: '9 months',
-      participants: 18,
-      status: 'Active',
-      modules: 20,
-      completionRate: 65,
-      budget: 'RM 156,000',
-      startDate: '2024-06-01',
-      coordinator: 'Siti Nurhaliza',
-      description: 'Comprehensive HR certification aligned with CIPD standards',
-      tracks: ['Talent Management', 'Employee Relations', 'Compensation', 'Organizational Development']
-    }
-  ];
-
-  // Upskilling Modules
-  const upskillingModules = [
-    {
-      id: 1,
-      title: 'AI for Business Professionals',
-      category: 'Emerging Tech',
-      level: 'Intermediate',
-      duration: '4 weeks',
-      format: 'Self-paced + Live Sessions',
-      enrolled: 156,
+      id: '1',
+      title: 'Advanced React & TypeScript',
+      category: 'Technical',
+      instructor: 'Ahmad Zulkifli',
+      duration: '12 hours',
+      level: 'Advanced',
+      enrolled: 45,
+      completed: 32,
       rating: 4.8,
-      skillsGained: ['AI Fundamentals', 'ChatGPT for Productivity', 'AI Strategy', 'Ethical AI'],
-      provider: 'Internal + Coursera',
-      cost: 'RM 1,200',
-      certificationOffered: true,
-      trending: true
+      type: 'Video',
+      status: 'active',
+      thumbnail: '🎯',
+      skills: ['React', 'TypeScript', 'Hooks'],
     },
     {
-      id: 2,
-      title: 'Data Analytics Essentials',
-      category: 'Data Science',
-      level: 'Beginner',
-      duration: '6 weeks',
-      format: 'Hybrid',
-      enrolled: 203,
-      rating: 4.9,
-      skillsGained: ['Excel Advanced', 'SQL Basics', 'Data Visualization', 'Power BI'],
-      provider: 'Internal',
-      cost: 'RM 800',
-      certificationOffered: true,
-      trending: true
-    },
-    {
-      id: 3,
-      title: 'Agile Project Management',
-      category: 'Project Management',
+      id: '2',
+      title: 'Leadership Excellence Program',
+      category: 'Leadership',
+      instructor: 'Dr. Siti Aminah',
+      duration: '20 hours',
       level: 'Intermediate',
-      duration: '3 weeks',
-      format: 'Instructor-led',
-      enrolled: 89,
+      enrolled: 28,
+      completed: 15,
+      rating: 4.9,
+      type: 'Workshop',
+      status: 'active',
+      thumbnail: '👑',
+      skills: ['Leadership', 'Communication', 'Strategy'],
+    },
+    {
+      id: '3',
+      title: 'Data Analytics Fundamentals',
+      category: 'Technical',
+      instructor: 'Raj Kumar',
+      duration: '15 hours',
+      level: 'Beginner',
+      enrolled: 52,
+      completed: 40,
       rating: 4.7,
-      skillsGained: ['Scrum', 'Kanban', 'Sprint Planning', 'Agile Leadership'],
-      provider: 'PMI Partner',
-      cost: 'RM 2,400',
-      certificationOffered: true,
-      trending: false
+      type: 'Interactive',
+      status: 'active',
+      thumbnail: '📊',
+      skills: ['Data Analysis', 'Excel', 'SQL'],
     },
     {
-      id: 4,
-      title: 'Cybersecurity Fundamentals',
-      category: 'IT Security',
-      level: 'Beginner',
-      duration: '5 weeks',
-      format: 'Online',
-      enrolled: 134,
-      rating: 4.6,
-      skillsGained: ['Network Security', 'Threat Detection', 'Security Protocols', 'Incident Response'],
-      provider: 'Udemy Business',
-      cost: 'RM 600',
-      certificationOffered: false,
-      trending: true
-    },
-    {
-      id: 5,
-      title: 'Design Thinking Workshop',
-      category: 'Innovation',
-      level: 'All Levels',
-      duration: '2 weeks',
-      format: 'Workshop',
-      enrolled: 67,
-      rating: 4.9,
-      skillsGained: ['Creative Problem Solving', 'User Research', 'Prototyping', 'Innovation Strategy'],
-      provider: 'IDEO U',
-      cost: 'RM 3,200',
-      certificationOffered: true,
-      trending: true
-    },
-    {
-      id: 6,
-      title: 'Emotional Intelligence for Leaders',
+      id: '4',
+      title: 'Effective Communication in Bahasa Malaysia',
       category: 'Soft Skills',
+      instructor: 'Nurul Huda',
+      duration: '8 hours',
       level: 'Intermediate',
-      duration: '4 weeks',
-      format: 'Blended',
-      enrolled: 112,
+      enrolled: 35,
+      completed: 28,
+      rating: 4.6,
+      type: 'Video',
+      status: 'active',
+      thumbnail: '💬',
+      skills: ['Communication', 'Bahasa Malaysia', 'Presentation'],
+    },
+    {
+      id: '5',
+      title: 'Malaysian Employment Law & Compliance',
+      category: 'Compliance',
+      instructor: 'Lee Wei Ming',
+      duration: '10 hours',
+      level: 'Intermediate',
+      enrolled: 42,
+      completed: 38,
+      rating: 4.9,
+      type: 'Reading',
+      status: 'active',
+      thumbnail: '⚖️',
+      skills: ['Employment Act', 'Compliance', 'HR Law'],
+    },
+    {
+      id: '6',
+      title: 'Agile Project Management',
+      category: 'Management',
+      instructor: 'David Tan',
+      duration: '18 hours',
+      level: 'Advanced',
+      enrolled: 30,
+      completed: 20,
       rating: 4.8,
-      skillsGained: ['Self-Awareness', 'Empathy', 'Relationship Management', 'Leadership Presence'],
-      provider: 'Internal',
-      cost: 'RM 1,500',
-      certificationOffered: false,
-      trending: false
-    }
+      type: 'Workshop',
+      status: 'active',
+      thumbnail: '🚀',
+      skills: ['Agile', 'Scrum', 'Project Management'],
+    },
   ];
 
-  // Learning Paths
-  const learningPaths = [
+  const employeeProgress: EmployeeProgress[] = [
     {
-      id: 1,
-      title: 'Software Engineer Career Path',
-      role: 'Software Engineer',
-      level: 'Junior → Senior',
-      duration: '18-24 months',
-      courses: 28,
-      participants: 45,
-      stages: [
-        { name: 'Foundation', courses: 8, duration: '3 months' },
-        { name: 'Intermediate', courses: 12, duration: '6 months' },
-        { name: 'Advanced', courses: 8, duration: '9 months' }
-      ],
-      completionRate: 67,
-      avgSalaryIncrease: '35%'
+      id: '1',
+      name: 'Ahmad Syafiq bin Hassan',
+      department: 'Engineering',
+      coursesEnrolled: 5,
+      coursesCompleted: 3,
+      certificationsEarned: 2,
+      hoursLearned: 45,
+      averageScore: 92,
+      currentCourses: ['Advanced React & TypeScript', 'Agile Project Management'],
+      skillsAcquired: ['React', 'TypeScript', 'Leadership', 'Agile'],
     },
     {
-      id: 2,
-      title: 'Marketing Manager Pathway',
-      role: 'Marketing Manager',
-      level: 'Specialist → Manager',
-      duration: '12 months',
-      courses: 18,
-      participants: 23,
-      stages: [
-        { name: 'Core Marketing', courses: 6, duration: '3 months' },
-        { name: 'Digital Mastery', courses: 7, duration: '4 months' },
-        { name: 'Strategic Leadership', courses: 5, duration: '5 months' }
-      ],
-      completionRate: 82,
-      avgSalaryIncrease: '28%'
+      id: '2',
+      name: 'Siti Nurhaliza',
+      department: 'Sales',
+      coursesEnrolled: 4,
+      coursesCompleted: 4,
+      certificationsEarned: 3,
+      hoursLearned: 38,
+      averageScore: 95,
+      currentCourses: [],
+      skillsAcquired: ['Leadership', 'Communication', 'Sales Strategy'],
     },
     {
-      id: 3,
-      title: 'Data Analyst to Data Scientist',
-      role: 'Data Scientist',
-      level: 'Analyst → Scientist',
-      duration: '15 months',
-      courses: 32,
-      participants: 34,
-      stages: [
-        { name: 'Statistics & Math', courses: 10, duration: '4 months' },
-        { name: 'ML & AI', courses: 14, duration: '6 months' },
-        { name: 'Advanced Projects', courses: 8, duration: '5 months' }
-      ],
-      completionRate: 71,
-      avgSalaryIncrease: '42%'
+      id: '3',
+      name: 'Raj Kumar Patel',
+      department: 'Marketing',
+      coursesEnrolled: 3,
+      coursesCompleted: 2,
+      certificationsEarned: 1,
+      hoursLearned: 28,
+      averageScore: 88,
+      currentCourses: ['Data Analytics Fundamentals'],
+      skillsAcquired: ['Data Analysis', 'Marketing'],
+    },
+    {
+      id: '4',
+      name: 'Lee Mei Ling',
+      department: 'HR',
+      coursesEnrolled: 6,
+      coursesCompleted: 5,
+      certificationsEarned: 4,
+      hoursLearned: 52,
+      averageScore: 94,
+      currentCourses: ['Malaysian Employment Law & Compliance'],
+      skillsAcquired: ['HR Law', 'Compliance', 'Leadership', 'Communication'],
+    },
+  ];
+
+  const certifications: Certification[] = [
+    {
+      id: '1',
+      name: 'Certified Agile Practitioner',
+      issuer: 'International Agile Institute',
+      category: 'Project Management',
+      validityPeriod: '3 years',
+      employeesEarned: 12,
+      icon: '🏆',
+    },
+    {
+      id: '2',
+      name: 'Malaysian HR Compliance Specialist',
+      issuer: 'Malaysia HR Institute',
+      category: 'Compliance',
+      validityPeriod: '2 years',
+      employeesEarned: 8,
+      icon: '⚖️',
+    },
+    {
+      id: '3',
+      name: 'Advanced Data Analytics Certificate',
+      issuer: 'Data Science Academy',
+      category: 'Technical',
+      validityPeriod: 'Lifetime',
+      employeesEarned: 15,
+      icon: '📊',
+    },
+    {
+      id: '4',
+      name: 'Leadership Excellence Certification',
+      issuer: 'Asia Leadership Center',
+      category: 'Leadership',
+      validityPeriod: '5 years',
+      employeesEarned: 10,
+      icon: '👑',
+    },
+  ];
+
+  const totalCourses = courses.length;
+  const totalEnrollments = courses.reduce((sum, c) => sum + c.enrolled, 0);
+  const averageCompletion = Math.round(
+    (courses.reduce((sum, c) => sum + c.completed, 0) / totalEnrollments) * 100
+  );
+  const totalCertifications = certifications.reduce((sum, c) => sum + c.employeesEarned, 0);
+
+  const stats = [
+    {
+      label: 'Active Courses',
+      value: totalCourses,
+      change: '+2 this month',
+      icon: BookOpen,
+      gradient: 'from-blue-500/80 to-cyan-500/80',
+    },
+    {
+      label: 'Total Enrollments',
+      value: totalEnrollments,
+      change: '+18% this quarter',
+      icon: Users,
+      gradient: 'from-purple-500/80 to-violet-500/80',
+    },
+    {
+      label: 'Completion Rate',
+      value: averageCompletion,
+      suffix: '%',
+      change: '+5% vs last month',
+      icon: Target,
+      gradient: 'from-green-500/80 to-emerald-500/80',
+    },
+    {
+      label: 'Certifications Earned',
+      value: totalCertifications,
+      change: '+12 this quarter',
+      icon: Award,
+      gradient: 'from-orange-500/80 to-amber-500/80',
+    },
+  ];
+
+  const categoryDistributionData = [
+    { name: 'Technical', value: courses.filter(c => c.category === 'Technical').length },
+    { name: 'Leadership', value: courses.filter(c => c.category === 'Leadership').length },
+    { name: 'Soft Skills', value: courses.filter(c => c.category === 'Soft Skills').length },
+    { name: 'Compliance', value: courses.filter(c => c.category === 'Compliance').length },
+    { name: 'Management', value: courses.filter(c => c.category === 'Management').length },
+  ];
+
+  const monthlyEnrollmentData = [
+    { month: 'Jul', enrollments: 45, completions: 32 },
+    { month: 'Aug', enrollments: 52, completions: 40 },
+    { month: 'Sep', enrollments: 48, completions: 38 },
+    { month: 'Oct', enrollments: 58, completions: 45 },
+    { month: 'Nov', enrollments: 62, completions: 50 },
+    { month: 'Dec', enrollments: totalEnrollments, completions: courses.reduce((sum, c) => sum + c.completed, 0) },
+  ];
+
+  const skillsDevelopmentData = [
+    { skill: 'React', employees: 15 },
+    { skill: 'Leadership', employees: 22 },
+    { skill: 'Data Analysis', employees: 18 },
+    { skill: 'Communication', employees: 25 },
+    { skill: 'Agile', employees: 12 },
+  ];
+
+  const learningPathData = [
+    { category: 'Technical', score: 85 },
+    { category: 'Leadership', score: 78 },
+    { category: 'Soft Skills', score: 82 },
+    { category: 'Compliance', score: 92 },
+    { category: 'Management', score: 75 },
+  ];
+
+  const COLORS = ['#8B5CF6', '#EC4899', '#10B981', '#F59E0B', '#3B82F6', '#EF4444'];
+
+  const getLevelColor = (level: string) => {
+    switch (level) {
+      case 'Beginner':
+        return 'bg-green-100 text-green-700 border-green-200';
+      case 'Intermediate':
+        return 'bg-orange-100 text-orange-700 border-orange-200';
+      case 'Advanced':
+        return 'bg-red-100 text-red-700 border-red-200';
+      default:
+        return 'bg-gray-100 text-gray-700 border-gray-200';
     }
-  ];
+  };
 
-  // Skills Assessment
-  const skillsGaps = [
-    { skill: 'AI/ML Proficiency', currentLevel: 45, targetLevel: 80, gap: 35, priority: 'High', employees: 89 },
-    { skill: 'Cloud Technologies', currentLevel: 62, targetLevel: 85, gap: 23, priority: 'High', employees: 124 },
-    { skill: 'Data Analytics', currentLevel: 58, targetLevel: 75, gap: 17, priority: 'Medium', employees: 156 },
-    { skill: 'Agile Methodologies', currentLevel: 71, targetLevel: 90, gap: 19, priority: 'Medium', employees: 98 },
-    { skill: 'Leadership Skills', currentLevel: 65, targetLevel: 85, gap: 20, priority: 'High', employees: 67 },
-    { skill: 'Digital Marketing', currentLevel: 70, targetLevel: 80, gap: 10, priority: 'Low', employees: 45 }
-  ];
+  const filteredCourses = courses.filter(course => {
+    const matchesSearch = course.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         course.instructor.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesCategory = selectedCategory === 'all' || course.category === selectedCategory;
+    return matchesSearch && matchesCategory;
+  });
 
-  const renderOverview = () => (
+  const renderDashboard = () => (
     <div className="space-y-6">
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {stats.map((stat, idx) => {
+      {/* Stats */}
+      <StaggerContainer className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {stats.map((stat, index) => {
           const Icon = stat.icon;
-          const isPositive = stat.trend.startsWith('+');
           return (
-            <div key={idx} className="bg-white rounded-xl border-2 border-gray-200 p-6 hover:shadow-lg transition-all">
-              <div className="flex items-start justify-between">
-                <div className="flex-1">
-                  <p className="text-sm text-gray-600 mb-1">{stat.label}</p>
-                  <p className="text-3xl font-bold text-gray-900 mb-2">{stat.value}</p>
-                  <p className="text-xs text-gray-500">{stat.subtext}</p>
+            <StaggerItem key={index}>
+              <GlassmorphicCard
+                gradient={`${stat.gradient.replace('/80', '/10')} backdrop-blur-xl`}
+                animation="scale"
+                delay={index * 0.1}
+              >
+                <div className="p-6">
+                  <div className="flex items-start justify-between mb-3">
+                    <div>
+                      <p className="text-sm text-gray-600 mb-1">{stat.label}</p>
+                      <motion.p
+                        className="text-3xl font-bold text-gray-900"
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        transition={{ delay: index * 0.1 + 0.3, type: 'spring' }}
+                      >
+                        <AnimatedCounter value={stat.value} duration={2} />
+                        {stat.suffix}
+                      </motion.p>
+                    </div>
+                    <motion.div
+                      className={`w-12 h-12 bg-gradient-to-br ${stat.gradient} rounded-xl flex items-center justify-center shadow-lg`}
+                      whileHover={{ rotate: 360 }}
+                      transition={{ duration: 0.5 }}
+                    >
+                      <Icon className="w-6 h-6 text-white" />
+                    </motion.div>
+                  </div>
+                  <p className="text-sm text-gray-600">{stat.change}</p>
                 </div>
-                <div className={`w-12 h-12 rounded-xl flex items-center justify-center bg-${stat.color}-100`}>
-                  <Icon className={`w-6 h-6 text-${stat.color}-600`} />
-                </div>
-              </div>
-              <div className="mt-4 flex items-center gap-2">
-                {isPositive ? (
-                  <TrendingUp className="w-4 h-4 text-green-600" />
-                ) : (
-                  <TrendingDown className="w-4 h-4 text-red-600" />
-                )}
-                <span className={`text-sm font-semibold ${isPositive ? 'text-green-600' : 'text-red-600'}`}>
-                  {stat.trend}
-                </span>
-                <span className="text-sm text-gray-500">vs last quarter</span>
-              </div>
-            </div>
+              </GlassmorphicCard>
+            </StaggerItem>
           );
         })}
-      </div>
+      </StaggerContainer>
 
-      {/* Quick Actions */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl p-6 text-white">
-          <div className="flex items-start justify-between mb-4">
-            <div>
-              <h3 className="text-xl font-bold mb-2">New Development Programs</h3>
-              <p className="text-purple-100">Launch custom training initiatives</p>
-            </div>
-            <Rocket className="w-10 h-10 opacity-80" />
-          </div>
-          <button className="w-full bg-white text-purple-600 px-4 py-3 rounded-lg font-semibold hover:shadow-lg transition-all">
-            Create Program
-          </button>
-        </div>
-
-        <div className="bg-gradient-to-br from-blue-500 to-cyan-500 rounded-xl p-6 text-white">
-          <div className="flex items-start justify-between mb-4">
-            <div>
-              <h3 className="text-xl font-bold mb-2">Skills Gap Analysis</h3>
-              <p className="text-blue-100">Identify and address skill deficiencies</p>
-            </div>
-            <Target className="w-10 h-10 opacity-80" />
-          </div>
-          <button className="w-full bg-white text-blue-600 px-4 py-3 rounded-lg font-semibold hover:shadow-lg transition-all">
-            Run Assessment
-          </button>
-        </div>
-      </div>
-
-      {/* Featured Programs & Trending Upskilling */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Featured Programs */}
-        <div className="bg-white rounded-xl border-2 border-gray-200 p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-bold text-gray-900">Featured Programs</h3>
-            <button 
-              onClick={() => setActiveTab('development-programs')}
-              className="text-purple-600 hover:text-purple-700 text-sm font-semibold flex items-center gap-1"
-            >
-              View All <ChevronRight className="w-4 h-4" />
-            </button>
-          </div>
-          <div className="space-y-3">
-            {developmentPrograms.slice(0, 3).map((program) => (
-              <div key={program.id} className="border-2 border-gray-100 rounded-lg p-4 hover:border-purple-200 transition-all">
-                <div className="flex items-start justify-between mb-2">
-                  <div className="flex-1">
-                    <h4 className="font-semibold text-gray-900">{program.name}</h4>
-                    <p className="text-sm text-gray-500">{program.type}</p>
-                  </div>
-                  <span className={`px-2 py-1 text-xs rounded-full ${
-                    program.status === 'Active' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'
-                  }`}>
-                    {program.status}
-                  </span>
-                </div>
-                <div className="flex items-center gap-4 text-sm text-gray-600">
-                  <span className="flex items-center gap-1">
-                    <Users className="w-4 h-4" />
-                    {program.participants}
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <Clock className="w-4 h-4" />
-                    {program.duration}
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <BookOpen className="w-4 h-4" />
-                    {program.modules} modules
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Trending Upskilling */}
-        <div className="bg-white rounded-xl border-2 border-gray-200 p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-bold text-gray-900">Trending Upskilling</h3>
-            <button 
-              onClick={() => setActiveTab('upskilling')}
-              className="text-blue-600 hover:text-blue-700 text-sm font-semibold flex items-center gap-1"
-            >
-              View All <ChevronRight className="w-4 h-4" />
-            </button>
-          </div>
-          <div className="space-y-3">
-            {upskillingModules.filter(m => m.trending).slice(0, 3).map((module) => (
-              <div key={module.id} className="border-2 border-gray-100 rounded-lg p-4 hover:border-blue-200 transition-all">
-                <div className="flex items-start justify-between mb-2">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      <h4 className="font-semibold text-gray-900">{module.title}</h4>
-                      <Sparkles className="w-4 h-4 text-orange-500" />
-                    </div>
-                    <p className="text-sm text-gray-500">{module.category}</p>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
-                    <span className="text-sm font-semibold">{module.rating}</span>
-                  </div>
-                </div>
-                <div className="flex items-center gap-4 text-sm text-gray-600">
-                  <span>{module.duration}</span>
-                  <span>•</span>
-                  <span>{module.enrolled} enrolled</span>
-                  <span>•</span>
-                  <span className="text-blue-600 font-semibold">{module.cost}</span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-
-  const renderDevelopmentPrograms = () => (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-bold text-gray-900">Development Programs</h2>
-          <p className="text-gray-600">Comprehensive training initiatives for career growth</p>
-        </div>
-        <button className="px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg hover:shadow-lg transition-all flex items-center gap-2">
-          <Plus className="w-4 h-4" />
-          Create Program
-        </button>
-      </div>
-
-      {/* Programs Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {developmentPrograms.map((program) => (
-          <div key={program.id} className="bg-white rounded-xl border-2 border-gray-200 p-6 hover:shadow-lg transition-all">
-            <div className="flex items-start justify-between mb-4">
-              <div className="flex-1">
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center">
-                    <Rocket className="w-6 h-6 text-white" />
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-gray-900">{program.name}</h3>
-                    <p className="text-sm text-gray-500">{program.type}</p>
-                  </div>
-                </div>
-              </div>
-              <span className={`px-3 py-1 text-sm rounded-full font-semibold ${
-                program.status === 'Active' 
-                  ? 'bg-green-100 text-green-700' 
-                  : program.status === 'Enrolling'
-                  ? 'bg-blue-100 text-blue-700'
-                  : 'bg-gray-100 text-gray-700'
-              }`}>
-                {program.status}
-              </span>
-            </div>
-
-            <p className="text-gray-600 mb-4">{program.description}</p>
-
-            {/* Stats */}
-            <div className="grid grid-cols-2 gap-4 mb-4 p-4 bg-gray-50 rounded-lg">
+      {/* AI Learning Features */}
+      <SlideIn direction="up" delay={0.2}>
+        <GlassmorphicCard gradient="from-blue-500/10 to-cyan-500/10" blur="xl">
+          <div className="p-6">
+            <div className="flex items-start gap-3 mb-4">
+              <Brain className="w-6 h-6 text-blue-600 mt-0.5" />
               <div>
-                <p className="text-xs text-gray-500 mb-1">Duration</p>
-                <p className="font-semibold text-gray-900">{program.duration}</p>
-              </div>
-              <div>
-                <p className="text-xs text-gray-500 mb-1">Participants</p>
-                <p className="font-semibold text-gray-900">{program.participants}</p>
-              </div>
-              <div>
-                <p className="text-xs text-gray-500 mb-1">Modules</p>
-                <p className="font-semibold text-gray-900">{program.modules}</p>
-              </div>
-              <div>
-                <p className="text-xs text-gray-500 mb-1">Budget</p>
-                <p className="font-semibold text-gray-900">{program.budget}</p>
+                <h4 className="font-semibold text-blue-900 mb-1">AI-Powered Learning Platform</h4>
+                <p className="text-sm text-blue-700">
+                  Personalized learning paths, skill gap analysis, and intelligent course recommendations
+                </p>
               </div>
             </div>
-
-            {/* Progress */}
-            {program.completionRate > 0 && (
-              <div className="mb-4">
-                <div className="flex items-center justify-between text-sm mb-2">
-                  <span className="text-gray-600">Completion Rate</span>
-                  <span className="font-semibold text-gray-900">{program.completionRate}%</span>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div 
-                    className="bg-gradient-to-r from-purple-500 to-pink-500 h-2 rounded-full transition-all"
-                    style={{ width: `${program.completionRate}%` }}
-                  ></div>
-                </div>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <div className="bg-white/50 backdrop-blur-sm rounded-lg p-3 text-center">
+                <Zap className="w-5 h-5 text-blue-600 mx-auto mb-1" />
+                <p className="text-xs font-semibold text-gray-900">Smart Recommendations</p>
+                <p className="text-xs text-gray-600">AI-powered</p>
               </div>
-            )}
-
-            {/* Tracks */}
-            <div className="mb-4">
-              <p className="text-sm font-semibold text-gray-700 mb-2">Learning Tracks:</p>
-              <div className="flex flex-wrap gap-2">
-                {program.tracks.map((track, idx) => (
-                  <span key={idx} className="px-2 py-1 bg-purple-50 text-purple-700 text-xs rounded-full">
-                    {track}
-                  </span>
-                ))}
+              <div className="bg-white/50 backdrop-blur-sm rounded-lg p-3 text-center">
+                <Target className="w-5 h-5 text-blue-600 mx-auto mb-1" />
+                <p className="text-xs font-semibold text-gray-900">Skill Gap Analysis</p>
+                <p className="text-xs text-gray-600">Auto-detect</p>
               </div>
-            </div>
-
-            {/* Actions */}
-            <div className="flex items-center gap-2">
-              <button className="flex-1 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-all font-semibold">
-                View Details
-              </button>
-              <button className="px-4 py-2 border-2 border-gray-200 rounded-lg hover:border-purple-300 transition-all">
-                <Settings className="w-4 h-4 text-gray-600" />
-              </button>
+              <div className="bg-white/50 backdrop-blur-sm rounded-lg p-3 text-center">
+                <TrendingUp className="w-5 h-5 text-blue-600 mx-auto mb-1" />
+                <p className="text-xs font-semibold text-gray-900">Progress Tracking</p>
+                <p className="text-xs text-gray-600">Real-time</p>
+              </div>
+              <div className="bg-white/50 backdrop-blur-sm rounded-lg p-3 text-center">
+                <Award className="w-5 h-5 text-blue-600 mx-auto mb-1" />
+                <p className="text-xs font-semibold text-gray-900">Certifications</p>
+                <p className="text-xs text-gray-600">Verified</p>
+              </div>
             </div>
           </div>
-        ))}
-      </div>
-    </div>
-  );
-
-  const renderUpskilling = () => (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-bold text-gray-900">Upskilling & Reskilling Modules</h2>
-          <p className="text-gray-600">Targeted training to close skill gaps and drive growth</p>
-        </div>
-        <button className="px-4 py-2 bg-gradient-to-r from-blue-500 to-cyan-500 text-white rounded-lg hover:shadow-lg transition-all flex items-center gap-2">
-          <Plus className="w-4 h-4" />
-          Add Module
-        </button>
-      </div>
-
-      {/* Filters */}
-      <div className="bg-white rounded-xl border-2 border-gray-200 p-4">
-        <div className="flex flex-wrap gap-3">
-          <div className="flex-1 min-w-[200px]">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Search modules..."
-                className="w-full pl-10 pr-4 py-2 border-2 border-gray-200 rounded-lg focus:border-blue-500 outline-none"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-            </div>
-          </div>
-          <select className="px-4 py-2 border-2 border-gray-200 rounded-lg focus:border-blue-500 outline-none">
-            <option>All Categories</option>
-            <option>Emerging Tech</option>
-            <option>Data Science</option>
-            <option>Project Management</option>
-            <option>IT Security</option>
-            <option>Soft Skills</option>
-          </select>
-          <select className="px-4 py-2 border-2 border-gray-200 rounded-lg focus:border-blue-500 outline-none">
-            <option>All Levels</option>
-            <option>Beginner</option>
-            <option>Intermediate</option>
-            <option>Advanced</option>
-          </select>
-        </div>
-      </div>
-
-      {/* Modules Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {upskillingModules.map((module) => (
-          <div key={module.id} className="bg-white rounded-xl border-2 border-gray-200 p-6 hover:shadow-lg transition-all">
-            <div className="flex items-start justify-between mb-4">
-              <div className="flex-1">
-                <div className="flex items-center gap-2 mb-2">
-                  <h3 className="font-bold text-gray-900">{module.title}</h3>
-                  {module.trending && (
-                    <span className="px-2 py-0.5 bg-orange-100 text-orange-700 text-xs rounded-full flex items-center gap-1">
-                      <Sparkles className="w-3 h-3" />
-                      Trending
-                    </span>
-                  )}
-                </div>
-                <div className="flex items-center gap-3 text-sm">
-                  <span className="px-2 py-1 bg-blue-50 text-blue-700 rounded font-semibold">
-                    {module.category}
-                  </span>
-                  <span className="text-gray-600">{module.level}</span>
-                </div>
-              </div>
-              <div className="flex flex-col items-end gap-1">
-                <div className="flex items-center gap-1">
-                  <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
-                  <span className="font-semibold text-gray-900">{module.rating}</span>
-                </div>
-                {module.certificationOffered && (
-                  <Award className="w-4 h-4 text-purple-600" title="Certification offered" />
-                )}
-              </div>
-            </div>
-
-            {/* Skills Gained */}
-            <div className="mb-4">
-              <p className="text-sm font-semibold text-gray-700 mb-2">Skills You'll Gain:</p>
-              <div className="flex flex-wrap gap-2">
-                {module.skillsGained.map((skill, idx) => (
-                  <span key={idx} className="px-2 py-1 bg-green-50 text-green-700 text-xs rounded">
-                    {skill}
-                  </span>
-                ))}
-              </div>
-            </div>
-
-            {/* Info */}
-            <div className="grid grid-cols-2 gap-3 mb-4 p-3 bg-gray-50 rounded-lg text-sm">
-              <div className="flex items-center gap-2 text-gray-600">
-                <Clock className="w-4 h-4" />
-                {module.duration}
-              </div>
-              <div className="flex items-center gap-2 text-gray-600">
-                <Video className="w-4 h-4" />
-                {module.format}
-              </div>
-              <div className="flex items-center gap-2 text-gray-600">
-                <Users className="w-4 h-4" />
-                {module.enrolled} enrolled
-              </div>
-              <div className="flex items-center gap-2 text-gray-600">
-                <Globe className="w-4 h-4" />
-                {module.provider}
-              </div>
-            </div>
-
-            {/* Cost & Actions */}
-            <div className="flex items-center gap-3">
-              <div className="flex-1">
-                <p className="text-sm text-gray-500">Cost per employee</p>
-                <p className="text-xl font-bold text-blue-600">{module.cost}</p>
-              </div>
-              <button className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all font-semibold">
-                Enroll Team
-              </button>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-
-  const renderSkillsAssessment = () => (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-bold text-gray-900">Skills Gap Analysis</h2>
-          <p className="text-gray-600">Identify and address critical skill deficiencies</p>
-        </div>
-        <button className="px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-lg hover:shadow-lg transition-all flex items-center gap-2">
-          <Target className="w-4 h-4" />
-          Run New Assessment
-        </button>
-      </div>
-
-      {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="bg-white rounded-xl border-2 border-red-200 p-4">
-          <div className="flex items-center justify-between mb-2">
-            <p className="text-sm text-gray-600">Critical Gaps</p>
-            <AlertCircle className="w-5 h-5 text-red-600" />
-          </div>
-          <p className="text-3xl font-bold text-gray-900">3</p>
-          <p className="text-xs text-red-600 mt-1">Immediate action required</p>
-        </div>
-        <div className="bg-white rounded-xl border-2 border-orange-200 p-4">
-          <div className="flex items-center justify-between mb-2">
-            <p className="text-sm text-gray-600">Medium Priority</p>
-            <Target className="w-5 h-5 text-orange-600" />
-          </div>
-          <p className="text-3xl font-bold text-gray-900">2</p>
-          <p className="text-xs text-orange-600 mt-1">Plan within quarter</p>
-        </div>
-        <div className="bg-white rounded-xl border-2 border-green-200 p-4">
-          <div className="flex items-center justify-between mb-2">
-            <p className="text-sm text-gray-600">On Track</p>
-            <CheckCircle className="w-5 h-5 text-green-600" />
-          </div>
-          <p className="text-3xl font-bold text-gray-900">1</p>
-          <p className="text-xs text-green-600 mt-1">Meeting targets</p>
-        </div>
-        <div className="bg-white rounded-xl border-2 border-blue-200 p-4">
-          <div className="flex items-center justify-between mb-2">
-            <p className="text-sm text-gray-600">Avg Gap Size</p>
-            <BarChart3 className="w-5 h-5 text-blue-600" />
-          </div>
-          <p className="text-3xl font-bold text-gray-900">21%</p>
-          <p className="text-xs text-blue-600 mt-1">Across all skills</p>
-        </div>
-      </div>
-
-      {/* Skills Gap Details */}
-      <div className="bg-white rounded-xl border-2 border-gray-200 p-6">
-        <h3 className="font-bold text-gray-900 mb-4">Detailed Skills Analysis</h3>
-        <div className="space-y-4">
-          {skillsGaps.map((skill, idx) => (
-            <div key={idx} className="border-2 border-gray-100 rounded-lg p-4">
-              <div className="flex items-start justify-between mb-3">
-                <div className="flex-1">
-                  <h4 className="font-semibold text-gray-900 mb-1">{skill.skill}</h4>
-                  <p className="text-sm text-gray-600">{skill.employees} employees assessed</p>
-                </div>
-                <span className={`px-3 py-1 text-sm rounded-full font-semibold ${
-                  skill.priority === 'High' 
-                    ? 'bg-red-100 text-red-700' 
-                    : skill.priority === 'Medium'
-                    ? 'bg-orange-100 text-orange-700'
-                    : 'bg-blue-100 text-blue-700'
-                }`}>
-                  {skill.priority} Priority
-                </span>
-              </div>
-
-              {/* Progress Bars */}
-              <div className="space-y-3">
-                <div>
-                  <div className="flex items-center justify-between text-sm mb-2">
-                    <span className="text-gray-600">Current Level</span>
-                    <span className="font-semibold text-gray-900">{skill.currentLevel}%</span>
-                  </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div 
-                      className="bg-blue-500 h-2 rounded-full"
-                      style={{ width: `${skill.currentLevel}%` }}
-                    ></div>
-                  </div>
-                </div>
-
-                <div>
-                  <div className="flex items-center justify-between text-sm mb-2">
-                    <span className="text-gray-600">Target Level</span>
-                    <span className="font-semibold text-gray-900">{skill.targetLevel}%</span>
-                  </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div 
-                      className="bg-green-500 h-2 rounded-full"
-                      style={{ width: `${skill.targetLevel}%` }}
-                    ></div>
-                  </div>
-                </div>
-
-                <div className="flex items-center justify-between p-3 bg-orange-50 rounded-lg">
-                  <span className="text-sm font-semibold text-orange-900">Gap to Close</span>
-                  <span className="text-lg font-bold text-orange-600">{skill.gap}%</span>
-                </div>
-              </div>
-
-              {/* Actions */}
-              <div className="mt-4 flex items-center gap-2">
-                <button className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-all text-sm font-semibold">
-                  View Training Plan
-                </button>
-                <button className="px-4 py-2 border-2 border-gray-200 rounded-lg hover:border-purple-300 transition-all text-sm">
-                  Assign Courses
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-
-  const renderLearningPaths = () => (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-bold text-gray-900">Career Learning Paths</h2>
-          <p className="text-gray-600">Structured progression roadmaps for career advancement</p>
-        </div>
-        <button className="px-4 py-2 bg-gradient-to-r from-indigo-500 to-purple-500 text-white rounded-lg hover:shadow-lg transition-all flex items-center gap-2">
-          <Plus className="w-4 h-4" />
-          Create Path
-        </button>
-      </div>
-
-      {/* Learning Paths */}
-      <div className="space-y-6">
-        {learningPaths.map((path) => (
-          <div key={path.id} className="bg-white rounded-xl border-2 border-gray-200 p-6 hover:shadow-lg transition-all">
-            <div className="flex items-start justify-between mb-6">
-              <div className="flex items-center gap-4">
-                <div className="w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-xl flex items-center justify-center">
-                  <MapPin className="w-8 h-8 text-white" />
-                </div>
-                <div>
-                  <h3 className="text-xl font-bold text-gray-900">{path.title}</h3>
-                  <p className="text-gray-600">{path.level}</p>
-                  <div className="flex items-center gap-4 mt-2 text-sm text-gray-600">
-                    <span className="flex items-center gap-1">
-                      <Clock className="w-4 h-4" />
-                      {path.duration}
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <BookOpen className="w-4 h-4" />
-                      {path.courses} courses
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <Users className="w-4 h-4" />
-                      {path.participants} enrolled
-                    </span>
-                  </div>
-                </div>
-              </div>
-              <div className="text-right">
-                <p className="text-sm text-gray-600 mb-1">Avg Salary Increase</p>
-                <p className="text-2xl font-bold text-green-600">+{path.avgSalaryIncrease}</p>
-              </div>
-            </div>
-
-            {/* Stages Timeline */}
-            <div className="mb-6">
-              <h4 className="font-semibold text-gray-900 mb-4">Learning Journey</h4>
-              <div className="relative">
-                <div className="absolute top-6 left-8 right-8 h-0.5 bg-gray-200"></div>
-                <div className="grid grid-cols-3 gap-4 relative">
-                  {path.stages.map((stage, idx) => (
-                    <div key={idx} className="text-center">
-                      <div className="w-12 h-12 mx-auto bg-gradient-to-br from-indigo-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold mb-2 relative z-10">
-                        {idx + 1}
-                      </div>
-                      <h5 className="font-semibold text-gray-900 mb-1">{stage.name}</h5>
-                      <p className="text-sm text-gray-600">{stage.courses} courses</p>
-                      <p className="text-sm text-gray-500">{stage.duration}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            {/* Progress */}
-            <div className="mb-4">
-              <div className="flex items-center justify-between text-sm mb-2">
-                <span className="text-gray-600">Overall Completion Rate</span>
-                <span className="font-semibold text-gray-900">{path.completionRate}%</span>
-              </div>
-              <div className="w-full bg-gray-200 rounded-full h-2">
-                <div 
-                  className="bg-gradient-to-r from-indigo-500 to-purple-500 h-2 rounded-full"
-                  style={{ width: `${path.completionRate}%` }}
-                ></div>
-              </div>
-            </div>
-
-            {/* Actions */}
-            <div className="flex items-center gap-3">
-              <button className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-all font-semibold">
-                View Full Path
-              </button>
-              <button className="px-4 py-2 border-2 border-gray-200 rounded-lg hover:border-indigo-300 transition-all">
-                Enroll Employees
-              </button>
-              <button className="px-4 py-2 border-2 border-gray-200 rounded-lg hover:border-indigo-300 transition-all">
-                <Download className="w-4 h-4 text-gray-600" />
-              </button>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* Create Custom Path CTA */}
-      <div className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-xl border-2 border-indigo-200 p-8 text-center">
-        <Rocket className="w-12 h-12 text-indigo-600 mx-auto mb-4" />
-        <h3 className="text-xl font-bold text-gray-900 mb-2">Create Custom Learning Path</h3>
-        <p className="text-gray-600 mb-4">Design personalized career progression roadmaps for your teams</p>
-        <button className="px-6 py-3 bg-gradient-to-r from-indigo-500 to-purple-500 text-white rounded-lg hover:shadow-lg transition-all font-semibold">
-          Get Started
-        </button>
-      </div>
-    </div>
-  );
-
-  const renderAnalytics = () => (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-bold text-gray-900">Learning Analytics & Insights</h2>
-          <p className="text-gray-600">Comprehensive training effectiveness metrics</p>
-        </div>
-        <div className="flex items-center gap-2">
-          <button className="px-4 py-2 border-2 border-gray-200 rounded-lg hover:border-blue-300 transition-all flex items-center gap-2">
-            <Filter className="w-4 h-4" />
-            Filters
-          </button>
-          <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all flex items-center gap-2">
-            <Download className="w-4 h-4" />
-            Export Report
-          </button>
-        </div>
-      </div>
-
-      {/* KPI Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white rounded-xl border-2 border-blue-200 p-6">
-          <div className="flex items-center justify-between mb-3">
-            <Activity className="w-8 h-8 text-blue-600" />
-            <TrendingUp className="w-5 h-5 text-green-600" />
-          </div>
-          <p className="text-sm text-gray-600 mb-1">Engagement Rate</p>
-          <p className="text-3xl font-bold text-gray-900">94.5%</p>
-          <p className="text-sm text-green-600 mt-1">+12% from last month</p>
-        </div>
-
-        <div className="bg-white rounded-xl border-2 border-purple-200 p-6">
-          <div className="flex items-center justify-between mb-3">
-            <Trophy className="w-8 h-8 text-purple-600" />
-            <TrendingUp className="w-5 h-5 text-green-600" />
-          </div>
-          <p className="text-sm text-gray-600 mb-1">Avg Completion Time</p>
-          <p className="text-3xl font-bold text-gray-900">4.2 days</p>
-          <p className="text-sm text-green-600 mt-1">-18% faster</p>
-        </div>
-
-        <div className="bg-white rounded-xl border-2 border-green-200 p-6">
-          <div className="flex items-center justify-between mb-3">
-            <Target className="w-8 h-8 text-green-600" />
-            <TrendingUp className="w-5 h-5 text-green-600" />
-          </div>
-          <p className="text-sm text-gray-600 mb-1">Skills Acquired</p>
-          <p className="text-3xl font-bold text-gray-900">1,247</p>
-          <p className="text-sm text-green-600 mt-1">+156 this quarter</p>
-        </div>
-
-        <div className="bg-white rounded-xl border-2 border-orange-200 p-6">
-          <div className="flex items-center justify-between mb-3">
-            <DollarSign className="w-8 h-8 text-orange-600" />
-            <TrendingDown className="w-5 h-5 text-green-600" />
-          </div>
-          <p className="text-sm text-gray-600 mb-1">Cost per Employee</p>
-          <p className="text-3xl font-bold text-gray-900">RM 1,640</p>
-          <p className="text-sm text-green-600 mt-1">-8% optimized</p>
-        </div>
-      </div>
+        </GlassmorphicCard>
+      </SlideIn>
 
       {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Completion Trends */}
-        <div className="bg-white rounded-xl border-2 border-gray-200 p-6">
-          <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
-            <LineChart className="w-5 h-5 text-blue-600" />
-            Completion Trends (6 Months)
-          </h3>
-          <div className="h-64 flex items-end justify-between gap-2">
-            {[65, 72, 78, 81, 85, 87].map((value, idx) => (
-              <div key={idx} className="flex-1 flex flex-col items-center">
-                <div className="w-full bg-gradient-to-t from-blue-500 to-cyan-500 rounded-t-lg transition-all hover:opacity-80" style={{ height: `${value}%` }}></div>
-                <span className="text-xs text-gray-500 mt-2">{['Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][idx]}</span>
+        <SlideIn direction="left" delay={0.3}>
+          <GlassmorphicCard gradient="from-white/80 to-white/60" blur="xl">
+            <div className="p-6">
+              <h3 className="text-lg font-bold text-gray-900 mb-4">Course Categories</h3>
+              <div style={{ width: '100%', height: '250px', minHeight: '250px' }}>
+                <ResponsiveContainer width="100%" height="100%" minHeight={250}>
+                  <PieChart>
+                    <Pie
+                      data={categoryDistributionData}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={60}
+                      outerRadius={90}
+                      paddingAngle={5}
+                      dataKey="value"
+                      label={({ name, value }) => `${name}: ${value}`}
+                    >
+                      {categoryDistributionData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                  </PieChart>
+                </ResponsiveContainer>
               </div>
-            ))}
-          </div>
-        </div>
+            </div>
+          </GlassmorphicCard>
+        </SlideIn>
 
-        {/* Category Distribution */}
-        <div className="bg-white rounded-xl border-2 border-gray-200 p-6">
-          <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
-            <PieChart className="w-5 h-5 text-purple-600" />
-            Training by Category
-          </h3>
-          <div className="space-y-3">
-            {[
-              { name: 'Technical Skills', value: 35, color: 'blue' },
-              { name: 'Leadership', value: 25, color: 'purple' },
-              { name: 'Soft Skills', value: 20, color: 'green' },
-              { name: 'Compliance', value: 12, color: 'orange' },
-              { name: 'Other', value: 8, color: 'gray' }
-            ].map((cat, idx) => (
-              <div key={idx}>
-                <div className="flex items-center justify-between text-sm mb-2">
-                  <span className="text-gray-700">{cat.name}</span>
-                  <span className="font-semibold text-gray-900">{cat.value}%</span>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div 
-                    className={`bg-${cat.color}-500 h-2 rounded-full`}
-                    style={{ width: `${cat.value}%` }}
-                  ></div>
-                </div>
+        <SlideIn direction="right" delay={0.3}>
+          <GlassmorphicCard gradient="from-white/80 to-white/60" blur="xl">
+            <div className="p-6">
+              <h3 className="text-lg font-bold text-gray-900 mb-4">Learning Trends</h3>
+              <div style={{ width: '100%', height: '250px', minHeight: '250px' }}>
+                <ResponsiveContainer width="100%" height="100%" minHeight={250}>
+                  <LineChart data={monthlyEnrollmentData}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
+                    <XAxis dataKey="month" stroke="#6B7280" />
+                    <YAxis stroke="#6B7280" />
+                    <Tooltip />
+                    <Legend />
+                    <Line type="monotone" dataKey="enrollments" stroke="#8B5CF6" strokeWidth={3} dot={{ fill: '#8B5CF6', r: 4 }} />
+                    <Line type="monotone" dataKey="completions" stroke="#10B981" strokeWidth={3} dot={{ fill: '#10B981', r: 4 }} />
+                  </LineChart>
+                </ResponsiveContainer>
               </div>
-            ))}
+            </div>
+          </GlassmorphicCard>
+        </SlideIn>
+
+        <SlideIn direction="left" delay={0.4}>
+          <GlassmorphicCard gradient="from-white/80 to-white/60" blur="xl">
+            <div className="p-6">
+              <h3 className="text-lg font-bold text-gray-900 mb-4">Top Skills Developed</h3>
+              <div style={{ width: '100%', height: '250px', minHeight: '250px' }}>
+                <ResponsiveContainer width="100%" height="100%" minHeight={250}>
+                  <BarChart data={skillsDevelopmentData} layout="vertical">
+                    <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
+                    <XAxis type="number" stroke="#6B7280" />
+                    <YAxis type="category" dataKey="skill" stroke="#6B7280" width={100} />
+                    <Tooltip />
+                    <Bar dataKey="employees" fill="#8B5CF6" radius={[0, 8, 8, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+          </GlassmorphicCard>
+        </SlideIn>
+
+        <SlideIn direction="right" delay={0.4}>
+          <GlassmorphicCard gradient="from-white/80 to-white/60" blur="xl">
+            <div className="p-6">
+              <h3 className="text-lg font-bold text-gray-900 mb-4">Learning Path Performance</h3>
+              <div style={{ width: '100%', height: '250px', minHeight: '250px' }}>
+                <ResponsiveContainer width="100%" height="100%" minHeight={250}>
+                  <RadarChart data={learningPathData}>
+                    <PolarGrid stroke="#E5E7EB" />
+                    <PolarAngleAxis dataKey="category" stroke="#6B7280" />
+                    <PolarRadiusAxis stroke="#6B7280" />
+                    <Radar name="Performance" dataKey="score" stroke="#8B5CF6" fill="#8B5CF6" fillOpacity={0.6} />
+                    <Tooltip />
+                  </RadarChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+          </GlassmorphicCard>
+        </SlideIn>
+      </div>
+
+      {/* Featured Courses */}
+      <SlideIn direction="up" delay={0.5}>
+        <GlassmorphicCard gradient="from-white/80 to-white/60" blur="xl">
+          <div className="p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-bold text-gray-900">Featured Courses</h3>
+              <button
+                onClick={() => setViewMode('courses')}
+                className="text-blue-600 hover:text-blue-700 font-medium text-sm flex items-center gap-1"
+              >
+                View All <ArrowRight className="w-4 h-4" />
+              </button>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {courses.slice(0, 3).map((course, index) => (
+                <motion.div
+                  key={course.id}
+                  className="bg-white/50 backdrop-blur-sm rounded-xl p-4 border border-white/20 hover:border-blue-300 transition-all cursor-pointer"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                  whileHover={{ scale: 1.02 }}
+                >
+                  <div className="text-4xl mb-3">{course.thumbnail}</div>
+                  <h4 className="font-semibold text-gray-900 mb-2">{course.title}</h4>
+                  <p className="text-sm text-gray-600 mb-3">{course.instructor}</p>
+                  <div className="flex items-center justify-between text-sm">
+                    <div className="flex items-center gap-1">
+                      <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
+                      <span className="font-semibold">{course.rating}</span>
+                    </div>
+                    <span className="text-gray-600">{course.duration}</span>
+                  </div>
+                  <div className="mt-3 flex items-center justify-between">
+                    <span className={`px-2 py-1 rounded-full text-xs border ${getLevelColor(course.level)}`}>
+                      {course.level}
+                    </span>
+                    <span className="text-xs text-gray-600">{course.enrolled} enrolled</span>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
           </div>
+        </GlassmorphicCard>
+      </SlideIn>
+    </div>
+  );
+
+  const renderCourses = () => (
+    <div className="space-y-6">
+      <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+        <h3 className="text-xl font-bold text-gray-900">Course Library</h3>
+        <div className="flex items-center gap-2 w-full sm:w-auto">
+          <GlassInput
+            value={searchQuery}
+            onChange={setSearchQuery}
+            placeholder="Search courses..."
+            icon={<Search className="w-5 h-5" />}
+          />
+          <select
+            value={selectedCategory}
+            onChange={(e) => setSelectedCategory(e.target.value)}
+            className="px-4 py-3 bg-white/10 backdrop-blur-md border border-white/20 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+          >
+            <option value="all">All Categories</option>
+            <option value="Technical">Technical</option>
+            <option value="Leadership">Leadership</option>
+            <option value="Soft Skills">Soft Skills</option>
+            <option value="Compliance">Compliance</option>
+            <option value="Management">Management</option>
+          </select>
+          <GlassButton variant="primary" onClick={() => {}}>
+            <Plus className="w-4 h-4 mr-2" />
+            Add Course
+          </GlassButton>
         </div>
       </div>
 
-      {/* ROI Analysis */}
-      <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl border-2 border-green-200 p-6">
-        <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
-          <TrendingUp className="w-5 h-5 text-green-600" />
-          Training ROI Analysis
-        </h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div>
-            <p className="text-sm text-gray-600 mb-2">Total Investment</p>
-            <p className="text-2xl font-bold text-gray-900">RM 2.4M</p>
-            <p className="text-sm text-green-600 mt-1">Annual budget</p>
-          </div>
-          <div>
-            <p className="text-sm text-gray-600 mb-2">Productivity Increase</p>
-            <p className="text-2xl font-bold text-gray-900">+18.5%</p>
-            <p className="text-sm text-green-600 mt-1">Post-training improvement</p>
-          </div>
-          <div>
-            <p className="text-sm text-gray-600 mb-2">Estimated ROI</p>
-            <p className="text-2xl font-bold text-green-600">340%</p>
-            <p className="text-sm text-gray-600 mt-1">RM 8.2M value generated</p>
-          </div>
-        </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {filteredCourses.map((course, index) => (
+          <motion.div
+            key={course.id}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: index * 0.05 }}
+          >
+            <GlassmorphicCard gradient="from-white/80 to-white/60" blur="xl">
+              <div className="p-6">
+                <div className="flex items-start justify-between mb-3">
+                  <div className="text-5xl">{course.thumbnail}</div>
+                  <div className="flex items-center gap-2">
+                    <button className="p-2 hover:bg-white/50 rounded-lg transition-colors">
+                      <Eye className="w-4 h-4 text-gray-600" />
+                    </button>
+                    <button className="p-2 hover:bg-white/50 rounded-lg transition-colors">
+                      <Edit className="w-4 h-4 text-gray-600" />
+                    </button>
+                  </div>
+                </div>
+                <h4 className="font-bold text-gray-900 mb-2">{course.title}</h4>
+                <p className="text-sm text-gray-600 mb-3">{course.instructor}</p>
+                <div className="flex flex-wrap gap-2 mb-3">
+                  {course.skills.map((skill, idx) => (
+                    <span key={idx} className="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-full">
+                      {skill}
+                    </span>
+                  ))}
+                </div>
+                <div className="flex items-center justify-between text-sm mb-3">
+                  <div className="flex items-center gap-1">
+                    <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
+                    <span className="font-semibold">{course.rating}</span>
+                  </div>
+                  <div className="flex items-center gap-1 text-gray-600">
+                    <Clock className="w-4 h-4" />
+                    <span>{course.duration}</span>
+                  </div>
+                  <span className={`px-2 py-1 rounded-full text-xs border ${getLevelColor(course.level)}`}>
+                    {course.level}
+                  </span>
+                </div>
+                <div className="border-t border-gray-200 pt-3">
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-gray-600">{course.enrolled} enrolled</span>
+                    <span className="font-semibold text-green-600">
+                      {Math.round((course.completed / course.enrolled) * 100)}% completed
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </GlassmorphicCard>
+          </motion.div>
+        ))}
+      </div>
+    </div>
+  );
+
+  const renderEmployees = () => (
+    <div className="space-y-6">
+      <h3 className="text-xl font-bold text-gray-900">Employee Learning Progress</h3>
+
+      <div className="grid grid-cols-1 gap-4">
+        {employeeProgress.map((employee, index) => (
+          <motion.div
+            key={employee.id}
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: index * 0.1 }}
+          >
+            <GlassmorphicCard gradient="from-white/80 to-white/60" blur="xl">
+              <div className="p-6">
+                <div className="flex items-start justify-between mb-4">
+                  <div className="flex items-start gap-4 flex-1">
+                    <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center text-white font-bold text-xl">
+                      {employee.name.split(' ').map(n => n[0]).join('').slice(0, 2)}
+                    </div>
+                    <div className="flex-1">
+                      <h4 className="text-lg font-bold text-gray-900 mb-1">{employee.name}</h4>
+                      <p className="text-sm text-gray-600 mb-3">{employee.department}</p>
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm">
+                        <div>
+                          <p className="text-gray-500">Courses</p>
+                          <p className="font-semibold text-gray-900">
+                            {employee.coursesCompleted}/{employee.coursesEnrolled}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-gray-500">Certifications</p>
+                          <p className="font-semibold text-gray-900">{employee.certificationsEarned}</p>
+                        </div>
+                        <div>
+                          <p className="text-gray-500">Hours Learned</p>
+                          <p className="font-semibold text-gray-900">{employee.hoursLearned}h</p>
+                        </div>
+                        <div>
+                          <p className="text-gray-500">Avg Score</p>
+                          <p className="font-semibold text-green-600">{employee.averageScore}%</p>
+                        </div>
+                      </div>
+                      <div className="mt-3">
+                        <p className="text-sm text-gray-600 mb-2">Skills Acquired:</p>
+                        <div className="flex flex-wrap gap-2">
+                          {employee.skillsAcquired.map((skill, idx) => (
+                            <span key={idx} className="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">
+                              {skill}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                      {employee.currentCourses.length > 0 && (
+                        <div className="mt-3">
+                          <p className="text-sm text-gray-600 mb-2">Current Courses:</p>
+                          <div className="flex flex-wrap gap-2">
+                            {employee.currentCourses.map((course, idx) => (
+                              <span key={idx} className="px-2 py-1 bg-orange-100 text-orange-700 text-xs rounded-full">
+                                {course}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button className="p-2 hover:bg-white/50 rounded-lg transition-colors">
+                      <Eye className="w-5 h-5 text-gray-600" />
+                    </button>
+                    <button className="p-2 hover:bg-white/50 rounded-lg transition-colors">
+                      <Trophy className="w-5 h-5 text-gray-600" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </GlassmorphicCard>
+          </motion.div>
+        ))}
+      </div>
+    </div>
+  );
+
+  const renderCertifications = () => (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h3 className="text-xl font-bold text-gray-900">Certifications</h3>
+        <GlassButton variant="primary" onClick={() => {}}>
+          <Plus className="w-4 h-4 mr-2" />
+          Add Certification
+        </GlassButton>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {certifications.map((cert, index) => (
+          <motion.div
+            key={cert.id}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: index * 0.1 }}
+          >
+            <GlassmorphicCard gradient="from-white/80 to-white/60" blur="xl">
+              <div className="p-6">
+                <div className="flex items-start gap-4">
+                  <div className="text-5xl">{cert.icon}</div>
+                  <div className="flex-1">
+                    <h4 className="font-bold text-gray-900 mb-1">{cert.name}</h4>
+                    <p className="text-sm text-gray-600 mb-2">{cert.issuer}</p>
+                    <div className="flex items-center gap-4 text-sm text-gray-600 mb-3">
+                      <div className="flex items-center gap-1">
+                        <Briefcase className="w-4 h-4" />
+                        <span>{cert.category}</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <Calendar className="w-4 h-4" />
+                        <span>{cert.validityPeriod}</span>
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <UserCheck className="w-4 h-4 text-green-600" />
+                        <span className="text-sm font-semibold text-gray-900">
+                          {cert.employeesEarned} employees earned
+                        </span>
+                      </div>
+                      <button className="p-2 hover:bg-white/50 rounded-lg transition-colors">
+                        <Eye className="w-5 h-5 text-gray-600" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </GlassmorphicCard>
+          </motion.div>
+        ))}
       </div>
     </div>
   );
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
-            <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center">
-              <GraduationCap className="w-7 h-7 text-white" />
-            </div>
-            Learning & Development
-          </h1>
-          <p className="text-gray-600 mt-1">
-            Comprehensive training, upskilling, and career development platform
-          </p>
-        </div>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-cyan-50 to-purple-50 p-4 sm:p-6 lg:p-8">
+      {/* Animated Background */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        <motion.div
+          className="absolute bottom-20 left-10 w-96 h-96 bg-cyan-300/30 rounded-full blur-3xl"
+          animate={{
+            scale: [1, 1.2, 1],
+            opacity: [0.3, 0.5, 0.3],
+          }}
+          transition={{
+            duration: 8,
+            repeat: Infinity,
+            ease: 'easeInOut',
+          }}
+        />
       </div>
 
-      {/* Tabs */}
-      <div className="bg-white rounded-xl border-2 border-gray-200 p-2">
-        <div className="flex flex-wrap gap-2">
-          {[
-            { id: 'overview', label: 'Overview', icon: LayoutDashboard },
-            { id: 'development-programs', label: 'Development Programs', icon: Rocket },
-            { id: 'upskilling', label: 'Upskilling Modules', icon: Zap },
-            { id: 'skills-assessment', label: 'Skills Assessment', icon: Target },
-            { id: 'learning-paths', label: 'Learning Paths', icon: MapPin },
-            { id: 'analytics', label: 'Analytics', icon: BarChart3 },
-          ].map((tab) => {
-            const Icon = tab.icon;
-            return (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id as Tab)}
-                className={`px-4 py-2 rounded-lg transition-all flex items-center gap-2 ${
-                  activeTab === tab.id
-                    ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg'
-                    : 'text-gray-700 hover:bg-gray-100'
-                }`}
+      <div className="relative z-10 space-y-6">
+        {/* Header */}
+        <SlideIn direction="down">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+              <motion.h1 
+                className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
               >
-                <Icon className="w-4 h-4" />
-                <span className="font-medium">{tab.label}</span>
-              </button>
-            );
-          })}
-        </div>
-      </div>
+                Learning & Development
+              </motion.h1>
+              <p className="text-gray-600 mt-2">Empower your team with continuous learning</p>
+            </div>
+          </div>
+        </SlideIn>
 
-      {/* Content */}
-      <div>
-        {activeTab === 'overview' && renderOverview()}
-        {activeTab === 'development-programs' && renderDevelopmentPrograms()}
-        {activeTab === 'upskilling' && renderUpskilling()}
-        {activeTab === 'skills-assessment' && renderSkillsAssessment()}
-        {activeTab === 'learning-paths' && renderLearningPaths()}
-        {activeTab === 'analytics' && renderAnalytics()}
+        {/* Navigation Tabs */}
+        <SlideIn direction="down" delay={0.1}>
+          <GlassmorphicCard gradient="from-white/80 to-white/60" blur="xl">
+            <div className="p-2">
+              <div className="flex flex-wrap gap-2">
+                {[
+                  { id: 'dashboard', name: 'Dashboard', icon: BarChart3 },
+                  { id: 'courses', name: 'Courses', icon: BookOpen },
+                  { id: 'employees', name: 'Employee Progress', icon: Users },
+                  { id: 'certifications', name: 'Certifications', icon: Award },
+                  { id: 'analytics', name: 'Analytics', icon: TrendingUp },
+                ].map((tab) => {
+                  const Icon = tab.icon;
+                  return (
+                    <button
+                      key={tab.id}
+                      onClick={() => setViewMode(tab.id as ViewMode)}
+                      className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${
+                        viewMode === tab.id
+                          ? 'bg-gradient-to-r from-blue-500 to-cyan-500 text-white shadow-lg'
+                          : 'bg-white/30 text-gray-700 hover:bg-white/50'
+                      }`}
+                    >
+                      <Icon className="w-4 h-4" />
+                      <span className="hidden sm:inline">{tab.name}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </GlassmorphicCard>
+        </SlideIn>
+
+        {/* Content */}
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={viewMode}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.3 }}
+          >
+            {viewMode === 'dashboard' && renderDashboard()}
+            {viewMode === 'courses' && renderCourses()}
+            {viewMode === 'employees' && renderEmployees()}
+            {viewMode === 'certifications' && renderCertifications()}
+            {viewMode === 'analytics' && renderDashboard()}
+          </motion.div>
+        </AnimatePresence>
       </div>
     </div>
   );

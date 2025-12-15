@@ -4,13 +4,18 @@ import { RBACProvider } from './contexts/RBACContext';
 import { Dashboard } from './components/Dashboard';
 import { EmployeeDirectory } from './components/EmployeeDirectory';
 import { LeaveManagement } from './components/LeaveManagement';
+import { LeaveManagementEnhanced } from './components/LeaveManagementEnhanced';
 import { AttendanceTracking } from './components/AttendanceTracking';
+import { AttendanceTrackingEnhanced } from './components/AttendanceTrackingEnhanced';
 import { PayrollOverview } from './components/PayrollOverview';
+import { PayrollEnhanced } from './components/PayrollEnhanced';
 import { ComplianceCenter } from './components/ComplianceCenter';
+import { ComplianceEnhanced } from './components/ComplianceEnhanced';
 import { ReportsAnalytics } from './components/ReportsAnalytics';
 import { IndustrialRelations } from './components/IndustrialRelations';
 import { EmployeeRelations } from './components/EmployeeRelations';
 import { ForeignWorkers } from './components/ForeignWorkers';
+import { ExpatriateManagement } from './components/ExpatriateManagement';
 import { ZakatManagement } from './components/ZakatManagement';
 import { DatabaseManagement } from './components/DatabaseManagement';
 import { TenantManagement } from './components/TenantManagement';
@@ -22,9 +27,12 @@ import { WorkflowBuilder } from './components/WorkflowBuilder';
 import { MultilevelSidebar } from './components/MultilevelSidebar';
 import { AIChat } from './components/AIChat';
 import { LearningDevelopment } from './components/LearningDevelopment';
+import { AnimatedDashboard } from './components/AnimatedDashboard';
+import { AnimationShowcase } from './components/AnimationShowcase';
 import { CalendarView } from './components/CalendarView';
 import { TeacherScheduling } from './components/TeacherScheduling';
 import { ComingSoon } from './components/ComingSoon';
+import { TalentAcquisition } from './components/TalentAcquisition';
 import { 
   LayoutDashboard, 
   Users, 
@@ -62,6 +70,7 @@ type Tab =
   | 'industrial-relations'
   | 'employee-relations'
   | 'foreign-workers'
+  | 'expatriate-management'
   | 'zakat'
   | 'talent'
   | 'learning'
@@ -78,6 +87,7 @@ type Tab =
   | 'department-view'
   | 'team-hierarchy'
   | 'ai-chat'
+  | 'animation-showcase'
   | 'settings';
 
 function AppContent() {
@@ -151,25 +161,33 @@ function AppContent() {
       section: 'advanced'
     },
     { 
+      id: 'expatriate-management', 
+      name: 'Expatriate Management', 
+      icon: Globe,
+      section: 'advanced'
+    },
+    { 
       id: 'zakat', 
       name: 'Zakat Management', 
       icon: Sparkles,
       section: 'advanced',
       badge: 'Islamic'
     },
-    // Coming Soon
     { 
       id: 'talent', 
       name: 'Talent Acquisition', 
       icon: Users,
-      section: 'coming-soon'
+      section: 'advanced',
+      badge: 'AI'
     },
     { 
       id: 'learning', 
       name: 'Learning & Development', 
       icon: GraduationCap,
-      section: 'coming-soon'
+      section: 'advanced',
+      badge: 'AI'
     },
+    // Coming Soon
     { 
       id: 'performance', 
       name: 'Performance Management', 
@@ -252,6 +270,13 @@ function AppContent() {
       icon: Sparkles,
       section: 'settings'
     },
+    // Animation Showcase
+    { 
+      id: 'animation-showcase', 
+      name: 'Animation Showcase', 
+      icon: Sparkles,
+      section: 'settings'
+    },
     // Settings
     { 
       id: 'settings', 
@@ -264,17 +289,17 @@ function AppContent() {
   const renderContent = () => {
     switch (activeTab) {
       case 'dashboard':
-        return <Dashboard onNavigate={(tab) => setActiveTab(tab as Tab)} />;
+        return <AnimatedDashboard onNavigate={(tab) => setActiveTab(tab as Tab)} />;
       case 'employees':
         return <EmployeeDirectory />;
       case 'leave':
-        return <LeaveManagement />;
+        return <LeaveManagementEnhanced />;
       case 'attendance':
-        return <AttendanceTracking />;
+        return <AttendanceTrackingEnhanced />;
       case 'payroll':
-        return <PayrollOverview />;
+        return <PayrollEnhanced />;
       case 'compliance':
-        return <ComplianceCenter />;
+        return <ComplianceEnhanced />;
       case 'reports':
         return <ReportsAnalytics />;
       case 'industrial-relations':
@@ -283,10 +308,12 @@ function AppContent() {
         return <EmployeeRelations />;
       case 'foreign-workers':
         return <ForeignWorkers />;
+      case 'expatriate-management':
+        return <ExpatriateManagement />;
       case 'zakat':
         return <ZakatManagement />;
       case 'talent':
-        return <ComingSoon module="Talent Acquisition" />;
+        return <TalentAcquisition />;
       case 'learning':
         return <LearningDevelopment />;
       case 'performance':
@@ -315,10 +342,12 @@ function AppContent() {
         return <ComingSoon module="Team Hierarchy" />;
       case 'ai-chat':
         return <AIChat />;
+      case 'animation-showcase':
+        return <AnimationShowcase />;
       case 'settings':
         return <ComingSoon module="Settings" />;
       default:
-        return <Dashboard onNavigate={(tab) => setActiveTab(tab as Tab)} />;
+        return <AnimatedDashboard onNavigate={(tab) => setActiveTab(tab as Tab)} />;
     }
   };
 
