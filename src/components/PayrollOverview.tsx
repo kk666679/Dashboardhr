@@ -122,7 +122,7 @@ export function PayrollOverview() {
             Export
           </button>
         </div>
-        <ResponsiveContainer width="100%" height={300}>
+        <ResponsiveContainer width="100%" height={300} minHeight={300}>
           <BarChart data={monthlyData}>
             <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
             <XAxis dataKey="month" stroke="#6b7280" />

@@ -1,5 +1,20 @@
 import React from 'react';
 import { FileCheck, AlertTriangle, CheckCircle, Clock, Shield, BookOpen } from 'lucide-react';
+import {
+  PieChart,
+  Pie,
+  Cell,
+  BarChart,
+  Bar,
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from 'recharts';
 
 export function ComplianceCenter() {
   const complianceItems = [
@@ -74,6 +89,29 @@ export function ComplianceCenter() {
     },
   ];
 
+  // Chart data
+  const complianceOverviewData = [
+    { name: 'Compliant', value: 15, fill: '#10B981' },
+    { name: 'Warning', value: 1, fill: '#F59E0B' },
+    { name: 'Critical', value: 0, fill: '#EF4444' },
+  ];
+
+  const complianceTrendData = [
+    { month: 'Jan', score: 92 },
+    { month: 'Feb', score: 94 },
+    { month: 'Mar', score: 93 },
+    { month: 'Apr', score: 95 },
+    { month: 'May', score: 96 },
+    { month: 'Jun', score: 94 },
+  ];
+
+  const categoryScoresData = [
+    { category: 'Employment Act', score: 100 },
+    { category: 'Leave', score: 100 },
+    { category: 'Statutory', score: 93 },
+    { category: 'Safety', score: 100 },
+  ];
+
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'compliant':
@@ -136,6 +174,74 @@ export function ComplianceCenter() {
                 <span className="text-sm text-gray-700 dark:text-gray-300 transition-colors duration-300">1 Item Needs Attention</span>
               </div>
             </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Charts Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Compliance Overview Pie Chart */}
+        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 transition-colors duration-300">
+          <h3 className="text-gray-900 dark:text-gray-100 mb-4 transition-colors duration-300">Compliance Overview</h3>
+          <div style={{ width: '100%', height: '250px', minHeight: '250px' }}>
+            <ResponsiveContainer width="100%" height="100%" minHeight={250}>
+              <PieChart>
+                <Pie
+                  data={complianceOverviewData}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={50}
+                  outerRadius={80}
+                  paddingAngle={5}
+                  dataKey="value"
+                  label={({ name, value }) => `${name}: ${value}`}
+                >
+                  {complianceOverviewData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.fill} />
+                  ))}
+                </Pie>
+                <Tooltip />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        {/* Compliance Trend Area Chart */}
+        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 transition-colors duration-300">
+          <h3 className="text-gray-900 dark:text-gray-100 mb-4 transition-colors duration-300">Compliance Score Trend</h3>
+          <div style={{ width: '100%', height: '250px', minHeight: '250px' }}>
+            <ResponsiveContainer width="100%" height="100%" minHeight={250}>
+              <AreaChart data={complianceTrendData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
+                <XAxis dataKey="month" stroke="#6B7280" />
+                <YAxis stroke="#6B7280" domain={[80, 100]} />
+                <Tooltip />
+                <Area 
+                  type="monotone" 
+                  dataKey="score" 
+                  stroke="#3B82F6" 
+                  fill="#3B82F6" 
+                  fillOpacity={0.6} 
+                  name="Compliance Score %"
+                />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        {/* Category Scores Bar Chart */}
+        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 transition-colors duration-300">
+          <h3 className="text-gray-900 dark:text-gray-100 mb-4 transition-colors duration-300">Category Scores</h3>
+          <div style={{ width: '100%', height: '250px', minHeight: '250px' }}>
+            <ResponsiveContainer width="100%" height="100%" minHeight={250}>
+              <BarChart data={categoryScoresData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
+                <XAxis dataKey="category" stroke="#6B7280" angle={-45} textAnchor="end" height={80} />
+                <YAxis stroke="#6B7280" domain={[0, 100]} />
+                <Tooltip />
+                <Bar dataKey="score" fill="#10B981" radius={[8, 8, 0, 0]} name="Score %" />
+              </BarChart>
+            </ResponsiveContainer>
           </div>
         </div>
       </div>

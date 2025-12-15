@@ -157,6 +157,9 @@
 @layer base {
   * {
     @apply border-border outline-ring/50;
+    transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 200ms;
   }
 
   body {
@@ -164,6 +167,7 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     font-family: var(--font-sans);
+    transition: background-color 300ms ease-in-out, color 300ms ease-in-out;
   }
 }
 
@@ -224,6 +228,46 @@
 
 html {
   font-size: var(--font-size);
+}
+
+/* Smooth transitions for theme changes */
+html.transitioning,
+html.transitioning *,
+html.transitioning *:before,
+html.transitioning *:after {
+  transition: background-color 300ms ease-in-out, 
+              color 300ms ease-in-out, 
+              border-color 300ms ease-in-out,
+              fill 300ms ease-in-out,
+              stroke 300ms ease-in-out !important;
+  transition-delay: 0s !important;
+}
+
+/* Semantic color utilities for easier theming */
+@layer utilities {
+  .text-theme-primary {
+    color: var(--primary);
+  }
+  
+  .text-theme-secondary {
+    color: var(--secondary);
+  }
+  
+  .text-theme-accent {
+    color: var(--accent);
+  }
+  
+  .bg-theme-card {
+    background-color: var(--card);
+  }
+  
+  .border-theme {
+    border-color: var(--border);
+  }
+  
+  .shadow-theme {
+    box-shadow: var(--shadow);
+  }
 }
 
 /* Neo-Brutalism specific styles */

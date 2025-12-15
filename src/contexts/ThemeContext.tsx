@@ -28,12 +28,23 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     // Update localStorage
     localStorage.setItem('hrms-theme', theme);
     
+    // Add transitioning class for smooth color changes
+    const root = document.documentElement;
+    root.classList.add('transitioning');
+    
     // Update document class
     if (theme === 'dark') {
-      document.documentElement.classList.add('dark');
+      root.classList.add('dark');
     } else {
-      document.documentElement.classList.remove('dark');
+      root.classList.remove('dark');
     }
+    
+    // Remove transitioning class after transition completes
+    const timer = setTimeout(() => {
+      root.classList.remove('transitioning');
+    }, 300);
+    
+    return () => clearTimeout(timer);
   }, [theme]);
 
   const toggleTheme = () => {

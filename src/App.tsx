@@ -319,10 +319,10 @@ function AppContent() {
   };
 
   return (
-    <div className="flex h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-purple-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-900 transition-colors duration-300">
+    <div className="flex h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-purple-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-900">
       {/* Sidebar */}
       <aside 
-        className={`fixed lg:static inset-y-0 left-0 z-50 border-r-4 transition-all duration-300 ease-in-out shadow-lg ${
+        className={`fixed lg:static inset-y-0 left-0 z-50 border-r-4 shadow-lg transition-all duration-300 ease-in-out ${
           sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
         } ${
           sidebarCollapsed ? 'lg:w-20' : 'lg:w-72'

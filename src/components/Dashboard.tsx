@@ -307,7 +307,7 @@ export function Dashboard({ onNavigate }: DashboardProps) {
             </div>
             <Target className="w-6 h-6 text-purple-600" />
           </div>
-          <ResponsiveContainer width="100%" height={300}>
+          <ResponsiveContainer width="100%" height={300} minHeight={300}>
             <ComposedChart data={headcountGrowthData}>
               <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
               <XAxis dataKey="month" stroke="#6B7280" />
@@ -426,7 +426,7 @@ export function Dashboard({ onNavigate }: DashboardProps) {
             </div>
             <Calendar className="w-6 h-6 text-violet-600" />
           </div>
-          <ResponsiveContainer width="100%" height={250}>
+          <ResponsiveContainer width="100%" height={250} minHeight={250}>
             <PieChart>
               <Pie
                 data={leaveTypeData}
@@ -508,7 +508,7 @@ export function Dashboard({ onNavigate }: DashboardProps) {
           </div>
           <Target className="w-6 h-6 text-purple-600" />
         </div>
-        <ResponsiveContainer width="100%" height={350}>
+        <ResponsiveContainer width="100%" height={350} minHeight={350}>
           <RadarChart data={performanceRadarData}>
             <PolarGrid stroke="#E5E7EB" />
             <PolarAngleAxis dataKey="skill" stroke="#6B7280" />
