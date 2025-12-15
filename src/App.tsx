@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { TenantProvider } from './contexts/TenantContext';
 import { RBACProvider } from './contexts/RBACContext';
+import { ThemeProvider } from './contexts/ThemeContext';
 import { Dashboard } from './components/Dashboard';
 import { EmployeeDirectory } from './components/EmployeeDirectory';
+import { EmployeeDirectoryEnhanced } from './components/EmployeeDirectoryEnhanced';
 import { LeaveManagement } from './components/LeaveManagement';
 import { LeaveManagementEnhanced } from './components/LeaveManagementEnhanced';
 import { AttendanceTracking } from './components/AttendanceTracking';
@@ -16,11 +18,15 @@ import { IndustrialRelations } from './components/IndustrialRelations';
 import { EmployeeRelations } from './components/EmployeeRelations';
 import { ForeignWorkers } from './components/ForeignWorkers';
 import { ExpatriateManagement } from './components/ExpatriateManagement';
+import { PerformanceManagement } from './components/PerformanceManagement';
 import { ZakatManagement } from './components/ZakatManagement';
 import { DatabaseManagement } from './components/DatabaseManagement';
 import { TenantManagement } from './components/TenantManagement';
 import { RoleManagement } from './components/RoleManagement';
 import { TenantSwitcher } from './components/TenantSwitcher';
+import { RoleSwitcher } from './components/RoleSwitcher';
+import { ThemeToggle } from './components/ThemeToggle';
+import { GlassmorphicCard } from './components/GlassmorphicCard';
 import { OrganizationChart } from './components/OrganizationChart';
 import { WorkFlowShowcase } from './components/reactflow/WorkFlowShowcase';
 import { WorkflowBuilder } from './components/WorkflowBuilder';
@@ -28,7 +34,6 @@ import { MultilevelSidebar } from './components/MultilevelSidebar';
 import { AIChat } from './components/AIChat';
 import { LearningDevelopment } from './components/LearningDevelopment';
 import { AnimatedDashboard } from './components/AnimatedDashboard';
-import { AnimationShowcase } from './components/AnimationShowcase';
 import { CalendarView } from './components/CalendarView';
 import { TeacherScheduling } from './components/TeacherScheduling';
 import { ComingSoon } from './components/ComingSoon';
@@ -71,10 +76,10 @@ type Tab =
   | 'employee-relations'
   | 'foreign-workers'
   | 'expatriate-management'
+  | 'performance'
   | 'zakat'
   | 'talent'
   | 'learning'
-  | 'performance'
   | 'calendar'
   | 'teacher-scheduling'
   | 'database'
@@ -87,7 +92,6 @@ type Tab =
   | 'department-view'
   | 'team-hierarchy'
   | 'ai-chat'
-  | 'animation-showcase'
   | 'settings';
 
 function AppContent() {
@@ -167,6 +171,13 @@ function AppContent() {
       section: 'advanced'
     },
     { 
+      id: 'performance', 
+      name: 'Performance Management', 
+      icon: Target,
+      section: 'advanced',
+      badge: 'AI'
+    },
+    { 
       id: 'zakat', 
       name: 'Zakat Management', 
       icon: Sparkles,
@@ -188,12 +199,6 @@ function AppContent() {
       badge: 'AI'
     },
     // Coming Soon
-    { 
-      id: 'performance', 
-      name: 'Performance Management', 
-      icon: Target,
-      section: 'coming-soon'
-    },
     { 
       id: 'calendar', 
       name: 'Calendar View', 
@@ -234,46 +239,10 @@ function AppContent() {
       icon: Network,
       section: 'settings'
     },
-    // ReactFlow Showcase
-    { 
-      id: 'reactflow-showcase', 
-      name: 'ReactFlow Showcase', 
-      icon: Sparkles,
-      section: 'settings',
-      badge: 'New'
-    },
-    // Learning Development
-    { 
-      id: 'learning-development', 
-      name: 'Learning Development', 
-      icon: GraduationCap,
-      section: 'settings'
-    },
-    // Calendar View
-    { 
-      id: 'calendar-view', 
-      name: 'Calendar View', 
-      icon: Calendar,
-      section: 'settings'
-    },
-    // Teacher Scheduling
-    { 
-      id: 'teacher-scheduling', 
-      name: 'Teacher Scheduling', 
-      icon: Calendar,
-      section: 'settings'
-    },
     // AI Chat
     { 
       id: 'ai-chat', 
       name: 'AI Chat', 
-      icon: Sparkles,
-      section: 'settings'
-    },
-    // Animation Showcase
-    { 
-      id: 'animation-showcase', 
-      name: 'Animation Showcase', 
       icon: Sparkles,
       section: 'settings'
     },
@@ -291,7 +260,7 @@ function AppContent() {
       case 'dashboard':
         return <AnimatedDashboard onNavigate={(tab) => setActiveTab(tab as Tab)} />;
       case 'employees':
-        return <EmployeeDirectory />;
+        return <EmployeeDirectoryEnhanced />;
       case 'leave':
         return <LeaveManagementEnhanced />;
       case 'attendance':
@@ -310,14 +279,14 @@ function AppContent() {
         return <ForeignWorkers />;
       case 'expatriate-management':
         return <ExpatriateManagement />;
+      case 'performance':
+        return <PerformanceManagement />;
       case 'zakat':
         return <ZakatManagement />;
       case 'talent':
         return <TalentAcquisition />;
       case 'learning':
         return <LearningDevelopment />;
-      case 'performance':
-        return <ComingSoon module="Performance Management" />;
       case 'calendar':
         return <CalendarView />;
       case 'teacher-scheduling':
@@ -342,8 +311,6 @@ function AppContent() {
         return <ComingSoon module="Team Hierarchy" />;
       case 'ai-chat':
         return <AIChat />;
-      case 'animation-showcase':
-        return <AnimationShowcase />;
       case 'settings':
         return <ComingSoon module="Settings" />;
       default:
@@ -352,40 +319,40 @@ function AppContent() {
   };
 
   return (
-    <div className="flex h-screen bg-gray-50">
+    <div className="flex h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-purple-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-900 transition-colors duration-300">
       {/* Sidebar */}
       <aside 
-        className={`fixed lg:static inset-y-0 left-0 z-50 bg-white border-r border-gray-200 transition-all duration-300 ease-in-out ${
+        className={`fixed lg:static inset-y-0 left-0 z-50 border-r-4 transition-all duration-300 ease-in-out shadow-lg ${
           sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
         } ${
-          sidebarCollapsed ? 'lg:w-20' : 'lg:w-64'
-        } w-64`}
+          sidebarCollapsed ? 'lg:w-20' : 'lg:w-72'
+        } w-72 bg-white dark:bg-gray-800 border-black dark:border-white`}
       >
         <div className="flex flex-col h-full">
           {/* Logo */}
-          <div className={`flex items-center justify-between border-b border-gray-200 transition-all duration-300 ${
-            sidebarCollapsed ? 'px-4 py-4' : 'px-6 py-4'
+          <div className={`flex items-center justify-between border-b-4 border-black dark:border-white bg-gradient-to-r from-blue-500 to-purple-600 transition-all duration-300 ${
+            sidebarCollapsed ? 'px-4 py-5' : 'px-6 py-5'
           }`}>
             <div className={`overflow-hidden transition-all duration-300 ${
               sidebarCollapsed ? 'w-0 opacity-0' : 'w-auto opacity-100'
             }`}>
-              <h1 className="text-blue-600 whitespace-nowrap">AI-HRMS</h1>
-              <p className="text-xs text-gray-500 whitespace-nowrap">HR Management System</p>
+              <h1 className="text-2xl text-white drop-shadow-lg whitespace-nowrap">AI-HRMS</h1>
+              <p className="text-sm text-blue-100 whitespace-nowrap">Malaysia Edition</p>
             </div>
             
             {/* Collapsed Logo */}
             <div className={`transition-all duration-300 ${
               sidebarCollapsed ? 'opacity-100' : 'opacity-0 absolute'
             }`}>
-              <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white">
-                AI
+              <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center text-blue-600 shadow-lg neo-shadow-sm">
+                <span className="font-bold">AI</span>
               </div>
             </div>
 
             {/* Mobile Close Button */}
             <button
               onClick={() => setSidebarOpen(false)}
-              className="lg:hidden text-gray-500 hover:text-gray-700"
+              className="lg:hidden text-white hover:bg-white/20 rounded-lg p-2 transition-all duration-200 hover:scale-110"
             >
               <X className="w-5 h-5" />
             </button>
@@ -393,14 +360,14 @@ function AppContent() {
             {/* Desktop Collapse Toggle */}
             <button
               onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-              className={`hidden lg:block text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg p-1.5 transition-all duration-300 ${
+              className={`hidden lg:flex items-center justify-center text-white hover:bg-white/20 rounded-lg p-2 transition-all duration-200 hover:scale-110 ${
                 sidebarCollapsed ? 'ml-0' : 'ml-auto'
               }`}
             >
               {sidebarCollapsed ? (
-                <ChevronRight className="w-4 h-4" />
+                <ChevronRight className="w-5 h-5" />
               ) : (
-                <ChevronLeft className="w-4 h-4" />
+                <ChevronLeft className="w-5 h-5" />
               )}
             </button>
           </div>
@@ -410,12 +377,16 @@ function AppContent() {
             sidebarCollapsed ? 'px-2' : 'px-4'
           }`}>
             {/* Core Modules */}
-            <div className="mb-4">
-              <p className={`py-2 text-xs text-gray-400 uppercase tracking-wider transition-all duration-300 overflow-hidden ${
+            <div className="mb-6">
+              <div className={`flex items-center gap-2 mb-3 transition-all duration-300 overflow-hidden ${
                 sidebarCollapsed ? 'px-2 opacity-0 h-0' : 'px-4 opacity-100 h-auto'
               }`}>
-                Core Modules
-              </p>
+                <div className="h-px flex-1 bg-gradient-to-r from-transparent via-gray-300 dark:via-gray-600 to-transparent"></div>
+                <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider font-semibold">
+                  Core Modules
+                </p>
+                <div className="h-px flex-1 bg-gradient-to-r from-transparent via-gray-300 dark:via-gray-600 to-transparent"></div>
+              </div>
               {navigation.filter(item => item.section === 'main').map((item) => {
                 const Icon = item.icon;
                 const isActive = activeTab === item.id;
@@ -426,27 +397,32 @@ function AppContent() {
                       setActiveTab(item.id as Tab);
                       setSidebarOpen(false);
                     }}
-                    className={`w-full flex items-center gap-3 rounded-lg transition-all duration-200 group relative ${
+                    className={`w-full flex items-center gap-3 rounded-lg transition-all duration-200 group relative mb-1 border-2 ${
                       sidebarCollapsed ? 'px-3 py-3 justify-center' : 'px-4 py-3'
                     } ${
                       isActive
-                        ? 'bg-blue-50 text-blue-600'
-                        : 'text-gray-700 hover:bg-gray-50'
+                        ? 'bg-blue-500 text-white border-blue-600 shadow-lg neo-shadow-sm dark:bg-blue-600 dark:border-blue-700'
+                        : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 border-transparent hover:border-gray-200 dark:hover:border-gray-600'
                     }`}
                     title={sidebarCollapsed ? item.name : ''}
                   >
-                    <Icon className="w-5 h-5 flex-shrink-0" />
-                    <span className={`transition-all duration-300 whitespace-nowrap ${
+                    <Icon className={`w-5 h-5 flex-shrink-0 transition-transform duration-200 ${isActive ? 'scale-110' : 'group-hover:scale-110'}`} />
+                    <span className={`transition-all duration-300 whitespace-nowrap font-medium ${
                       sidebarCollapsed ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'
                     }`}>
                       {item.name}
                     </span>
 
+                    {/* Active indicator */}
+                    {isActive && !sidebarCollapsed && (
+                      <div className="ml-auto w-2 h-2 bg-white rounded-full animate-pulse"></div>
+                    )}
+
                     {/* Tooltip for collapsed state */}
                     {sidebarCollapsed && (
-                      <div className="absolute left-full ml-2 px-3 py-2 bg-gray-900 text-white text-sm rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 whitespace-nowrap z-50">
+                      <div className="absolute left-full ml-3 px-4 py-2 bg-gray-900 dark:bg-gray-700 text-white text-sm rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 whitespace-nowrap z-50 shadow-xl border-2 border-white dark:border-gray-500">
                         {item.name}
-                        <div className="absolute top-1/2 -left-1 -translate-y-1/2 w-2 h-2 bg-gray-900 rotate-45"></div>
+                        <div className="absolute top-1/2 -left-1.5 -translate-y-1/2 w-3 h-3 bg-gray-900 dark:bg-gray-700 rotate-45 border-l-2 border-b-2 border-white dark:border-gray-500"></div>
                       </div>
                     )}
                   </button>
@@ -455,12 +431,16 @@ function AppContent() {
             </div>
 
             {/* Advanced Modules */}
-            <div className="mb-4">
-              <p className={`py-2 text-xs text-gray-400 uppercase tracking-wider transition-all duration-300 overflow-hidden ${
+            <div className="mb-6">
+              <div className={`flex items-center gap-2 mb-3 transition-all duration-300 overflow-hidden ${
                 sidebarCollapsed ? 'px-2 opacity-0 h-0' : 'px-4 opacity-100 h-auto'
               }`}>
-                Advanced Modules
-              </p>
+                <div className="h-px flex-1 bg-gradient-to-r from-transparent via-purple-300 dark:via-purple-600 to-transparent"></div>
+                <p className="text-xs text-purple-600 dark:text-purple-400 uppercase tracking-wider font-semibold">
+                  Advanced
+                </p>
+                <div className="h-px flex-1 bg-gradient-to-r from-transparent via-purple-300 dark:via-purple-600 to-transparent"></div>
+              </div>
               {navigation.filter(item => item.section === 'advanced').map((item) => {
                 const Icon = item.icon;
                 const isActive = activeTab === item.id;
@@ -471,45 +451,54 @@ function AppContent() {
                       setActiveTab(item.id as Tab);
                       setSidebarOpen(false);
                     }}
-                    className={`w-full flex items-center gap-3 rounded-lg transition-all duration-200 group relative ${
+                    className={`w-full flex items-center gap-3 rounded-lg transition-all duration-200 group relative mb-1 border-2 ${
                       sidebarCollapsed ? 'px-3 py-3 justify-center' : 'px-4 py-3'
                     } ${
                       isActive
-                        ? 'bg-blue-50 text-blue-600'
-                        : 'text-gray-700 hover:bg-gray-50'
+                        ? 'bg-purple-500 text-white border-purple-600 shadow-lg neo-shadow-sm dark:bg-purple-600 dark:border-purple-700'
+                        : 'text-gray-700 dark:text-gray-300 hover:bg-purple-50 dark:hover:bg-purple-900/20 border-transparent hover:border-purple-200 dark:hover:border-purple-600'
                     }`}
                     title={sidebarCollapsed ? item.name : ''}
                   >
-                    <Icon className="w-5 h-5 flex-shrink-0" />
-                    <span className={`flex-1 text-left transition-all duration-300 whitespace-nowrap ${
+                    <Icon className={`w-5 h-5 flex-shrink-0 transition-transform duration-200 ${isActive ? 'scale-110' : 'group-hover:scale-110'}`} />
+                    <span className={`flex-1 text-left transition-all duration-300 whitespace-nowrap font-medium ${
                       sidebarCollapsed ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'
                     }`}>
                       {item.name}
                     </span>
                     {item.badge && !sidebarCollapsed && (
-                      <span className={`px-2 py-0.5 text-xs rounded-full ${
+                      <span className={`px-2 py-1 text-xs rounded-md font-semibold border-2 transition-all duration-200 ${
                         item.badge === 'AI' 
-                          ? 'bg-purple-100 text-purple-700'
-                          : 'bg-green-100 text-green-700'
+                          ? isActive 
+                            ? 'bg-white text-purple-600 border-white'
+                            : 'bg-purple-100 text-purple-700 border-purple-200 dark:bg-purple-900 dark:text-purple-200 dark:border-purple-700'
+                          : isActive
+                            ? 'bg-white text-green-600 border-white'
+                            : 'bg-green-100 text-green-700 border-green-200 dark:bg-green-900 dark:text-green-200 dark:border-green-700'
                       }`}>
                         {item.badge}
                       </span>
                     )}
 
+                    {/* Active indicator */}
+                    {isActive && !sidebarCollapsed && !item.badge && (
+                      <div className="ml-auto w-2 h-2 bg-white rounded-full animate-pulse"></div>
+                    )}
+
                     {/* Badge indicator for collapsed state */}
                     {item.badge && sidebarCollapsed && (
-                      <div className={`absolute top-2 right-2 w-2 h-2 rounded-full ${
+                      <div className={`absolute top-2 right-2 w-2.5 h-2.5 rounded-full border-2 border-white dark:border-gray-800 ${
                         item.badge === 'AI' ? 'bg-purple-500' : 'bg-green-500'
                       }`}></div>
                     )}
 
                     {/* Tooltip for collapsed state */}
                     {sidebarCollapsed && (
-                      <div className="absolute left-full ml-2 px-3 py-2 bg-gray-900 text-white text-sm rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 whitespace-nowrap z-50">
+                      <div className="absolute left-full ml-3 px-4 py-2 bg-gray-900 dark:bg-gray-700 text-white text-sm rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 whitespace-nowrap z-50 shadow-xl border-2 border-white dark:border-gray-500">
                         <div className="flex items-center gap-2">
                           {item.name}
                           {item.badge && (
-                            <span className={`px-2 py-0.5 text-xs rounded-full ${
+                            <span className={`px-2 py-0.5 text-xs rounded-md font-semibold ${
                               item.badge === 'AI' 
                                 ? 'bg-purple-500 text-white'
                                 : 'bg-green-500 text-white'
@@ -518,7 +507,7 @@ function AppContent() {
                             </span>
                           )}
                         </div>
-                        <div className="absolute top-1/2 -left-1 -translate-y-1/2 w-2 h-2 bg-gray-900 rotate-45"></div>
+                        <div className="absolute top-1/2 -left-1.5 -translate-y-1/2 w-3 h-3 bg-gray-900 dark:bg-gray-700 rotate-45 border-l-2 border-b-2 border-white dark:border-gray-500"></div>
                       </div>
                     )}
                   </button>
@@ -628,20 +617,20 @@ function AppContent() {
           </nav>
 
           {/* Footer */}
-          <div className={`border-t border-gray-200 transition-all duration-300 ${
+          <div className={`border-t border-gray-200 dark:border-gray-700 transition-all duration-300 ${
             sidebarCollapsed ? 'px-3 py-4' : 'px-6 py-4'
           }`}>
             <div className={`flex items-center transition-all duration-300 ${
               sidebarCollapsed ? 'justify-center' : 'gap-3'
             }`}>
-              <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 flex-shrink-0">
+              <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center text-blue-600 dark:text-blue-400 flex-shrink-0">
                 HR
               </div>
               <div className={`transition-all duration-300 overflow-hidden ${
                 sidebarCollapsed ? 'w-0 opacity-0' : 'w-auto opacity-100'
               }`}>
                 <p className="text-sm whitespace-nowrap">Admin User</p>
-                <p className="text-xs text-gray-500 whitespace-nowrap">admin@company.my</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">admin@company.my</p>
               </div>
             </div>
           </div>
@@ -659,25 +648,28 @@ function AppContent() {
       {/* Main Content */}
       <main className="flex-1 overflow-y-auto">
         {/* Header */}
-        <header className="bg-white border-b border-gray-200 sticky top-0 z-30">
+        <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-30">
           <div className="px-4 sm:px-6 lg:px-8 py-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
                 <button
                   onClick={() => setSidebarOpen(true)}
-                  className="lg:hidden text-gray-500 hover:text-gray-700"
+                  className="lg:hidden text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors duration-200"
                 >
                   <Menu className="w-6 h-6" />
                 </button>
                 <div>
-                  <h2 className="text-gray-900">
+                  <h2 className="text-gray-900 dark:text-gray-100">
                     {navigation.find(n => n.id === activeTab)?.name}
                   </h2>
-                  <p className="text-sm text-gray-500">Manage your workforce efficiently</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">Manage your workforce efficiently</p>
                 </div>
               </div>
               <div className="flex items-center gap-4">
-                <div className="hidden sm:block px-4 py-2 bg-green-50 text-green-700 rounded-lg text-sm">
+                <ThemeToggle />
+                <RoleSwitcher />
+                <TenantSwitcher />
+                <div className="hidden sm:block px-4 py-2 bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-300 rounded-lg text-sm transition-colors duration-300">
                   🇲🇾 Malaysia Compliance Ready
                 </div>
               </div>
@@ -698,7 +690,9 @@ export default function App() {
   return (
     <TenantProvider>
       <RBACProvider>
-        <AppContent />
+        <ThemeProvider>
+          <AppContent />
+        </ThemeProvider>
       </RBACProvider>
     </TenantProvider>
   );

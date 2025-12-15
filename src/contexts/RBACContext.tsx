@@ -39,6 +39,14 @@ export type Permission =
   | 'er.manage'
   | 'foreignworkers.view'
   | 'foreignworkers.manage'
+  | 'expatriate.view'
+  | 'expatriate.manage'
+  | 'performance.view'
+  | 'performance.manage'
+  | 'talent.view'
+  | 'talent.manage'
+  | 'learning.view'
+  | 'learning.manage'
   | 'zakat.view'
   | 'zakat.manage'
   // System
@@ -100,6 +108,10 @@ export function RBACProvider({ children }: { children: ReactNode }) {
         'reports.view', 'reports.create', 'reports.export', 'reports.analytics',
         'ir.view', 'ir.manage', 'er.view', 'er.manage',
         'foreignworkers.view', 'foreignworkers.manage',
+        'expatriate.view', 'expatriate.manage',
+        'performance.view', 'performance.manage',
+        'talent.view', 'talent.manage',
+        'learning.view', 'learning.manage',
         'zakat.view', 'zakat.manage',
         'settings.view', 'settings.manage',
         'database.view', 'database.manage',
@@ -122,6 +134,10 @@ export function RBACProvider({ children }: { children: ReactNode }) {
         'reports.view', 'reports.create', 'reports.export', 'reports.analytics',
         'ir.view', 'ir.manage', 'er.view', 'er.manage',
         'foreignworkers.view', 'foreignworkers.manage',
+        'expatriate.view', 'expatriate.manage',
+        'performance.view', 'performance.manage',
+        'talent.view', 'talent.manage',
+        'learning.view', 'learning.manage',
         'zakat.view', 'zakat.manage',
         'settings.view',
         'users.view',
@@ -142,6 +158,10 @@ export function RBACProvider({ children }: { children: ReactNode }) {
         'reports.view', 'reports.create', 'reports.export',
         'ir.view', 'er.view', 'er.manage',
         'foreignworkers.view', 'foreignworkers.manage',
+        'expatriate.view', 'expatriate.manage',
+        'performance.view', 'performance.manage',
+        'talent.view', 'talent.manage',
+        'learning.view', 'learning.manage',
         'zakat.view',
       ],
     },

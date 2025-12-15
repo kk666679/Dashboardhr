@@ -55,9 +55,9 @@ export function ComplianceCenter() {
 
   const recentUpdates = [
     {
-      title: 'Minimum Wage Update 2024',
-      date: '2024-05-01',
-      description: 'New minimum wage of RM1,500/month effective May 1, 2024.',
+      title: 'Minimum Wage Update 2025',
+      date: '2025-02-01',
+      description: 'New minimum wage of RM1,700/month effective November 1, 2025.',
       type: 'regulation'
     },
     {
@@ -116,24 +116,24 @@ export function ComplianceCenter() {
   return (
     <div className="space-y-6">
       {/* Overall Compliance Status */}
-      <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-6 border border-green-200">
+      <div className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-xl p-6 border border-green-200 dark:border-green-700 transition-colors duration-300">
         <div className="flex items-start gap-4">
-          <div className="p-3 bg-green-100 rounded-lg">
-            <Shield className="w-6 h-6 text-green-600" />
+          <div className="p-3 bg-green-100 dark:bg-green-800 rounded-lg transition-colors duration-300">
+            <Shield className="w-6 h-6 text-green-600 dark:text-green-300" />
           </div>
           <div className="flex-1">
-            <h3 className="text-gray-900 mb-2">Compliance Status: Good Standing</h3>
-            <p className="text-sm text-gray-700 mb-3">
+            <h3 className="text-gray-900 dark:text-gray-100 mb-2 transition-colors duration-300">Compliance Status: Good Standing</h3>
+            <p className="text-sm text-gray-700 dark:text-gray-300 mb-3 transition-colors duration-300">
               Your organization is compliant with Malaysian labor laws. 1 minor item requires attention.
             </p>
             <div className="flex flex-wrap gap-4">
               <div className="flex items-center gap-2">
-                <CheckCircle className="w-4 h-4 text-green-600" />
-                <span className="text-sm text-gray-700">15 Items Compliant</span>
+                <CheckCircle className="w-4 h-4 text-green-600 dark:text-green-400" />
+                <span className="text-sm text-gray-700 dark:text-gray-300 transition-colors duration-300">15 Items Compliant</span>
               </div>
               <div className="flex items-center gap-2">
-                <AlertTriangle className="w-4 h-4 text-orange-600" />
-                <span className="text-sm text-gray-700">1 Item Needs Attention</span>
+                <AlertTriangle className="w-4 h-4 text-orange-600 dark:text-orange-400" />
+                <span className="text-sm text-gray-700 dark:text-gray-300 transition-colors duration-300">1 Item Needs Attention</span>
               </div>
             </div>
           </div>
@@ -141,17 +141,17 @@ export function ComplianceCenter() {
       </div>
 
       {/* Upcoming Deadlines */}
-      <div className="bg-white rounded-xl p-6 border border-gray-200">
+      <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 transition-colors duration-300">
         <div className="flex items-center gap-2 mb-4">
-          <Clock className="w-5 h-5 text-blue-600" />
-          <h3 className="text-gray-900">Upcoming Compliance Deadlines</h3>
+          <Clock className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+          <h3 className="text-gray-900 dark:text-gray-100 transition-colors duration-300">Upcoming Compliance Deadlines</h3>
         </div>
         <div className="space-y-3">
           {upcomingDeadlines.map((deadline, index) => (
-            <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+            <div key={index} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg transition-colors duration-300">
               <div className="flex-1">
-                <p className="text-sm text-gray-900">{deadline.task}</p>
-                <p className="text-xs text-gray-600 mt-1">
+                <p className="text-sm text-gray-900 dark:text-gray-100 transition-colors duration-300">{deadline.task}</p>
+                <p className="text-xs text-gray-600 dark:text-gray-400 mt-1 transition-colors duration-300">
                   Due: {new Date(deadline.date).toLocaleDateString('en-MY', { day: 'numeric', month: 'long', year: 'numeric' })}
                 </p>
               </div>
@@ -166,18 +166,18 @@ export function ComplianceCenter() {
       {/* Compliance Categories */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {complianceItems.map((category, index) => (
-          <div key={index} className="bg-white rounded-xl p-6 border border-gray-200">
+          <div key={index} className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 transition-colors duration-300">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-gray-900">{category.category}</h3>
+              <h3 className="text-gray-900 dark:text-gray-100 transition-colors duration-300">{category.category}</h3>
               {getStatusIcon(category.status)}
             </div>
             <div className="space-y-3">
               {category.items.map((item, itemIndex) => (
-                <div key={itemIndex} className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
+                <div key={itemIndex} className="flex items-start gap-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg transition-colors duration-300">
                   {getStatusIcon(item.status)}
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm text-gray-900">{item.name}</p>
-                    <p className="text-xs text-gray-600 mt-1">{item.description}</p>
+                    <p className="text-sm text-gray-900 dark:text-gray-100 transition-colors duration-300">{item.name}</p>
+                    <p className="text-xs text-gray-600 dark:text-gray-400 mt-1 transition-colors duration-300">{item.description}</p>
                   </div>
                 </div>
               ))}
@@ -187,24 +187,24 @@ export function ComplianceCenter() {
       </div>
 
       {/* Recent Regulatory Updates */}
-      <div className="bg-white rounded-xl p-6 border border-gray-200">
+      <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700 transition-colors duration-300">
         <div className="flex items-center gap-2 mb-4">
-          <BookOpen className="w-5 h-5 text-purple-600" />
-          <h3 className="text-gray-900">Recent Regulatory Updates</h3>
+          <BookOpen className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+          <h3 className="text-gray-900 dark:text-gray-100 transition-colors duration-300">Recent Regulatory Updates</h3>
         </div>
         <div className="space-y-4">
           {recentUpdates.map((update, index) => (
-            <div key={index} className="p-4 border border-gray-200 rounded-lg">
+            <div key={index} className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg transition-colors duration-300">
               <div className="flex items-start justify-between mb-2">
-                <h4 className="text-sm text-gray-900">{update.title}</h4>
-                <span className="text-xs text-gray-500">
+                <h4 className="text-sm text-gray-900 dark:text-gray-100 transition-colors duration-300">{update.title}</h4>
+                <span className="text-xs text-gray-500 dark:text-gray-400 transition-colors duration-300">
                   {new Date(update.date).toLocaleDateString('en-MY', { month: 'short', day: 'numeric', year: 'numeric' })}
                 </span>
               </div>
-              <p className="text-sm text-gray-600">{update.description}</p>
+              <p className="text-sm text-gray-600 dark:text-gray-300 transition-colors duration-300">{update.description}</p>
               <div className="mt-2">
                 <span className={`text-xs px-2 py-1 rounded ${
-                  update.type === 'regulation' ? 'bg-blue-100 text-blue-700' : 'bg-purple-100 text-purple-700'
+                  update.type === 'regulation' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-200' : 'bg-purple-100 text-purple-700 dark:bg-purple-900 dark:text-purple-200'
                 }`}>
                   {update.type.toUpperCase()}
                 </span>
@@ -216,20 +216,20 @@ export function ComplianceCenter() {
 
       {/* Quick Resources */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <button className="bg-white border border-gray-200 rounded-lg p-4 hover:border-blue-300 transition-colors">
-          <FileCheck className="w-6 h-6 text-blue-600 mb-2" />
-          <h4 className="text-sm text-gray-900 mb-1">Compliance Checklist</h4>
-          <p className="text-xs text-gray-600">Download full checklist</p>
+        <button className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:border-blue-300 dark:hover:border-blue-600 transition-all duration-300">
+          <FileCheck className="w-6 h-6 text-blue-600 dark:text-blue-400 mb-2 transition-colors duration-300" />
+          <h4 className="text-sm text-gray-900 dark:text-gray-100 mb-1 transition-colors duration-300">Compliance Checklist</h4>
+          <p className="text-xs text-gray-600 dark:text-gray-400 transition-colors duration-300">Download full checklist</p>
         </button>
-        <button className="bg-white border border-gray-200 rounded-lg p-4 hover:border-blue-300 transition-colors">
-          <BookOpen className="w-6 h-6 text-green-600 mb-2" />
-          <h4 className="text-sm text-gray-900 mb-1">Policy Templates</h4>
-          <p className="text-xs text-gray-600">Access HR policy templates</p>
+        <button className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:border-blue-300 dark:hover:border-blue-600 transition-all duration-300">
+          <BookOpen className="w-6 h-6 text-green-600 dark:text-green-400 mb-2 transition-colors duration-300" />
+          <h4 className="text-sm text-gray-900 dark:text-gray-100 mb-1 transition-colors duration-300">Policy Templates</h4>
+          <p className="text-xs text-gray-600 dark:text-gray-400 transition-colors duration-300">Access HR policy templates</p>
         </button>
-        <button className="bg-white border border-gray-200 rounded-lg p-4 hover:border-blue-300 transition-colors">
-          <Shield className="w-6 h-6 text-purple-600 mb-2" />
-          <h4 className="text-sm text-gray-900 mb-1">Audit Reports</h4>
-          <p className="text-xs text-gray-600">View compliance audits</p>
+        <button className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:border-blue-300 dark:hover:border-blue-600 transition-all duration-300">
+          <Shield className="w-6 h-6 text-purple-600 dark:text-purple-400 mb-2 transition-colors duration-300" />
+          <h4 className="text-sm text-gray-900 dark:text-gray-100 mb-1 transition-colors duration-300">Audit Reports</h4>
+          <p className="text-xs text-gray-600 dark:text-gray-400 transition-colors duration-300">View compliance audits</p>
         </button>
       </div>
     </div>

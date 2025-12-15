@@ -19,7 +19,8 @@ import {
   X,
   Edit,
   Trash2,
-  Eye
+  Eye,
+  UserCircle
 } from 'lucide-react';
 import {
   GlassmorphicCard,
@@ -42,6 +43,7 @@ import {
   Legend,
   ResponsiveContainer,
 } from 'recharts';
+import { EmployeeSelfService } from './EmployeeSelfService';
 
 interface Employee {
   id: string;

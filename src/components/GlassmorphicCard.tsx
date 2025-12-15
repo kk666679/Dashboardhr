@@ -63,9 +63,10 @@ export const GlassmorphicCard: React.FC<GlassmorphicCardProps> = ({
     <motion.div
       className={`
         bg-gradient-to-br ${gradient}
+        dark:from-gray-800/70 dark:to-gray-700/50
         ${blurClasses[blur]}
-        border border-white/20
-        shadow-xl shadow-purple-500/10
+        border border-white/20 dark:border-gray-600/30
+        shadow-xl shadow-purple-500/10 dark:shadow-purple-500/5
         rounded-2xl
         ${onClick ? 'cursor-pointer' : ''}
         ${className}

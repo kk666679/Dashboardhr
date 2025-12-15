@@ -456,8 +456,8 @@ export function ComplianceEnhanced() {
                   <p className="text-xs text-gray-600">Workplace safety and health standards</p>
                 </div>
                 <div className="bg-white/50 backdrop-blur-sm rounded-lg p-4">
-                  <p className="text-sm font-semibold text-gray-900 mb-2">Minimum Wages Order</p>
-                  <p className="text-xs text-gray-600">RM 1,500/month effective May 2024</p>
+                  <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-2">Minimum Wages Order</p>
+                  <p className="text-xs text-gray-600 dark:text-gray-400">RM 1,700/month effective November 2025</p>
                 </div>
               </div>
             </div>

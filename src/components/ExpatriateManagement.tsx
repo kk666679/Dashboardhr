@@ -42,6 +42,7 @@ import {
   Package,
   Languages,
   HandHeart,
+  BarChart3,
 } from 'lucide-react';
 import {
   GlassmorphicCard,
