@@ -1,0 +1,961 @@
+// This is your Prisma schema file for AI-HRMS
+// Learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================
+// User & Authentication
+// ============================================
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String?
+  role      UserRole @default(EMPLOYEE)
+  isActive  Boolean  @default(true)
+  lastLogin DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  employee Employee?
+
+  @@map("users")
+}
+
+enum UserRole {
+  SUPER_ADMIN
+  ADMIN
+  HR_MANAGER
+  IR_SPECIALIST
+  ER_SPECIALIST
+  PAYROLL_MANAGER
+  MANAGER
+  EMPLOYEE
+}
+
+// ============================================
+// Employee Management
+// ============================================
+
+model Employee {
+  id           String         @id @default(cuid())
+  userId       String         @unique
+  employeeCode String         @unique
+  firstName    String
+  lastName     String
+  email        String         @unique
+  phone        String?
+  dateOfBirth  DateTime?
+  gender       Gender?
+  nationality  String         @default("Malaysian")
+  icNumber     String?        @unique // Malaysian IC Number
+  
+  // Employment Details
+  departmentId String
+  position     String
+  employmentType EmploymentType @default(FULL_TIME)
+  joinDate     DateTime
+  confirmationDate DateTime?
+  resignDate   DateTime?
+  status       EmployeeStatus @default(ACTIVE)
+  
+  // Address
+  address      String?
+  city         String?
+  state        String?
+  postcode     String?
+  country      String         @default("Malaysia")
+  
+  // Emergency Contact
+  emergencyContactName  String?
+  emergencyContactPhone String?
+  emergencyContactRelation String?
+  
+  // Banking Details
+  bankName     String?
+  bankAccount  String?
+  
+  // Statutory Details
+  epfNumber    String?
+  socsoNumber  String?
+  eisNumber    String?
+  taxNumber    String? // Income Tax Number
+  
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relations
+  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  department   Department @relation(fields: [departmentId], references: [id])
+  
+  leaveRequests     LeaveRequest[]
+  attendanceRecords AttendanceRecord[]
+  payrollRecords    PayrollRecord[]
+  leaveBalances     LeaveBalance[]
+  performanceReviews PerformanceReview[]
+  trainings         EmployeeTraining[]
+
+  @@map("employees")
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
+enum EmploymentType {
+  FULL_TIME
+  PART_TIME
+  CONTRACT
+  INTERNSHIP
+}
+
+enum EmployeeStatus {
+  ACTIVE
+  ON_LEAVE
+  REMOTE
+  SUSPENDED
+  RESIGNED
+  TERMINATED
+}
+
+// ============================================
+// Department & Organization
+// ============================================
+
+model Department {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String?
+  managerId   String?
+  location    String?
+  costCenter  String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  employees   Employee[]
+
+  @@map("departments")
+}
+
+// ============================================
+// Leave Management
+// ============================================
+
+model LeaveRequest {
+  id           String      @id @default(cuid())
+  employeeId   String
+  leaveTypeId  String
+  startDate    DateTime
+  endDate      DateTime
+  days         Float // Can be decimal for half days
+  reason       String
+  status       LeaveStatus @default(PENDING)
+  approvedBy   String?
+  approvedDate DateTime?
+  rejectedReason String?
+  attachmentUrl  String?
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  employee     Employee    @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  leaveType    LeaveType   @relation(fields: [leaveTypeId], references: [id])
+
+  @@map("leave_requests")
+}
+
+enum LeaveStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  CANCELLED
+}
+
+model LeaveType {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String?
+  daysPerYear Int
+  isPaid      Boolean  @default(true)
+  requiresDocument Boolean @default(false)
+  color       String   @default("#3B82F6")
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  leaveRequests LeaveRequest[]
+  leaveBalances LeaveBalance[]
+
+  @@map("leave_types")
+}
+
+model LeaveBalance {
+  id          String   @id @default(cuid())
+  employeeId  String
+  leaveTypeId String
+  year        Int
+  entitled    Float
+  used        Float    @default(0)
+  carried     Float    @default(0)
+  available   Float
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  employee    Employee  @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  leaveType   LeaveType @relation(fields: [leaveTypeId], references: [id])
+
+  @@unique([employeeId, leaveTypeId, year])
+  @@map("leave_balances")
+}
+
+// ============================================
+// Attendance Management
+// ============================================
+
+model AttendanceRecord {
+  id          String           @id @default(cuid())
+  employeeId  String
+  date        DateTime
+  checkIn     DateTime?
+  checkOut    DateTime?
+  status      AttendanceStatus @default(PRESENT)
+  workHours   Float?
+  overtime    Float?
+  lateMinutes Int?
+  earlyLeave  Int?
+  remarks     String?
+  location    String?
+  ipAddress   String?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  employee    Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+
+  @@unique([employeeId, date])
+  @@map("attendance_records")
+}
+
+enum AttendanceStatus {
+  PRESENT
+  ABSENT
+  LATE
+  HALF_DAY
+  ON_LEAVE
+  PUBLIC_HOLIDAY
+  WEEKEND
+}
+
+// ============================================
+// Payroll Management
+// ============================================
+
+model PayrollRecord {
+  id            String   @id @default(cuid())
+  employeeId    String
+  month         Int
+  year          Int
+  
+  // Earnings
+  basicSalary   Float
+  allowances    Float    @default(0)
+  overtime      Float    @default(0)
+  bonus         Float    @default(0)
+  commission    Float    @default(0)
+  grossSalary   Float
+  
+  // Deductions
+  epfEmployee   Float    @default(0)
+  epfEmployer   Float    @default(0)
+  socso         Float    @default(0)
+  eis           Float    @default(0)
+  incomeTax     Float    @default(0) // PCB - Monthly Tax Deduction
+  otherDeductions Float  @default(0)
+  totalDeductions Float
+  
+  // Net Pay
+  netSalary     Float
+  
+  status        PayrollStatus @default(DRAFT)
+  processedDate DateTime?
+  paidDate      DateTime?
+  paymentMethod String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  employee      Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+
+  @@unique([employeeId, month, year])
+  @@map("payroll_records")
+}
+
+enum PayrollStatus {
+  DRAFT
+  PROCESSED
+  PAID
+  CANCELLED
+}
+
+// ============================================
+// Performance Management
+// ============================================
+
+model PerformanceReview {
+  id              String   @id @default(cuid())
+  employeeId      String
+  reviewerId      String?
+  reviewPeriod    String // e.g., "Q1 2024", "2024"
+  reviewDate      DateTime
+  
+  // Ratings (1-5 scale)
+  productivityRating    Int?
+  qualityRating         Int?
+  communicationRating   Int?
+  teamworkRating        Int?
+  leadershipRating      Int?
+  overallRating         Float?
+  
+  strengths       String?
+  improvements    String?
+  goals           String?
+  comments        String?
+  
+  status          ReviewStatus @default(DRAFT)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  employee        Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+
+  @@map("performance_reviews")
+}
+
+enum ReviewStatus {
+  DRAFT
+  SUBMITTED
+  COMPLETED
+  ACKNOWLEDGED
+}
+
+// ============================================
+// Training & Development
+// ============================================
+
+model Training {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  provider    String?
+  category    String?
+  duration    Int? // in hours
+  cost        Float?
+  location    String?
+  startDate   DateTime?
+  endDate     DateTime?
+  capacity    Int?
+  status      TrainingStatus @default(SCHEDULED)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  employees   EmployeeTraining[]
+
+  @@map("trainings")
+}
+
+enum TrainingStatus {
+  SCHEDULED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+model EmployeeTraining {
+  id          String   @id @default(cuid())
+  employeeId  String
+  trainingId  String
+  enrolledDate DateTime @default(now())
+  completedDate DateTime?
+  status      TrainingEnrollmentStatus @default(ENROLLED)
+  score       Float?
+  feedback    String?
+  certificateUrl String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  employee    Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  training    Training @relation(fields: [trainingId], references: [id], onDelete: Cascade)
+
+  @@unique([employeeId, trainingId])
+  @@map("employee_trainings")
+}
+
+enum TrainingEnrollmentStatus {
+  ENROLLED
+  IN_PROGRESS
+  COMPLETED
+  FAILED
+  WITHDRAWN
+}
+
+// ============================================
+// Compliance & Regulations
+// ============================================
+
+model ComplianceItem {
+  id          String   @id @default(cuid())
+  category    String
+  title       String
+  description String
+  requirement String?
+  status      ComplianceStatus @default(COMPLIANT)
+  lastReviewDate DateTime?
+  nextReviewDate DateTime?
+  responsible String?
+  documents   String[] // Array of document URLs
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("compliance_items")
+}
+
+enum ComplianceStatus {
+  COMPLIANT
+  WARNING
+  NON_COMPLIANT
+  PENDING_REVIEW
+}
+
+model ComplianceDeadline {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  category    String
+  dueDate     DateTime
+  priority    Priority @default(MEDIUM)
+  status      DeadlineStatus @default(PENDING)
+  completedDate DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("compliance_deadlines")
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum DeadlineStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  OVERDUE
+}
+
+// ============================================
+// Public Holidays
+// ============================================
+
+model PublicHoliday {
+  id          String   @id @default(cuid())
+  name        String
+  date        DateTime
+  state       String? // Some holidays are state-specific in Malaysia
+  isNational  Boolean  @default(true)
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("public_holidays")
+}
+
+// ============================================
+// Announcements & Notifications
+// ============================================
+
+model Announcement {
+  id          String   @id @default(cuid())
+  title       String
+  content     String
+  category    String?
+  priority    Priority @default(MEDIUM)
+  publishDate DateTime @default(now())
+  expiryDate  DateTime?
+  isActive    Boolean  @default(true)
+  targetRoles String[] // Which roles can see this
+  createdBy   String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("announcements")
+}
+
+// ============================================
+// Audit Logs
+// ============================================
+
+model AuditLog {
+  id          String   @id @default(cuid())
+  userId      String?
+  action      String
+  entity      String
+  entityId    String?
+  changes     Json?
+  ipAddress   String?
+  userAgent   String?
+  createdAt   DateTime @default(now())
+
+  @@map("audit_logs")
+}
+
+// ============================================
+// Islamic Finance & Zakat Management
+// ============================================
+
+model ZakatRecord {
+  id              String   @id @default(cuid())
+  employeeId      String
+  month           Int
+  year            Int
+  
+  // Zakatable Income Calculation
+  basicSalary     Float
+  allowances      Float    @default(0)
+  zakatableIncome Float    // Base for zakat calculation
+  
+  // Zakat Details
+  state           String   // Zakat institution varies by state
+  zakatRate       Float    @default(2.5) // Typically 2.5%
+  zakatAmount     Float
+  
+  // Payment Status
+  status          ZakatStatus @default(PENDING)
+  paidDate        DateTime?
+  receiptNumber   String?
+  institutionName String?
+  
+  // Sharia Compliance
+  isHalalVerified Boolean  @default(false)
+  verifiedBy      String?
+  verifiedDate    DateTime?
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@unique([employeeId, month, year])
+  @@map("zakat_records")
+}
+
+enum ZakatStatus {
+  PENDING
+  CALCULATED
+  PAID
+  EXEMPTED
+}
+
+model TabungHajiContribution {
+  id              String   @id @default(cuid())
+  employeeId      String
+  month           Int
+  year            Int
+  
+  contributionAmount Float
+  accountNumber   String?
+  
+  status          THStatus @default(PENDING)
+  processedDate   DateTime?
+  referenceNumber String?
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@unique([employeeId, month, year])
+  @@map("tabung_haji_contributions")
+}
+
+enum THStatus {
+  PENDING
+  PROCESSED
+  COMPLETED
+  FAILED
+}
+
+// ============================================
+// Foreign Workers Management System (FWMS)
+// ============================================
+
+model ForeignWorker {
+  id              String   @id @default(cuid())
+  employeeId      String   @unique
+  
+  // Immigration Details
+  passportNumber  String   @unique
+  passportExpiry  DateTime
+  nationality     String
+  
+  // Work Permit Details
+  permitType      PermitType
+  permitNumber    String   @unique
+  permitIssueDate DateTime
+  permitExpiryDate DateTime
+  permitStatus    PermitStatus @default(ACTIVE)
+  
+  // Immigration Pass
+  passType        String?  // Employment Pass, Work Permit, etc.
+  passNumber      String?
+  passExpiryDate  DateTime?
+  
+  // FOMEMA Medical
+  fomemaNumber    String?
+  lastMedicalDate DateTime?
+  nextMedicalDate DateTime?
+  medicalStatus   MedicalStatus @default(PENDING)
+  
+  // Recruitment Details
+  agencyId        String?
+  agencyLicense   String?
+  recruitmentDate DateTime?
+  contractEndDate DateTime?
+  
+  // Levy & Compliance
+  monthlyLevy     Float    @default(0)
+  lastLevyPaid    DateTime?
+  complianceScore Float?
+  
+  // Accommodation
+  accommodationType String?
+  accommodationAddress String?
+  
+  // Emergency Contact (Home Country)
+  emergencyContactName String?
+  emergencyContactPhone String?
+  emergencyContactCountry String?
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  agency          RecruitmentAgency? @relation(fields: [agencyId], references: [id])
+  permitRenewals  PermitRenewal[]
+  medicalRecords  FOMEMARecord[]
+
+  @@map("foreign_workers")
+}
+
+enum PermitType {
+  EMPLOYMENT_PASS
+  WORK_PERMIT
+  PROFESSIONAL_VISIT_PASS
+  TEMPORARY_EMPLOYMENT_PASS
+}
+
+enum PermitStatus {
+  ACTIVE
+  EXPIRING_SOON
+  EXPIRED
+  RENEWAL_PENDING
+  CANCELLED
+}
+
+enum MedicalStatus {
+  PENDING
+  SCHEDULED
+  COMPLETED
+  FAILED
+  EXPIRED
+}
+
+model RecruitmentAgency {
+  id              String   @id @default(cuid())
+  name            String
+  licenseNumber   String   @unique
+  licenseExpiry   DateTime
+  contactPerson   String?
+  phone           String?
+  email           String?
+  address         String?
+  rating          Float?
+  isActive        Boolean  @default(true)
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  foreignWorkers  ForeignWorker[]
+
+  @@map("recruitment_agencies")
+}
+
+model PermitRenewal {
+  id              String   @id @default(cuid())
+  foreignWorkerId String
+  
+  currentExpiryDate DateTime
+  renewalDate     DateTime
+  newExpiryDate   DateTime?
+  
+  status          RenewalStatus @default(PENDING)
+  submittedDate   DateTime?
+  approvedDate    DateTime?
+  
+  renewalCost     Float?
+  levyAmount      Float?
+  
+  documents       String[] // Array of document URLs
+  notes           String?
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  foreignWorker   ForeignWorker @relation(fields: [foreignWorkerId], references: [id], onDelete: Cascade)
+
+  @@map("permit_renewals")
+}
+
+enum RenewalStatus {
+  PENDING
+  SUBMITTED
+  APPROVED
+  REJECTED
+  COMPLETED
+}
+
+model FOMEMARecord {
+  id              String   @id @default(cuid())
+  foreignWorkerId String
+  
+  medicalDate     DateTime
+  expiryDate      DateTime
+  fomemaNumber    String?
+  
+  result          FOMEMAResult
+  diseases        String[] // Array of detected diseases if any
+  
+  clinicName      String?
+  doctorName      String?
+  certificateUrl  String?
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  foreignWorker   ForeignWorker @relation(fields: [foreignWorkerId], references: [id], onDelete: Cascade)
+
+  @@map("fomema_records")
+}
+
+enum FOMEMAResult {
+  PENDING
+  SUITABLE
+  UNSUITABLE
+  TEMPORARY_UNSUITABLE
+}
+
+// ============================================
+// Industrial Relations (IR) Module
+// ============================================
+
+model IndustrialRelationsCase {
+  id              String   @id @default(cuid())
+  caseNumber      String   @unique
+  
+  employeeId      String?
+  department      String?
+  
+  caseType        IRCaseType
+  category        String
+  
+  description     String
+  filedDate       DateTime @default(now())
+  
+  status          IRCaseStatus @default(FILED)
+  priority        Priority @default(MEDIUM)
+  
+  // AI Predictions
+  resolutionPrediction String? // AI-predicted outcome
+  riskScore       Float?   // 0-100 risk assessment
+  
+  // Case Management
+  assignedTo      String?
+  hearingDate     DateTime?
+  closedDate      DateTime?
+  
+  outcome         String?
+  settlement      String?
+  
+  documents       String[] // Form 34, evidence, etc.
+  notes           String?
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("industrial_relations_cases")
+}
+
+enum IRCaseType {
+  DISMISSAL
+  DISCRIMINATION
+  WAGE_DISPUTE
+  COLLECTIVE_AGREEMENT
+  TRADE_UNION
+  STRIKE
+  LOCKOUT
+  UNFAIR_PRACTICE
+}
+
+enum IRCaseStatus {
+  FILED
+  UNDER_REVIEW
+  MEDIATION
+  HEARING_SCHEDULED
+  IN_COURT
+  RESOLVED
+  DISMISSED
+  WITHDRAWN
+}
+
+// ============================================
+// Employee Relations (ER) Module
+// ============================================
+
+model EmployeeRelationsCase {
+  id              String   @id @default(cuid())
+  caseNumber      String   @unique
+  
+  employeeId      String
+  reportedBy      String?
+  
+  caseType        ERCaseType
+  severity        ERSeverity @default(MEDIUM)
+  
+  description     String
+  reportedDate    DateTime @default(now())
+  
+  status          ERCaseStatus @default(REPORTED)
+  
+  // AI Analysis
+  sentimentScore  Float?   // AI sentiment analysis
+  conflictRisk    Float?   // Conflict escalation risk
+  
+  // Investigation
+  investigatorId  String?
+  investigationStartDate DateTime?
+  investigationEndDate   DateTime?
+  
+  findings        String?
+  actionTaken     String?
+  
+  // Resolution
+  resolutionDate  DateTime?
+  outcome         String?
+  
+  // PDPA Compliance
+  isConfidential  Boolean  @default(true)
+  
+  documents       String[]
+  notes           String?
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("employee_relations_cases")
+}
+
+enum ERCaseType {
+  HARASSMENT
+  BULLYING
+  DISCRIMINATION
+  CONFLICT
+  GRIEVANCE
+  POLICY_VIOLATION
+  MISCONDUCT
+  PERFORMANCE_ISSUE
+}
+
+enum ERSeverity {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum ERCaseStatus {
+  REPORTED
+  ACKNOWLEDGED
+  INVESTIGATING
+  UNDER_REVIEW
+  ACTION_TAKEN
+  RESOLVED
+  CLOSED
+}
+
+// ============================================
+// Compensation & Benefits
+// ============================================
+
+model SalaryBenchmark {
+  id              String   @id @default(cuid())
+  position        String
+  department      String?
+  industry        String   @default("Technology")
+  
+  location        String   @default("Kuala Lumpur")
+  
+  // Salary Ranges (MYR)
+  minSalary       Float
+  medianSalary    Float
+  maxSalary       Float
+  
+  // Percentiles
+  percentile25    Float?
+  percentile75    Float?
+  percentile90    Float?
+  
+  // Source
+  dataSource      String?
+  sampleSize      Int?
+  
+  effectiveDate   DateTime @default(now())
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("salary_benchmarks")
+}
+
+// ============================================
+// Multi-Tenancy Support
+// ============================================
+
+model Tenant {
+  id              String   @id @default(cuid())
+  name            String
+  slug            String   @unique
+  
+  // Company Details
+  companyName     String
+  companyRegNo    String?
+  taxId           String?
+  
+  // Subscription
+  subscriptionPlan String  @default("basic")
+  isActive        Boolean  @default(true)
+  trialEndsAt     DateTime?
+  
+  // Limits
+  maxEmployees    Int      @default(100)
+  maxStorage      Int      @default(10000) // MB
+  
+  // Customization
+  logo            String?
+  primaryColor    String   @default("#3B82F6")
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("tenants")
+}
