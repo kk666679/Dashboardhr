@@ -307,18 +307,20 @@ export function Dashboard({ onNavigate }: DashboardProps) {
             </div>
             <Target className="w-6 h-6 text-purple-600" />
           </div>
-          <ResponsiveContainer width="100%" height={300} minHeight={300}>
-            <ComposedChart data={headcountGrowthData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
-              <XAxis dataKey="month" stroke="#6B7280" />
-              <YAxis stroke="#6B7280" />
-              <Tooltip content={<CustomTooltip />} />
-              <Legend />
-              <Bar dataKey="newHires" name="New Hires" fill="#10B981" radius={[8, 8, 0, 0]} />
-              <Bar dataKey="terminations" name="Terminations" fill="#EF4444" radius={[8, 8, 0, 0]} />
-              <Line type="monotone" dataKey="employees" name="Total Employees" stroke="#8B5CF6" strokeWidth={3} />
-            </ComposedChart>
-          </ResponsiveContainer>
+          <div style={{ width: '100%', height: '300px', minHeight: '300px' }}>
+            <ResponsiveContainer width="100%" height="100%" minHeight={300}>
+              <ComposedChart data={headcountGrowthData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
+                <XAxis dataKey="month" stroke="#6B7280" />
+                <YAxis stroke="#6B7280" />
+                <Tooltip content={<CustomTooltip />} />
+                <Legend />
+                <Bar dataKey="newHires" name="New Hires" fill="#10B981" radius={[8, 8, 0, 0]} />
+                <Bar dataKey="terminations" name="Terminations" fill="#EF4444" radius={[8, 8, 0, 0]} />
+                <Line type="monotone" dataKey="employees" name="Total Employees" stroke="#8B5CF6" strokeWidth={3} />
+              </ComposedChart>
+            </ResponsiveContainer>
+          </div>
         </div>
 
         {/* Department Distribution */}
@@ -364,17 +366,19 @@ export function Dashboard({ onNavigate }: DashboardProps) {
             </div>
             <UserCheck className="w-6 h-6 text-purple-600" />
           </div>
-          <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={attendanceTrendData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
-              <XAxis dataKey="month" stroke="#6B7280" />
-              <YAxis stroke="#6B7280" />
-              <Tooltip content={<CustomTooltip />} />
-              <Legend />
-              <Line type="monotone" dataKey="attendance" name="Attendance %" stroke="#8B5CF6" strokeWidth={3} dot={{ fill: '#8B5CF6', r: 4 }} />
-              <Line type="monotone" dataKey="target" name="Target" stroke="#10B981" strokeWidth={3} dot={{ fill: '#10B981', r: 4 }} />
-            </LineChart>
-          </ResponsiveContainer>
+          <div style={{ width: '100%', height: '300px', minHeight: '300px' }}>
+            <ResponsiveContainer width="100%" height="100%" minHeight={300}>
+              <LineChart data={attendanceTrendData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
+                <XAxis dataKey="month" stroke="#6B7280" />
+                <YAxis stroke="#6B7280" />
+                <Tooltip content={<CustomTooltip />} />
+                <Legend />
+                <Line type="monotone" dataKey="attendance" name="Attendance %" stroke="#8B5CF6" strokeWidth={3} dot={{ fill: '#8B5CF6', r: 4 }} />
+                <Line type="monotone" dataKey="target" name="Target" stroke="#10B981" strokeWidth={3} dot={{ fill: '#10B981', r: 4 }} />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
         </div>
 
         {/* Payroll Overview */}
@@ -386,32 +390,34 @@ export function Dashboard({ onNavigate }: DashboardProps) {
             </div>
             <DollarSign className="w-6 h-6 text-green-600" />
           </div>
-          <ResponsiveContainer width="100%" height={300}>
-            <AreaChart data={payrollTrendData}>
-              <defs>
-                <linearGradient id="colorSalaries" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#8B5CF6" stopOpacity={0.8}/>
-                  <stop offset="95%" stopColor="#8B5CF6" stopOpacity={0.1}/>
-                </linearGradient>
-                <linearGradient id="colorBenefits" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#10B981" stopOpacity={0.8}/>
-                  <stop offset="95%" stopColor="#10B981" stopOpacity={0.1}/>
-                </linearGradient>
-                <linearGradient id="colorBonuses" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#F59E0B" stopOpacity={0.8}/>
-                  <stop offset="95%" stopColor="#F59E0B" stopOpacity={0.1}/>
-                </linearGradient>
-              </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
-              <XAxis dataKey="month" stroke="#6B7280" />
-              <YAxis stroke="#6B7280" />
-              <Tooltip content={<CustomTooltip />} />
-              <Legend />
-              <Area type="monotone" dataKey="salaries" stackId="1" name="Salaries" stroke="#8B5CF6" fill="url(#colorSalaries)" />
-              <Area type="monotone" dataKey="benefits" stackId="1" name="Benefits" stroke="#10B981" fill="url(#colorBenefits)" />
-              <Area type="monotone" dataKey="bonuses" stackId="1" name="Bonuses" stroke="#F59E0B" fill="url(#colorBonuses)" />
-            </AreaChart>
-          </ResponsiveContainer>
+          <div style={{ width: '100%', height: '300px', minHeight: '300px' }}>
+            <ResponsiveContainer width="100%" height="100%" minHeight={300}>
+              <AreaChart data={payrollTrendData}>
+                <defs>
+                  <linearGradient id="colorSalaries" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#8B5CF6" stopOpacity={0.8}/>
+                    <stop offset="95%" stopColor="#8B5CF6" stopOpacity={0.1}/>
+                  </linearGradient>
+                  <linearGradient id="colorBenefits" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#10B981" stopOpacity={0.8}/>
+                    <stop offset="95%" stopColor="#10B981" stopOpacity={0.1}/>
+                  </linearGradient>
+                  <linearGradient id="colorBonuses" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#F59E0B" stopOpacity={0.8}/>
+                    <stop offset="95%" stopColor="#F59E0B" stopOpacity={0.1}/>
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
+                <XAxis dataKey="month" stroke="#6B7280" />
+                <YAxis stroke="#6B7280" />
+                <Tooltip content={<CustomTooltip />} />
+                <Legend />
+                <Area type="monotone" dataKey="salaries" stackId="1" name="Salaries" stroke="#8B5CF6" fill="url(#colorSalaries)" />
+                <Area type="monotone" dataKey="benefits" stackId="1" name="Benefits" stroke="#10B981" fill="url(#colorBenefits)" />
+                <Area type="monotone" dataKey="bonuses" stackId="1" name="Bonuses" stroke="#F59E0B" fill="url(#colorBonuses)" />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
         </div>
       </div>
 
@@ -508,17 +514,19 @@ export function Dashboard({ onNavigate }: DashboardProps) {
           </div>
           <Target className="w-6 h-6 text-purple-600" />
         </div>
-        <ResponsiveContainer width="100%" height={350} minHeight={350}>
-          <RadarChart data={performanceRadarData}>
-            <PolarGrid stroke="#E5E7EB" />
-            <PolarAngleAxis dataKey="skill" stroke="#6B7280" />
-            <PolarRadiusAxis stroke="#6B7280" />
-            <Tooltip content={<CustomTooltip />} />
-            <Legend />
-            <Radar name="Current" dataKey="current" stroke="#8B5CF6" fill="#8B5CF6" fillOpacity={0.3} />
-            <Radar name="Target" dataKey="target" stroke="#10B981" fill="#10B981" fillOpacity={0.3} />
-          </RadarChart>
-        </ResponsiveContainer>
+        <div style={{ width: '100%', height: '350px', minHeight: '350px' }}>
+          <ResponsiveContainer width="100%" height="100%" minHeight={350}>
+            <RadarChart data={performanceRadarData}>
+              <PolarGrid stroke="#E5E7EB" />
+              <PolarAngleAxis dataKey="skill" stroke="#6B7280" />
+              <PolarRadiusAxis stroke="#6B7280" />
+              <Tooltip content={<CustomTooltip />} />
+              <Legend />
+              <Radar name="Current" dataKey="current" stroke="#8B5CF6" fill="#8B5CF6" fillOpacity={0.3} />
+              <Radar name="Target" dataKey="target" stroke="#10B981" fill="#10B981" fillOpacity={0.3} />
+            </RadarChart>
+          </ResponsiveContainer>
+        </div>
       </div>
 
       {/* AI Insights */}
