@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Globe,
   Users,
@@ -350,28 +350,28 @@ export function ExpatriateManagement() {
   const stats = [
     {
       label: 'Total Expatriates',
-      value: totalExpatriates,
+      amount: totalExpatriates,
       change: '+1 this quarter',
       icon: Globe,
       gradient: 'from-blue-500/80 to-cyan-500/80',
     },
     {
       label: 'EP Expiring Soon',
-      value: expiringEP,
+      amount: expiringEP,
       change: 'Action required',
       icon: AlertTriangle,
       gradient: 'from-orange-500/80 to-amber-500/80',
     },
     {
       label: 'Active Assignments',
-      value: activeAssignments,
+      amount: activeAssignments,
       change: `${Math.round((activeAssignments / totalExpatriates) * 100)}% retention`,
       icon: CheckCircle,
       gradient: 'from-green-500/80 to-emerald-500/80',
     },
     {
       label: 'Monthly Cost',
-      value: Math.round(totalCompensation / 1000),
+      amount: Math.round(totalCompensation / 1000),
       prefix: 'RM ',
       suffix: 'K',
       change: 'Total compensation',
@@ -382,11 +382,11 @@ export function ExpatriateManagement() {
 
   // Analytics Data
   const nationalityData = [
-    { name: 'British', value: 1, fill: '#8B5CF6' },
-    { name: 'American', value: 1, fill: '#EC4899' },
-    { name: 'German', value: 1, fill: '#10B981' },
-    { name: 'Japanese', value: 1, fill: '#F59E0B' },
-    { name: 'French', value: 1, fill: '#3B82F6' },
+    { type: 'British', amount: 1, fill: '#8B5CF6' },
+    { type: 'American', amount: 1, fill: '#EC4899' },
+    { type: 'German', amount: 1, fill: '#10B981' },
+    { type: 'Japanese', amount: 1, fill: '#F59E0B' },
+    { type: 'French', amount: 1, fill: '#3B82F6' },
   ];
 
   const epTypeData = [
@@ -409,9 +409,9 @@ export function ExpatriateManagement() {
   ];
 
   const allowanceBreakdownData = [
-    { type: 'Housing', amount: 37500, fill: '#8B5CF6' },
-    { type: 'Transport', amount: 8700, fill: '#EC4899' },
-    { type: 'Education', amount: 19500, fill: '#10B981' },
+    { name: 'Housing', value: 37500, fill: '#8B5CF6' },
+    { name: 'Transport', value: 8700, fill: '#EC4899' },
+    { name: 'Education', value: 19500, fill: '#10B981' },
   ];
 
   const COLORS = ['#8B5CF6', '#EC4899', '#10B981', '#F59E0B', '#3B82F6', '#EF4444'];
@@ -484,7 +484,7 @@ export function ExpatriateManagement() {
                     cx="50%"
                     cy="50%"
                     outerRadius={90}
-                    dataKey="value"
+                    dataKey="amount"
                     label={({ name, value }) => `${name}: ${value}`}
                   >
                     {nationalityData.map((entry, index) => (
@@ -546,7 +546,7 @@ export function ExpatriateManagement() {
                     cy="50%"
                     outerRadius={90}
                     dataKey="amount"
-                    label={({ type, amount }) => `${type}: RM ${amount / 1000}K`}
+                    label={({ name, value }) => `${name}: RM ${value / 1000}K`}
                   >
                     {allowanceBreakdownData.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={entry.fill} />
@@ -879,7 +879,7 @@ export function ExpatriateManagement() {
                   cy="50%"
                   outerRadius={90}
                   dataKey="count"
-                  label={({ status, count }) => `${status}: ${count}`}
+                  label={({ name, value }) => `${name}: ${value}`}
                 >
                   {taxStatusData.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={entry.fill} />
@@ -1040,7 +1040,7 @@ export function ExpatriateManagement() {
                           transition={{ delay: index * 0.1 + 0.3, type: 'spring' }}
                         >
                           {stat.prefix}
-                          <AnimatedCounter value={stat.value} duration={2} />
+                          <AnimatedCounter value={stat.amount} duration={2} />
                           {stat.suffix}
                         </motion.p>
                       </div>

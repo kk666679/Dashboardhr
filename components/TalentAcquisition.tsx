@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
 import {
   Users,
   Briefcase,
@@ -402,13 +401,13 @@ export function TalentAcquisition() {
                         {stat.suffix}
                       </motion.p>
                     </div>
-                    <motion.div
+                    <div
                       className={`w-12 h-12 bg-gradient-to-br ${stat.gradient} rounded-xl flex items-center justify-center shadow-lg`}
                       whileHover={{ rotate: 360 }}
                       transition={{ duration: 0.5 }}
                     >
                       <Icon className="w-6 h-6 text-white" />
-                    </motion.div>
+                    </div>
                   </div>
                   <p className="text-sm text-gray-600">{stat.change}</p>
                 </div>
@@ -571,12 +570,12 @@ export function TalentAcquisition() {
                   onClick={() => action.title === 'Parse Resume' && setShowResumeParser(true)}
                   className="w-full p-6 text-center hover:bg-white/30 rounded-xl transition-all"
                 >
-                  <motion.div
+                  <div
                     className={`w-12 h-12 bg-gradient-to-br ${action.color} rounded-xl flex items-center justify-center mx-auto mb-3 shadow-lg`}
                     whileHover={{ scale: 1.1, rotate: 5 }}
                   >
                     <Icon className="w-6 h-6 text-white" />
-                  </motion.div>
+                  </div>
                   <h4 className="text-sm font-semibold text-gray-900 mb-1">{action.title}</h4>
                   <p className="text-xs text-gray-600">{action.desc}</p>
                 </button>
@@ -600,7 +599,7 @@ export function TalentAcquisition() {
 
       <div className="grid grid-cols-1 gap-4">
         {jobPostings.map((job, index) => (
-          <motion.div
+          <div
             key={job.id}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -662,7 +661,7 @@ export function TalentAcquisition() {
                 </div>
               </div>
             </GlassmorphicCard>
-          </motion.div>
+          </div>
         ))}
       </div>
     </div>
@@ -697,7 +696,7 @@ export function TalentAcquisition() {
 
       <div className="grid grid-cols-1 gap-4">
         {filteredCandidates.map((candidate, index) => (
-          <motion.div
+          <div
             key={candidate.id}
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
@@ -774,7 +773,7 @@ export function TalentAcquisition() {
                 </div>
               </div>
             </GlassmorphicCard>
-          </motion.div>
+          </div>
         ))}
       </div>
     </div>
@@ -923,7 +922,7 @@ export function TalentAcquisition() {
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 p-4 sm:p-6 lg:p-8">
       {/* Animated Background */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <motion.div
+        <div
           className="absolute top-20 right-10 w-96 h-96 bg-purple-300/30 rounded-full blur-3xl"
           animate={{
             scale: [1, 1.2, 1],
@@ -989,8 +988,7 @@ export function TalentAcquisition() {
         </SlideIn>
 
         {/* Content */}
-        <AnimatePresence mode="wait">
-          <motion.div
+          <div
             key={viewMode}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -1003,21 +1001,19 @@ export function TalentAcquisition() {
             {viewMode === 'compliance' && renderCompliance()}
             {viewMode === 'pipeline' && renderDashboard()}
             {viewMode === 'analytics' && renderDashboard()}
-          </motion.div>
-        </AnimatePresence>
+          </div>
       </div>
 
       {/* Resume Parser Modal */}
-      <AnimatePresence>
         {showResumeParser && (
-          <motion.div
+          <div
             className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={() => setShowResumeParser(false)}
           >
-            <motion.div
+            <div
               className="bg-white rounded-2xl p-8 max-w-2xl w-full"
               initial={{ scale: 0.9, y: 20 }}
               animate={{ scale: 1, y: 0 }}
@@ -1069,10 +1065,9 @@ export function TalentAcquisition() {
                   </li>
                 </ul>
               </div>
-            </motion.div>
-          </motion.div>
+            </div>
+          </div>
         )}
-      </AnimatePresence>
     </div>
   );
 }

@@ -492,9 +492,8 @@ export function Dashboard({ onNavigate }: DashboardProps) {
             >
               <PolarGrid gridType="circle" stroke="#E5E7EB" />
               <RadialBar
-                minAngle={15}
                 background
-                clockWise
+                
                 dataKey="value"
                 cornerRadius={10}
               />

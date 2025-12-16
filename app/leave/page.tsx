@@ -1,5 +1,5 @@
-import { LeaveManagement } from '@/components/LeaveManagement'
+import { LeaveManagementEnhanced } from '@/components/LeaveManagementEnhanced'
 
 export default function LeavePage() {
-  return <LeaveManagement />
+  return <LeaveManagementEnhanced />
 }

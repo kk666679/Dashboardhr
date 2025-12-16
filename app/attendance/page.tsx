@@ -1,5 +1,5 @@
-import { AttendanceTracking } from '@/components/AttendanceTracking'
+import { AttendanceTrackingEnhanced } from '@/components/AttendanceTrackingEnhanced'
 
 export default function AttendancePage() {
-  return <AttendanceTracking />
+  return <AttendanceTrackingEnhanced />
 }

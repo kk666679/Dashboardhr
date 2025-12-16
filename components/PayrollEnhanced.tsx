@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { motion } from 'motion/react';
+import { motion } from "framer-motion";
 import { 
   Wallet, 
   TrendingUp, 
@@ -298,7 +298,7 @@ export function PayrollEnhanced() {
                           <AnimatedCounter
                             value={stat.value}
                             duration={2}
-                            decimals={typeof stat.value === 'number' && stat.value % 1 !== 0 ? 2 : 0}
+                            
                           />
                           {stat.suffix}
                         </motion.p>

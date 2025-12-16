@@ -5,7 +5,7 @@ import {
   BarChart,
   Bar,
   AreaChart,
-  Area,
+app  Area,
   PieChart,
   Pie,
   Cell,

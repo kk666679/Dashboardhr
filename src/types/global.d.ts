@@ -1,0 +1,10 @@
+declare module 'next-themes';
+declare module 'chart.js';
+declare module 'react-chartjs-2';
+declare module 'react-resizable-panels';
+declare module 'input-otp';
+declare module '@radix-ui/*';
+declare module 'lucide-react';
+declare module 'recharts';
+declare module 'class-variance-authority';
+declare module 'react-hook-form';

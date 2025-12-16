@@ -1,5 +1,5 @@
-import { EmployeeDirectory } from '@/components/EmployeeDirectory'
+import { EmployeeDirectoryEnhanced } from '@/components/EmployeeDirectoryEnhanced'
 
 export default function EmployeesPage() {
-  return <EmployeeDirectory />
+  return <EmployeeDirectoryEnhanced />
 }

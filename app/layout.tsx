@@ -1,22 +1,34 @@
-import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
-import '../styles/globals.css'
+'use client';
 
-const inter = Inter({ subsets: ['latin'] })
+import React from 'react';
+import { TenantProvider } from './src/contexts/TenantContext';
+import { RBACProvider } from './src/contexts/RBACContext';
+import { ThemeProvider } from './src/contexts/ThemeContext';
 
-export const metadata: Metadata = {
-  title: 'AI HRMS Dashboard',
-  description: 'AI-powered HR Management System for Malaysian companies',
-}
 
+/**
+ * Root layout for Next.js App Router
+ * Marked as a Client Component because AppContent relies on useState and client-only UI
+ */
 export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode
+  children?: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body className={inter.className}>{children}</body>
+    <html lang="en" suppressHydrationWarning>
+      <body className="min-h-screen antialiased">
+        <TenantProvider>
+          <RBACProvider>
+            <ThemeProvider>
+              {/* App shell (sidebar + header + routed content) */}
+              <AppContent />
+              {/* Optional slot for parallel routes or overlays */}
+              {children}
+            </ThemeProvider>
+          </RBACProvider>
+        </TenantProvider>
+      </body>
     </html>
-  )
+  );
 }

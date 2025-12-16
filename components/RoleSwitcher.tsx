@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useRBAC } from '../contexts/RBACContext';
 import { Shield, ChevronDown, Check } from 'lucide-react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence } from "framer-motion";
 
 export function RoleSwitcher() {
   const { currentUser, roles, switchRole, getCurrentRole } = useRBAC();

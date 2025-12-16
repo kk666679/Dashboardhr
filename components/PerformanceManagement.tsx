@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Target,
   TrendingUp,
@@ -1206,7 +1206,7 @@ export function PerformanceManagement() {
                           animate={{ scale: 1 }}
                           transition={{ delay: index * 0.1 + 0.3, type: 'spring' }}
                         >
-                          <AnimatedCounter value={typeof stat.value === 'number' ? stat.value : parseFloat(stat.value)} duration={2} decimals={typeof stat.value === 'string' && stat.value.includes('.') ? 1 : 0} />
+                          <AnimatedCounter value={typeof stat.value === 'number' ? stat.value : parseFloat(stat.value)} duration={2} />
                           {stat.suffix}
                         </motion.p>
                       </div>

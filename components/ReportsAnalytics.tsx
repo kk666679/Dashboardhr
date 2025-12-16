@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
 import { 
   BarChart3, 
   Download, 
@@ -357,7 +356,7 @@ export function ReportsAnalytics() {
         ].map((stat, index) => {
           const Icon = stat.icon;
           return (
-            <motion.div
+            <div
               key={index}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -377,7 +376,7 @@ export function ReportsAnalytics() {
                   <p className="text-sm text-gray-600">{stat.change}</p>
                 </div>
               </GlassmorphicCard>
-            </motion.div>
+            </div>
           );
         })}
       </div>
@@ -709,7 +708,7 @@ export function ReportsAnalytics() {
       {/* Compliance Metrics */}
       <div className="grid grid-cols-1 gap-4">
         {complianceMetrics.map((metric, index) => (
-          <motion.div
+          <div
             key={index}
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
@@ -753,7 +752,7 @@ export function ReportsAnalytics() {
                 </div>
               </div>
             </GlassmorphicCard>
-          </motion.div>
+          </div>
         ))}
       </div>
     </div>
@@ -766,7 +765,7 @@ export function ReportsAnalytics() {
         {aiPredictions.map((prediction, index) => {
           const Icon = prediction.icon;
           return (
-            <motion.div
+            <div
               key={index}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -805,7 +804,7 @@ export function ReportsAnalytics() {
                   </div>
                 </div>
               </GlassmorphicCard>
-            </motion.div>
+            </div>
           );
         })}
       </div>
@@ -837,7 +836,7 @@ export function ReportsAnalytics() {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 p-4 sm:p-6 lg:p-8">
       {/* Animated Background */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <motion.div
+        <div
           className="absolute top-20 left-10 w-96 h-96 bg-blue-300/30 rounded-full blur-3xl"
           animate={{
             scale: [1, 1.2, 1],
@@ -912,13 +911,13 @@ export function ReportsAnalytics() {
                           {metric.suffix}
                         </motion.p>
                       </div>
-                      <motion.div
+                      <div
                         className={`w-12 h-12 bg-gradient-to-br ${metric.gradient} rounded-xl flex items-center justify-center shadow-lg`}
                         whileHover={{ rotate: 360 }}
                         transition={{ duration: 0.5 }}
                       >
                         <Icon className="w-6 h-6 text-white" />
-                      </motion.div>
+                      </div>
                     </div>
                     <p className="text-sm text-gray-600">{metric.change}</p>
                   </div>
@@ -994,8 +993,7 @@ export function ReportsAnalytics() {
         </SlideIn>
 
         {/* Content */}
-        <AnimatePresence mode="wait">
-          <motion.div
+          <div
             key={reportCategory}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -1008,8 +1006,7 @@ export function ReportsAnalytics() {
             {reportCategory === 'performance' && renderPerformance()}
             {reportCategory === 'compliance' && renderCompliance()}
             {reportCategory === 'ai-insights' && renderAIInsights()}
-          </motion.div>
-        </AnimatePresence>
+          </div>
       </div>
     </div>
   );

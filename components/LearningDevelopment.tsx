@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
 import {
   BookOpen,
   GraduationCap,
@@ -417,13 +416,13 @@ export function LearningDevelopment() {
                         {stat.suffix}
                       </motion.p>
                     </div>
-                    <motion.div
+                    <div
                       className={`w-12 h-12 bg-gradient-to-br ${stat.gradient} rounded-xl flex items-center justify-center shadow-lg`}
                       whileHover={{ rotate: 360 }}
                       transition={{ duration: 0.5 }}
                     >
                       <Icon className="w-6 h-6 text-white" />
-                    </motion.div>
+                    </div>
                   </div>
                   <p className="text-sm text-gray-600">{stat.change}</p>
                 </div>
@@ -578,7 +577,7 @@ export function LearningDevelopment() {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {courses.slice(0, 3).map((course, index) => (
-                <motion.div
+                <div
                   key={course.id}
                   className="bg-white/50 backdrop-blur-sm rounded-xl p-4 border border-white/20 hover:border-blue-300 transition-all cursor-pointer"
                   initial={{ opacity: 0, y: 20 }}
@@ -602,7 +601,7 @@ export function LearningDevelopment() {
                     </span>
                     <span className="text-xs text-gray-600">{course.enrolled} enrolled</span>
                   </div>
-                </motion.div>
+                </div>
               ))}
             </div>
           </div>
@@ -643,7 +642,7 @@ export function LearningDevelopment() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {filteredCourses.map((course, index) => (
-          <motion.div
+          <div
             key={course.id}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -694,7 +693,7 @@ export function LearningDevelopment() {
                 </div>
               </div>
             </GlassmorphicCard>
-          </motion.div>
+          </div>
         ))}
       </div>
     </div>
@@ -706,7 +705,7 @@ export function LearningDevelopment() {
 
       <div className="grid grid-cols-1 gap-4">
         {employeeProgress.map((employee, index) => (
-          <motion.div
+          <div
             key={employee.id}
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
@@ -777,7 +776,7 @@ export function LearningDevelopment() {
                 </div>
               </div>
             </GlassmorphicCard>
-          </motion.div>
+          </div>
         ))}
       </div>
     </div>
@@ -795,7 +794,7 @@ export function LearningDevelopment() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {certifications.map((cert, index) => (
-          <motion.div
+          <div
             key={cert.id}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -833,7 +832,7 @@ export function LearningDevelopment() {
                 </div>
               </div>
             </GlassmorphicCard>
-          </motion.div>
+          </div>
         ))}
       </div>
     </div>
@@ -843,7 +842,7 @@ export function LearningDevelopment() {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-cyan-50 to-purple-50 p-4 sm:p-6 lg:p-8">
       {/* Animated Background */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <motion.div
+        <div
           className="absolute bottom-20 left-10 w-96 h-96 bg-cyan-300/30 rounded-full blur-3xl"
           animate={{
             scale: [1, 1.2, 1],
@@ -908,8 +907,7 @@ export function LearningDevelopment() {
         </SlideIn>
 
         {/* Content */}
-        <AnimatePresence mode="wait">
-          <motion.div
+          <div
             key={viewMode}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -921,8 +919,7 @@ export function LearningDevelopment() {
             {viewMode === 'employees' && renderEmployees()}
             {viewMode === 'certifications' && renderCertifications()}
             {viewMode === 'analytics' && renderDashboard()}
-          </motion.div>
-        </AnimatePresence>
+          </div>
       </div>
     </div>
   );

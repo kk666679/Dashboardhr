@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
 import { 
   Search, 
   Plus, 
@@ -263,7 +262,7 @@ export function EmployeeDirectory() {
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 p-4 sm:p-6 lg:p-8">
       {/* Animated Background */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <motion.div
+        <div
           className="absolute top-20 right-10 w-96 h-96 bg-purple-300/30 rounded-full blur-3xl"
           animate={{
             scale: [1, 1.2, 1],
@@ -328,13 +327,13 @@ export function EmployeeDirectory() {
                           {stat.value}
                         </motion.p>
                       </div>
-                      <motion.div
+                      <div
                         className={`w-12 h-12 bg-gradient-to-br ${stat.gradient} rounded-xl flex items-center justify-center shadow-lg`}
                         whileHover={{ rotate: 360 }}
                         transition={{ duration: 0.5 }}
                       >
                         <Icon className="w-6 h-6 text-white" />
-                      </motion.div>
+                      </div>
                     </div>
                     <p className="text-sm text-gray-600">{stat.change}</p>
                   </div>
@@ -447,9 +446,8 @@ export function EmployeeDirectory() {
         </SlideIn>
 
         {/* Employee Grid/List */}
-        <AnimatePresence mode="wait">
           {viewMode === 'grid' ? (
-            <motion.div
+            <div
               key="grid"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -500,9 +498,9 @@ export function EmployeeDirectory() {
                   </StaggerItem>
                 ))}
               </StaggerContainer>
-            </motion.div>
+            </div>
           ) : (
-            <motion.div
+            <div
               key="list"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -568,9 +566,8 @@ export function EmployeeDirectory() {
                   </table>
                 </div>
               </GlassmorphicCard>
-            </motion.div>
+            </div>
           )}
-        </AnimatePresence>
       </div>
     </div>
   );

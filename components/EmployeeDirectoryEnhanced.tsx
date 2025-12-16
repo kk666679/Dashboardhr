@@ -1,8 +1,10 @@
+"use client";
+
 import React, { useState } from 'react';
 import { EmployeeDirectory } from './EmployeeDirectory';
 import { EmployeeSelfService } from './EmployeeSelfService';
 import { UserCircle, Users, ChevronRight } from 'lucide-react';
-import { motion } from 'motion/react';
+import { motion } from "framer-motion";
 import { GlassmorphicCard } from './GlassmorphicCard';
 import { useRBAC } from '../contexts/RBACContext';
 

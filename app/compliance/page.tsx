@@ -1,5 +1,5 @@
-import { ComplianceCenter } from '@/components/ComplianceCenter'
+import { ComplianceEnhanced } from '@/components/ComplianceEnhanced'
 
 export default function CompliancePage() {
-  return <ComplianceCenter />
+  return <ComplianceEnhanced />
 }
