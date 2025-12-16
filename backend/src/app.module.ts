@@ -19,6 +19,9 @@ import { RolesModule } from './modules/roles/roles.module';
 import { DepartmentsModule } from './modules/departments/departments.module';
 import { TenantsModule } from './modules/tenants/tenants.module';
 import { PagesModule } from './modules/pages/pages.module';
+import { LearningModule } from './modules/learning/learning.module';
+import { TalentModule } from './modules/talent/talent.module';
+import { AiAgentsModule } from './modules/ai-agents/ai-agents.module';
 
 // Common Module
 import { CommonModule } from './common/common.module';
@@ -59,6 +62,9 @@ import { CommonModule } from './common/common.module';
     ComplianceModule,
     AnalyticsModule,
     PagesModule,
+    LearningModule,
+    TalentModule,
+    AiAgentsModule,
   ],
   controllers: [],
   providers: [],

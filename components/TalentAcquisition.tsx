@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import {
@@ -712,10 +714,10 @@ export function TalentAcquisition() {
                       <div className="flex items-center gap-3 mb-2">
                         <h4 className="text-lg font-bold text-gray-900">{candidate.name}</h4>
                         {candidate.bumiputera && (
-                          <Flag className="w-4 h-4 text-green-600" title="Bumiputera" />
+                          <Flag className="w-4 h-4 text-green-600" />
                         )}
                         {candidate.requiresWorkPermit && (
-                          <Globe className="w-4 h-4 text-orange-600" title="Requires Work Permit" />
+                          <Globe className="w-4 h-4 text-orange-600" />
                         )}
                       </div>
                       <p className="text-sm text-gray-600 mb-3">{candidate.position}</p>
@@ -1074,3 +1076,5 @@ export function TalentAcquisition() {
     </div>
   );
 }
+
+export default TalentAcquisition;

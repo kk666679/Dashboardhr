@@ -34,6 +34,7 @@ AI-HRMS is a comprehensive human resource management system built specifically f
 - 📊 **Real-time Analytics** - Workforce planning, attrition prediction, compliance monitoring
 - 🔄 **Multi-tenant Architecture** - Scalable for enterprise deployment
 - 🌐 **Multi-language Support** - BM, English, Chinese, Tamil, Bengali, Nepali, Indonesian
+- 🎯 **Multi-Agent AI System** - Intelligent orchestration of specialized AI agents for HR tasks
 
 ---
 

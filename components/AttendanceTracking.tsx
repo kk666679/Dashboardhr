@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState, useEffect } from 'react';
 import { Clock, CheckCircle, XCircle, AlertCircle, Download, RefreshCw, UserCheck, UserX } from 'lucide-react';
 

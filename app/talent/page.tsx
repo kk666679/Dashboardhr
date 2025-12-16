@@ -1,4 +1,4 @@
-import { TalentAcquisition } from '../../../components/TalentAcquisition'
+import { TalentAcquisition } from '../../components/TalentAcquisition'
 
 export default function TalentPage() {
   return <TalentAcquisition />

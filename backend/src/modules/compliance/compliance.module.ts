@@ -1,13 +1,7 @@
 import { Module } from '@nestjs/common';
-
-// Database
-import { DatabaseModule } from '../../database/database.module';
-
-// Controllers
-import { ComplianceController } from './compliance.controller';
-
-// Services
 import { ComplianceService } from './compliance.service';
+import { ComplianceController } from './compliance.controller';
+import { DatabaseModule } from '../../database/database.module';
 
 @Module({
   imports: [DatabaseModule],

@@ -1,8 +1,0 @@
-export default function Home() {
-  return (
-    <main className="min-h-screen bg-background">
-      <AnimatedDashboard />
-    </main>
-  )
-}</parameter>
-<parameter name="path">/workspaces/Dashboardhr/app/page_complete.tsx</parameter>

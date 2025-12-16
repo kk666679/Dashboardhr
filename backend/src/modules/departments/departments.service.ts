@@ -46,4 +46,23 @@ export class DepartmentsService {
       where: { id },
     });
   }
+
+  async findEmployeesByDepartment(id: string) {
+    return this.prisma.employee.findMany({
+      where: { departmentId: id },
+    });
+  }
+
+  async findManager(id: string) {
+    const department = await this.prisma.department.findUnique({
+      where: { id },
+      select: { managerId: true },
+    });
+    if (department?.managerId) {
+      return this.prisma.employee.findUnique({
+        where: { id: department.managerId },
+      });
+    }
+    return null;
+  }
 }

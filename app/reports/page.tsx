@@ -1,4 +1,4 @@
-import { ReportsAnalytics } from '../../../components/ReportsAnalytics'
+import { ReportsAnalytics } from '@/components/ReportsAnalytics'
 
 export default function ReportsPage() {
   return <ReportsAnalytics />

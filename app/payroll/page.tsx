@@ -1,4 +1,4 @@
-import { PayrollOverview } from '../../../components/PayrollOverview'
+import { PayrollOverview } from '@/components/PayrollOverview'
 
 export default function PayrollPage() {
   return <PayrollOverview />
