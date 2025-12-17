@@ -332,26 +332,29 @@ export function Dashboard({ onNavigate }: DashboardProps) {
             </div>
             <Users className="w-6 h-6 text-pink-600" />
           </div>
-          <ResponsiveContainer width="100%" height={300}>
-            <PieChart>
-              <Pie
-                data={departmentData}
-                cx="50%"
-                cy="50%"
-                innerRadius={70}
-                outerRadius={100}
-                paddingAngle={2}
-                dataKey="value"
-                label={(entry) => `${entry.name}: ${entry.value}`}
-              >
-                {departmentData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={COLORS_GRADIENT[index % COLORS_GRADIENT.length]} />
-                ))}
-              </Pie>
-              <Tooltip content={<CustomTooltip />} />
-              <Legend />
-            </PieChart>
-          </ResponsiveContainer>
+
+          <div style={{ width: '100%', height: '300px', minHeight: '300px' }}>
+            <ResponsiveContainer width="100%" height="100%" minHeight={300}>
+              <PieChart>
+                <Pie
+                  data={departmentData}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={70}
+                  outerRadius={100}
+                  paddingAngle={2}
+                  dataKey="value"
+                  label={(entry) => `${entry.name}: ${entry.value}`}
+                >
+                  {departmentData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={COLORS_GRADIENT[index % COLORS_GRADIENT.length]} />
+                  ))}
+                </Pie>
+                <Tooltip content={<CustomTooltip />} />
+                <Legend />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
         </div>
       </div>
 
@@ -432,25 +435,28 @@ export function Dashboard({ onNavigate }: DashboardProps) {
             </div>
             <Calendar className="w-6 h-6 text-violet-600" />
           </div>
-          <ResponsiveContainer width="100%" height={250} minHeight={250}>
-            <PieChart>
-              <Pie
-                data={leaveTypeData}
-                cx="50%"
-                cy="50%"
-                innerRadius={50}
-                outerRadius={80}
-                paddingAngle={2}
-                dataKey="value"
-                label={(entry) => `${entry.name}: ${entry.value}%`}
-              >
-                {leaveTypeData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={COLORS_PRIMARY[index % COLORS_PRIMARY.length]} />
-                ))}
-              </Pie>
-              <Tooltip content={<CustomTooltip />} />
-            </PieChart>
-          </ResponsiveContainer>
+
+          <div style={{ width: '100%', height: '250px', minHeight: '250px' }}>
+            <ResponsiveContainer width="100%" height="100%" minHeight={250}>
+              <PieChart>
+                <Pie
+                  data={leaveTypeData}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={50}
+                  outerRadius={80}
+                  paddingAngle={2}
+                  dataKey="value"
+                  label={(entry) => `${entry.name}: ${entry.value}%`}
+                >
+                  {leaveTypeData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={COLORS_PRIMARY[index % COLORS_PRIMARY.length]} />
+                  ))}
+                </Pie>
+                <Tooltip content={<CustomTooltip />} />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
         </div>
 
         {/* Department Performance */}
@@ -462,15 +468,18 @@ export function Dashboard({ onNavigate }: DashboardProps) {
             </div>
             <Award className="w-6 h-6 text-blue-600" />
           </div>
-          <ResponsiveContainer width="100%" height={250}>
-            <BarChart data={departmentPerformanceData} layout="vertical">
-              <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
-              <XAxis type="number" stroke="#6B7280" />
-              <YAxis dataKey="department" type="category" stroke="#6B7280" width={100} />
-              <Tooltip content={<CustomTooltip />} />
-              <Bar dataKey="performance" fill="#8B5CF6" radius={[0, 8, 8, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
+
+          <div style={{ width: '100%', height: '250px', minHeight: '250px' }}>
+            <ResponsiveContainer width="100%" height="100%" minHeight={250}>
+              <BarChart data={departmentPerformanceData} layout="vertical">
+                <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
+                <XAxis type="number" stroke="#6B7280" />
+                <YAxis dataKey="department" type="category" stroke="#6B7280" width={100} />
+                <Tooltip content={<CustomTooltip />} />
+                <Bar dataKey="performance" fill="#8B5CF6" radius={[0, 8, 8, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
         </div>
 
         {/* Skills Progress */}
@@ -482,25 +491,28 @@ export function Dashboard({ onNavigate }: DashboardProps) {
             </div>
             <Brain className="w-6 h-6 text-pink-600" />
           </div>
-          <ResponsiveContainer width="100%" height={250}>
-            <RadialBarChart
-              innerRadius="10%"
-              outerRadius="90%"
-              data={skillsProgressData}
-              startAngle={90}
-              endAngle={-270}
-            >
-              <PolarGrid gridType="circle" stroke="#E5E7EB" />
-              <RadialBar
-                background
-                
-                dataKey="value"
-                cornerRadius={10}
-              />
-              <Legend iconSize={10} layout="vertical" verticalAlign="middle" align="right" />
-              <Tooltip content={<CustomTooltip />} />
-            </RadialBarChart>
-          </ResponsiveContainer>
+
+          <div style={{ width: '100%', height: '250px', minHeight: '250px' }}>
+            <ResponsiveContainer width="100%" height="100%" minHeight={250}>
+              <RadialBarChart
+                innerRadius="10%"
+                outerRadius="90%"
+                data={skillsProgressData}
+                startAngle={90}
+                endAngle={-270}
+              >
+                <PolarGrid gridType="circle" stroke="#E5E7EB" />
+                <RadialBar
+                  background
+                  
+                  dataKey="value"
+                  cornerRadius={10}
+                />
+                <Legend iconSize={10} layout="vertical" verticalAlign="middle" align="right" />
+                <Tooltip content={<CustomTooltip />} />
+              </RadialBarChart>
+            </ResponsiveContainer>
+          </div>
         </div>
       </div>
 

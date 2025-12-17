@@ -167,8 +167,12 @@ export default function ContentChart() {
             <option>Last 3 months</option>
           </select>
         </div>
-        <div className="h-64 sm:h-80 w-full">
-          <Line data={contentData} options={window.innerWidth < 640 ? mobileChartOptions : chartOptions} />
+
+        <div className="h-64 sm:h-80 w-full min-h-[16rem]">
+          <Line 
+            data={contentData} 
+            options={typeof window !== 'undefined' && window.innerWidth < 640 ? mobileChartOptions : chartOptions} 
+          />
         </div>
       </div>
 
@@ -178,8 +182,12 @@ export default function ContentChart() {
           <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">Content by Category</h3>
           <span className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">This year</span>
         </div>
-        <div className="h-48 sm:h-64 w-full">
-          <Bar data={categoryData} options={window.innerWidth < 640 ? mobileChartOptions : chartOptions} />
+
+        <div className="h-48 sm:h-64 w-full min-h-[12rem]">
+          <Bar 
+            data={categoryData} 
+            options={typeof window !== 'undefined' && window.innerWidth < 640 ? mobileChartOptions : chartOptions} 
+          />
         </div>
       </div>
     </div>

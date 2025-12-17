@@ -1,9 +1,9 @@
 'use client';
 
 import React from 'react';
-import { TenantProvider } from './src/contexts/TenantContext';
-import { RBACProvider } from './src/contexts/RBACContext';
-import { ThemeProvider } from './src/contexts/ThemeContext';
+import { TenantProvider } from '../contexts/TenantContext';
+import { RBACProvider } from '../contexts/RBACContext';
+import { ThemeProvider } from '../contexts/ThemeContext';
 
 
 /**
@@ -22,7 +22,6 @@ export default function RootLayout({
           <RBACProvider>
             <ThemeProvider>
               {/* App shell (sidebar + header + routed content) */}
-              <AppContent />
               {/* Optional slot for parallel routes or overlays */}
               {children}
             </ThemeProvider>

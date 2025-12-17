@@ -8,3 +8,7 @@ export function AIChat() {
     </div>
   );
 }
+
+export default function AIChatPage() {
+  return <AIChat />;
+}

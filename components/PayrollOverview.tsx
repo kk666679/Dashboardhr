@@ -122,18 +122,21 @@ export function PayrollOverview() {
             Export
           </button>
         </div>
-        <ResponsiveContainer width="100%" height={300} minHeight={300}>
-          <BarChart data={monthlyData}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-            <XAxis dataKey="month" stroke="#6b7280" />
-            <YAxis stroke="#6b7280" />
-            <Tooltip 
-              formatter={(value: number) => `RM ${value.toLocaleString()}`}
-              contentStyle={{ borderRadius: '8px', border: '1px solid #e5e7eb' }}
-            />
-            <Bar dataKey="amount" fill="#3B82F6" radius={[8, 8, 0, 0]} />
-          </BarChart>
-        </ResponsiveContainer>
+
+        <div style={{ width: '100%', height: '300px', minHeight: '300px' }}>
+          <ResponsiveContainer width="100%" height="100%" minHeight={300}>
+            <BarChart data={monthlyData}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+              <XAxis dataKey="month" stroke="#6b7280" />
+              <YAxis stroke="#6b7280" />
+              <Tooltip 
+                formatter={(value: number) => `RM ${value.toLocaleString()}`}
+                contentStyle={{ borderRadius: '8px', border: '1px solid #e5e7eb' }}
+              />
+              <Bar dataKey="amount" fill="#3B82F6" radius={[8, 8, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
       </div>
 
       {/* Employee Payroll Details */}

@@ -1,6 +1,8 @@
+
 'use client';
 
 import React, { useState } from 'react';
+import { motion } from 'framer-motion';
 import {
   BookOpen,
   GraduationCap,
@@ -416,13 +418,15 @@ export function LearningDevelopment() {
                         {stat.suffix}
                       </motion.p>
                     </div>
-                    <div
+
+
+                    <motion.div
                       className={`w-12 h-12 bg-gradient-to-br ${stat.gradient} rounded-xl flex items-center justify-center shadow-lg`}
                       whileHover={{ rotate: 360 }}
                       transition={{ duration: 0.5 }}
                     >
                       <Icon className="w-6 h-6 text-white" />
-                    </div>
+                    </motion.div>
                   </div>
                   <p className="text-sm text-gray-600">{stat.change}</p>
                 </div>
@@ -577,7 +581,8 @@ export function LearningDevelopment() {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {courses.slice(0, 3).map((course, index) => (
-                <div
+
+                <motion.div
                   key={course.id}
                   className="bg-white/50 backdrop-blur-sm rounded-xl p-4 border border-white/20 hover:border-blue-300 transition-all cursor-pointer"
                   initial={{ opacity: 0, y: 20 }}
@@ -601,7 +606,8 @@ export function LearningDevelopment() {
                     </span>
                     <span className="text-xs text-gray-600">{course.enrolled} enrolled</span>
                   </div>
-                </div>
+
+                </motion.div>
               ))}
             </div>
           </div>
@@ -641,8 +647,9 @@ export function LearningDevelopment() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+
         {filteredCourses.map((course, index) => (
-          <div
+          <motion.div
             key={course.id}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -686,6 +693,7 @@ export function LearningDevelopment() {
                 <div className="border-t border-gray-200 pt-3">
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-gray-600">{course.enrolled} enrolled</span>
+
                     <span className="font-semibold text-green-600">
                       {Math.round((course.completed / course.enrolled) * 100)}% completed
                     </span>
@@ -693,7 +701,7 @@ export function LearningDevelopment() {
                 </div>
               </div>
             </GlassmorphicCard>
-          </div>
+          </motion.div>
         ))}
       </div>
     </div>
@@ -704,8 +712,10 @@ export function LearningDevelopment() {
       <h3 className="text-xl font-bold text-gray-900">Employee Learning Progress</h3>
 
       <div className="grid grid-cols-1 gap-4">
+
+
         {employeeProgress.map((employee, index) => (
-          <div
+          <motion.div
             key={employee.id}
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
@@ -776,7 +786,7 @@ export function LearningDevelopment() {
                 </div>
               </div>
             </GlassmorphicCard>
-          </div>
+          </motion.div>
         ))}
       </div>
     </div>

@@ -60,7 +60,7 @@ export const GlassmorphicCard: React.FC<GlassmorphicCardProps> = ({
     : {};
 
   return (
-    <div
+    <motion.div
       className={`
         bg-gradient-to-br ${gradient}
         dark:from-gray-800/70 dark:to-gray-700/50
@@ -78,7 +78,7 @@ export const GlassmorphicCard: React.FC<GlassmorphicCardProps> = ({
       onClick={onClick}
     >
       {children}
-    </div>
+    </motion.div>
   );
 };
 
@@ -143,7 +143,7 @@ export const FloatingElement: React.FC<FloatingElementProps> = ({
   yOffset = 10,
 }) => {
   return (
-    <div
+    <motion.div
       initial={{ y: 0 }}
       animate={{ y: [-yOffset, yOffset, -yOffset] }}
       transition={{
@@ -154,7 +154,7 @@ export const FloatingElement: React.FC<FloatingElementProps> = ({
       }}
     >
       {children}
-    </div>
+    </motion.div>
   );
 };
 
@@ -170,7 +170,7 @@ export const PulseElement: React.FC<PulseElementProps> = ({
   duration = 2,
 }) => {
   return (
-    <div
+    <motion.div
       initial={{ scale: 1 }}
       animate={{ scale: [1, 1.05, 1] }}
       transition={{
@@ -181,7 +181,7 @@ export const PulseElement: React.FC<PulseElementProps> = ({
       }}
     >
       {children}
-    </div>
+    </motion.div>
   );
 };
 
@@ -197,7 +197,7 @@ export const StaggerContainer: React.FC<StaggerContainerProps> = ({
   className = '',
 }) => {
   return (
-    <div
+    <motion.div
       className={className}
       initial="hidden"
       animate="visible"
@@ -212,7 +212,7 @@ export const StaggerContainer: React.FC<StaggerContainerProps> = ({
       }}
     >
       {children}
-    </div>
+    </motion.div>
   );
 };
 
@@ -220,14 +220,14 @@ export const StaggerItem: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   return (
-    <div
+    <motion.div
       variants={{
         hidden: { opacity: 0, y: 20 },
         visible: { opacity: 1, y: 0 },
       }}
     >
       {children}
-    </div>
+    </motion.div>
   );
 };
 
@@ -250,13 +250,13 @@ export const SlideIn: React.FC<SlideInProps> = ({
   };
 
   return (
-    <div
+    <motion.div
       initial={{ opacity: 0, ...directions[direction] }}
       animate={{ opacity: 1, x: 0, y: 0 }}
       transition={{ duration: 0.5, delay, type: 'spring', stiffness: 100 }}
     >
       {children}
-    </div>
+    </motion.div>
   );
 };
 
@@ -267,13 +267,13 @@ interface RotateInProps {
 
 export const RotateIn: React.FC<RotateInProps> = ({ children, delay = 0 }) => {
   return (
-    <div
+    <motion.div
       initial={{ opacity: 0, rotate: -10 }}
       animate={{ opacity: 1, rotate: 0 }}
       transition={{ duration: 0.5, delay, type: 'spring', stiffness: 100 }}
     >
       {children}
-    </div>
+    </motion.div>
   );
 };
 
@@ -341,7 +341,7 @@ export const GlassInput: React.FC<{
   className = '',
 }) => {
   return (
-    <div
+    <motion.div
       className={`relative ${className}`}
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
@@ -374,7 +374,7 @@ export const GlassInput: React.FC<{
           transition-all
         `}
       />
-    </div>
+    </motion.div>
   );
 };
 
@@ -405,7 +405,7 @@ export const ParallaxCard: React.FC<{
   };
 
   return (
-    <div
+    <motion.div
       className={`perspective-1000 ${className}`}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
@@ -417,6 +417,6 @@ export const ParallaxCard: React.FC<{
       style={{ transformStyle: 'preserve-3d' }}
     >
       {children}
-    </div>
+    </motion.div>
   );
 };

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { AIChat } from '../../../AIChat';
+import { AIChat } from '../../../components/AIChat';
 import {
   Code,
   Send,
