@@ -1,0 +1,416 @@
+<svg xmlns="http://www.w3.org/2000/svg"
+     width="512"
+     height="512"
+     viewBox="0 0 512 512">
+
+<style>
+
+.mascot {
+ transform-origin:center;
+ animation:float 4s ease-in-out infinite;
+ cursor:pointer;
+}
+
+.mascot:hover {
+ filter:url(#hoverGlow);
+ transform:scale(1.06);
+}
+
+
+.eye {
+ animation:blink 5s infinite;
+ transform-origin:center;
+}
+
+
+.core {
+ animation:pulse 2s infinite;
+}
+
+
+.node {
+ animation:signal 1.5s infinite alternate;
+}
+
+
+.circuit {
+ stroke-dasharray:12 12;
+ animation:dataflow 2s linear infinite;
+}
+
+
+
+@keyframes float {
+0%,100% {
+ transform:translateY(0);
+}
+
+50% {
+ transform:translateY(-12px);
+}
+}
+
+
+
+@keyframes blink {
+
+0%,92%,100% {
+ transform:scaleY(1);
+}
+
+95% {
+ transform:scaleY(.1);
+}
+
+}
+
+
+
+@keyframes pulse {
+
+0%,100% {
+ r:28;
+ opacity:.7;
+}
+
+50% {
+ r:40;
+ opacity:1;
+}
+
+}
+
+
+
+@keyframes signal {
+
+from {
+ opacity:.3;
+}
+
+to {
+ opacity:1;
+}
+
+}
+
+
+
+@keyframes dataflow {
+
+to {
+ stroke-dashoffset:-50;
+}
+
+}
+
+</style>
+
+
+<defs>
+
+
+<linearGradient id="bg"
+ x2="1"
+ y2="1">
+
+<stop stop-color="#020617"/>
+
+<stop offset="1"
+      stop-color="#0f172a"/>
+
+</linearGradient>
+
+
+
+<linearGradient id="robot"
+ x2="1"
+ y2="1">
+
+<stop stop-color="#38bdf8"/>
+
+<stop offset=".5"
+      stop-color="#2563eb"/>
+
+<stop offset="1"
+      stop-color="#22c55e"/>
+
+</linearGradient>
+
+
+
+<linearGradient id="shield"
+ x2="0"
+ y2="1">
+
+<stop stop-color="#22c55e"/>
+
+<stop offset="1"
+      stop-color="#15803d"/>
+
+</linearGradient>
+
+
+
+<filter id="glow">
+
+<feGaussianBlur stdDeviation="10"
+result="blur"/>
+
+<feMerge>
+
+<feMergeNode in="blur"/>
+
+<feMergeNode in="SourceGraphic"/>
+
+</feMerge>
+
+</filter>
+
+
+
+<filter id="hoverGlow">
+
+<feGaussianBlur stdDeviation="15"
+result="blur"/>
+
+<feMerge>
+
+<feMergeNode in="blur"/>
+
+<feMergeNode in="SourceGraphic"/>
+
+</feMerge>
+
+</filter>
+
+
+</defs>
+
+
+
+<!-- Background -->
+
+<rect width="512"
+      height="512"
+      rx="120"
+      fill="url(#bg)"/>
+
+
+
+<!-- AI Aura -->
+
+<circle cx="256"
+        cy="220"
+        r="170"
+        fill="#38bdf8"
+        opacity=".08"/>
+
+
+
+<circle cx="256"
+        cy="220"
+        r="140"
+        fill="none"
+        stroke="#38bdf8"
+        stroke-width="2"
+        opacity=".25"/>
+
+
+
+
+<g class="mascot">
+
+
+<!-- Robot head -->
+
+
+<rect x="120"
+      y="120"
+      width="272"
+      height="210"
+      rx="80"
+      fill="url(#robot)"
+      filter="url(#glow)"/>
+
+
+
+<!-- Antenna -->
+
+
+<line x1="256"
+      y1="120"
+      x2="256"
+      y2="75"
+      stroke="#38bdf8"
+      stroke-width="8"/>
+
+
+<circle cx="256"
+        cy="65"
+        r="15"
+        fill="#22c55e"
+        class="node"/>
+
+
+
+
+<!-- Face -->
+
+
+<rect x="155"
+      y="170"
+      width="202"
+      height="120"
+      rx="50"
+      fill="#020617"/>
+
+
+
+
+<!-- Eyes -->
+
+
+<ellipse cx="210"
+         cy="220"
+         rx="22"
+         ry="30"
+         fill="#38bdf8"
+         class="eye"
+         filter="url(#glow)"/>
+
+
+<ellipse cx="302"
+         cy="220"
+         rx="22"
+         ry="30"
+         fill="#38bdf8"
+         class="eye"
+         filter="url(#glow)"/>
+
+
+
+
+<!-- AI Core -->
+
+<circle cx="256"
+        cy="260"
+        r="32"
+        fill="#22c55e"
+        class="core"
+        filter="url(#glow)"/>
+
+
+<circle cx="256"
+        cy="260"
+        r="10"
+        fill="white"/>
+
+
+
+
+<!-- Neural circuits -->
+
+
+<g stroke="#38bdf8"
+   stroke-width="4"
+   fill="none"
+   class="circuit">
+
+
+<path d="
+M160 180
+L110 150
+"/>
+
+
+<path d="
+M352 180
+L402 150
+"/>
+
+
+<path d="
+M160 270
+L100 300
+"/>
+
+
+<path d="
+M352 270
+L412 300
+"/>
+
+
+</g>
+
+
+
+
+<!-- HR Shield -->
+
+
+<path d="
+M205 345
+L256 325
+L307 345
+V405
+Q256 450
+205 405Z"
+fill="url(#shield)"
+stroke="white"
+stroke-width="5"/>
+
+
+<path d="
+M235 380
+L250 395
+L282 360"
+fill="none"
+stroke="white"
+stroke-width="8"/>
+
+
+
+
+<!-- Floating AI nodes -->
+
+
+<circle cx="90"
+        cy="210"
+        r="8"
+        fill="#22c55e"
+        class="node"/>
+
+
+<circle cx="422"
+        cy="210"
+        r="8"
+        fill="#22c55e"
+        class="node"/>
+
+
+
+</g>
+
+
+
+
+<!-- Brand -->
+
+
+<text x="256"
+      y="475"
+      text-anchor="middle"
+      font-family="Inter,system-ui"
+      font-size="52"
+      font-weight="900"
+      letter-spacing="5"
+      fill="white">
+
+AiFWMS
+
+</text>
+
+
+</svg>
