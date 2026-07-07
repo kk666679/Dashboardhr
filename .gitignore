@@ -2,5 +2,5 @@ node_modules
 .next
 .env*
 components
-.claude
-
+lib
+hooks

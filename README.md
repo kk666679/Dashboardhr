@@ -1,3 +1,9 @@
+
+<!--
+  AiFWMS — AI Foreign Worker Management System
+  Enterprise-grade README generated from repository analysis.
+  Note: No features were invented; uncertain items are marked with > **TODO:** Verify implementation.
+-->
 <div align="center">
 
   <!-- Logo placeholder -->
@@ -708,7 +714,11 @@ See [docs/FAQ.md](./docs/FAQ.md) for answers to common questions about:
 
 ## License
 
+<<<<<<< HEAD
 PROPRIETARY — see [LICENSE](./LICENSE).
+=======
+PROPRIETARY — see `LICENSE`.
+>>>>>>> 7b8345c (docs: updated)
 
 ---
 
