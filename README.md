@@ -1,5 +1,5 @@
 <!--
-  FWMS — Foreign Worker Management System
+  AiFWMS — AI Foreign Worker Management System
   Enterprise-grade README generated from repository analysis.
   Note: No features were invented; uncertain items are marked with > **TODO:** Verify implementation.
 -->
@@ -855,7 +855,7 @@ If provider keys aren’t available, the repo’s README mentions local orchestr
 
 ## License
 
-MIT — see `LICENSE`.
+PROPRIETARY — see `LICENSE`.
 
 ---
 

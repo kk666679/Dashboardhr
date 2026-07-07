@@ -1,8 +1,8 @@
 node_modules
 .next
-docs
-.claude
 .env*
 components
+.claude
 lib
 hooks
+docs
