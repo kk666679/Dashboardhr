@@ -1,0 +1,78 @@
+# Docker Compose — Sprint 30, Task 30.3
+# Single command: docker-compose up
+# Requirements: 30.6
+
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_DB: hcm_dev
+      POSTGRES_USER: hcm
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-hcm_dev_password}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U hcm -d hcm_dev"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    command: redis-server --maxmemory 512mb --maxmemory-policy allkeys-lru
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: development
+    environment:
+      DATABASE_URL: postgresql://hcm:${POSTGRES_PASSWORD:-hcm_dev_password}@postgres:5432/hcm_dev
+      REDIS_URL: redis://redis:6379
+      SECRETS_PROVIDER: env
+      NEXT_PUBLIC_TENANT_ID: tenant1
+      NODE_ENV: development
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/.next
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: npm run dev
+
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: development
+    environment:
+      DATABASE_URL: postgresql://hcm:${POSTGRES_PASSWORD:-hcm_dev_password}@postgres:5432/hcm_dev
+      REDIS_URL: redis://redis:6379
+      SECRETS_PROVIDER: env
+      NODE_ENV: development
+    volumes:
+      - .:/app
+      - /app/node_modules
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: npx tsx workers/index.ts
+
+volumes:
+  pgdata:
