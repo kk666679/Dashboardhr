@@ -1,41 +1,65 @@
 {
   "compilerOptions": {
+    "ignoreDeprecations": "6.0",
+    "baseUrl": ".",
     "lib": [
       "dom",
       "dom.iterable",
       "esnext"
     ],
     "allowJs": true,
+    "target": "ES2024",
     "skipLibCheck": true,
     "strict": false,
-    "noEmit": true,
-    "incremental": true,
-    "module": "esnext",
+    "noEmit": false,
     "esModuleInterop": true,
-    "moduleResolution": "node",
+    "module": "esnext",
+    "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "react-jsx",
+    "incremental": true,
     "plugins": [
       {
         "name": "next"
       }
     ],
-    "target": "ES2017",
-    "baseUrl": ".",
     "paths": {
-      "@/*": ["./*"]
-    }
+      "@/*": [
+        "./*"
+      ],
+      "@/components/*": [
+        "./components/*"
+      ],
+      "@/hooks/*": [
+        "./hooks/*"
+      ],
+      "@/lib/*": [
+        "./lib/*"
+      ],
+      "@/server/*": [
+        "./server/*"
+      ],
+      "@/services/*": [
+        "./services/*"
+      ],
+      "@/types/*": [
+        "types/*"
+      ],
+      "@/utils/*": [
+        "./utils/*"
+      ]
+    },
+    "forceConsistentCasingInFileNames": true
   },
-  "include": [ "src/types/**/*.d.ts", "src/types/**/*.d.ts",
+  "include": [
     "next-env.d.ts",
-    ".next/types/**/*.ts",
     "**/*.ts",
     "**/*.tsx",
+    ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts"
   ],
   "exclude": [
-    "node_modules",
-    "backend/**"
+    "node_modules"
   ]
 }
