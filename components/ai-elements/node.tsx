@@ -11,18 +11,20 @@ import { cn } from "@/lib/utils";
 import { Handle, Position } from "@xyflow/react";
 import type { ComponentProps } from "react";
 
-export type NodeProps = ComponentProps<typeof Card> & {
+export type NodeProps<T = unknown> = ComponentProps<typeof Card> & {
   handles: {
     target: boolean;
     source: boolean;
   };
+  data?: T;
+  selected?: boolean;
 };
 
 export const Node = ({ handles, className, ...props }: NodeProps) => (
   <Card
     className={cn(
       "node-container relative size-full h-auto w-sm gap-0 rounded-md p-0",
-      className
+      className,
     )}
     {...props}
   >
