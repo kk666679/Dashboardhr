@@ -855,7 +855,7 @@ If provider keys aren’t available, the repo’s README mentions local orchestr
 
 ## License
 
-MIT — see `LICENSE`.
+**PROPRIETARY** — see `LICENSE`.
 
 ---
 
