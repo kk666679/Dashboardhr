@@ -147,29 +147,25 @@
 
 > Placeholders (replace these paths with real images once available).
 
-### Desktop
+### Desktop CMD
 
-![Desktop Dashboard](./public/screenshots/desktop.png)
+![Desktop CMD](./docs/cmd.png)
 
-### Dark Mode
+### Flow Design
 
-![Dark Mode Dashboard](./public/screenshots/dark.png)
-
-### Mobile
-
-![Mobile Landing](./public/screenshots/mobile.png)
+![Flow Design](./docs/flow-design.png)
 
 ### Landing Page
 
-![Landing Page](./public/screenshots/landing.png)
+![Landing Page](./docs/landing.png)
 
-### Admin
+### Manager Self Service [MSS] Dashboard
 
-![Admin Dashboard](./public/screenshots/admin.png)
+![MSS Dashboard](./docs/mss.png)
 
-### Analytics
+### Live Location
 
-![Analytics](./public/screenshots/analytics.png)
+![Live](./docs/live-location.png)
 
 ---
 
