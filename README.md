@@ -283,25 +283,66 @@ flowchart LR
 
 ```mermaid
 flowchart TD
-  User
-  ↓
-  Middleware
-  ↓
-  Authentication
-  ↓
-  App Router
-  ↓
-  Layout
-  ↓
-  Pages / Routes
-  ↓
-  Components
-  ↓
-  API / tRPC
-  ↓
-  Services
-  ↓
-  Database
+    App["Full-Stack Application"]
+    
+    App --> FE["Frontend Layer (UI)"]
+    App --> API["API Transport Layer"]
+    App --> Services["Business Services Layer"]
+    App --> Data["Data Access Layer"]
+
+    %% --- FRONTEND BREAKDOWN ---
+    FE --> Pages["Pages (App Router)"]
+    FE --> Components["Components"]
+    FE --> Hooks["Custom Hooks"]
+    FE --> States["Client State (Context/Zustand)"]
+    
+    Pages --> AuthUI["Authentication Pages"]
+    Pages --> DashUI["Dashboard Pages"]
+    Pages --> SettingsUI["Settings Pages"]
+
+    Components --> SharedUI["Shared UI (Buttons/Modals)"]
+    Components --> FeatureUI["Feature-specific UI"]
+
+    %% --- API BREAKDOWN ---
+    API --> REST["REST Endpoints (route.ts)"]
+    API --> TRPC["tRPC Routers"]
+    API --> Validate["Input Validation (Zod)"]
+
+    TRPC --> UserRouter["User Router"]
+    TRPC --> ProductRouter["Product Router"]
+    TRPC --> OrderRouter["Order Router"]
+
+    %% --- SERVICES BREAKDOWN ---
+    Services --> AuthSvc["Authentication Service"]
+    Services --> BillingSvc["Billing/Payment Service"]
+    Services --> NotificationSvc["Notification Service"]
+    Services --> InventorySvc["Inventory Service"]
+    Services --> ReportingSvc["Reporting/Analytics Service"]
+
+    %% --- DATA BREAKDOWN ---
+    Data --> Repos["Repository Pattern"]
+    Data --> ORM["ORM (Prisma/Drizzle)"]
+    Data --> Migrations["Schema Migrations"]
+    
+    Repos --> UserRepo["User Repository"]
+    Repos --> ProductRepo["Product Repository"]
+    Repos --> OrderRepo["Order Repository"]
+
+    ORM --> DB[("PostgreSQL / MongoDB")]
+    Migrations --> DB
+
+    %% --- BLACK & WHITE STYLING (Grayscale Shading for Layer Differentiation) ---
+    classDef root fill:#ffffff,stroke:#000000,stroke-width:3px,color:#000000;
+    classDef front fill:#f9f9f9,stroke:#000000,stroke-width:2px,color:#000000;
+    classDef api fill:#e0e0e0,stroke:#000000,stroke-width:2px,color:#000000;
+    classDef svc fill:#cccccc,stroke:#000000,stroke-width:2px,color:#000000;
+    classDef data fill:#b3b3b3,stroke:#000000,stroke-width:2px,color:#000000;
+    
+    class App root;
+    class FE,Pages,Components,Hooks,States,AuthUI,DashUI,SettingsUI,SharedUI,FeatureUI front;
+    class API,REST,TRPC,Validate,UserRouter,ProductRouter,OrderRouter api;
+    class Services,AuthSvc,BillingSvc,NotificationSvc,InventorySvc,ReportingSvc svc;
+    class Data,Repos,ORM,Migrations,UserRepo,ProductRepo,OrderRepo,DB data;
 ```
 
 </details>
@@ -862,15 +903,4 @@ PROPRIETARY — see `LICENSE`.
 - Prisma
 - Vercel AI SDK
 - Open source community contributors
-
----
-
-## Footer
-
-Made with ❤️ using
-
-- Next.js
-- React
-- TypeScript
-- Tailwind CSS
 
