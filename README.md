@@ -167,6 +167,10 @@
 
 ![Live](./docs/live-location.png)
 
+### Compliance Management
+
+![Compliance](./docs/Screenshot_2026-2.png)
+
 ---
 
 ## Features
