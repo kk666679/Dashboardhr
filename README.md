@@ -171,6 +171,10 @@
 
 ![Compliance](./docs/Screenshot_2026-2.png)
 
+### Foreign Workers Permit & Immigrations
+
+![Permit](./docs/Screenshot_2026-3.png)
+
 ---
 
 ## Features
