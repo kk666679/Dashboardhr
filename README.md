@@ -100,7 +100,7 @@
 
 ## Quick Links
 
-- Live Demo: > **TODO:** Verify implementation.
+- Live Demo: > https://aifwms.xyz
 - Documentation: `docs/` and in-repo guides (see **Docs Roadmap**)
 - Issues: https://github.com/kk666679/dahboardhr/issues
 - Discussions: https://github.com/kk666679/dashboardhr/discussions
