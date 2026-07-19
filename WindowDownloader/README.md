@@ -2,7 +2,7 @@
 
 <div align="center">
 
-  <img src="./assets/icon.ico" alt="Window Downloader Icon" width="96" height="96" style="border-radius:24px;" />
+  <img src="./public/favicon.ico" alt="Window Downloader Icon" width="96" height="96" style="border-radius:24px;" />
 
   # Window Downloader
 
