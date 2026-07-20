@@ -175,6 +175,10 @@
 
 ![Permit](./docs/Screenshot_2026-3.png)
 
+### Accounting
+
+![Accounting](./public/accounting.png)
+
 ---
 
 ## Features
