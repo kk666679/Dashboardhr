@@ -179,6 +179,10 @@
 
 ![Accounting](./public/accounting.png)
 
+### Data Governance
+
+![Data Governance](./public/data-governance.png)
+
 ---
 
 ## Features
