@@ -384,10 +384,10 @@ graph TD
         A --> C[(Redis)]
         A --> D[BullMQ Workers]
         D --> C
-        B --> E[Neon Serverless (optional)]
+        B --> E[Neon Serverless]
     end
     F[External AI APIs] --> A
-    G[Vercel (optional)] --> A
+    G[Vercel] --> A
 ```
 
 For additional diagrams covering security, i18n, and more detailed component interactions, see [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md).
