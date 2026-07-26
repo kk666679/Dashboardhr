@@ -586,7 +586,7 @@ See [docs/QUICK_START.md](./docs/QUICK_START.md) for detailed setup instructions
 
 | Feature | Details |
 |---|---|
-| **Locales** | 9 languages (en, ms, zh, es, id, th, ph, vt, ar) |
+| **Locales** | 11 languages (en, ms, zh, es, id, th, ph, vt, bn, ne, ar) |
 | **RTL Support** | Arabic (`ar`) with full bidirectional layout |
 | **Translation Namespaces** | common, validation, errors, notifications, email |
 | **Formatting** | Locale-specific date, number, and currency formatting |
