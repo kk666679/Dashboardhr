@@ -1,0 +1,24 @@
+export { AppShell, useAppShell } from "./AppShell";
+export type { AppShellProps, ShellMode } from "./AppShell";
+export { ProductLayout } from "./ProductLayout";
+export { Header } from "./Header";
+export { ProductSidebar } from "./ProductSidebar";
+export { Breadcrumb } from "./Breadcrumb";
+export { MegaMenu } from "./MegaMenu";
+export { MobileMenu } from "./MobileMenu";
+export { UserMenu } from "./UserMenu";
+export { ProductSwitcher } from "./ProductSwitcher";
+export { SearchBar } from "./Search";
+export { CommandPalette, useCommandPalette } from "./CommandPalette";
+export type { CommandPaletteProps, CommandItem, CommandGroup } from "./CommandPalette";
+export { useCommandGroup } from "./command-registry";
+export type { RegisteredCommandGroup, RegisteredCommandItem } from "./command-registry";
+export { FeatureFlagProvider, FeatureFlag, FeatureFlagBadge, FeatureFlagList, useFeatureFlags, DEFAULT_FEATURE_FLAGS } from "./FeatureFlag";
+export type { FlagVariant, FeatureFlagConfig, FeatureFlagContextValue, FeatureFlagProps, FeatureFlagBadgeProps, FeatureFlagListProps } from "./FeatureFlag";
+export { AIStreamingText } from "./AIStreamingText";
+export type { AIStreamingTextProps, StreamingEffect } from "./AIStreamingText";
+export { AuditLogViewer } from "./AuditLogViewer";
+export type { AuditLogViewerProps, AuditLogEntry, AuditAction } from "./AuditLogViewer";
+export { NotificationsDropdown } from "./NotificationsDropdown";
+export type { NotificationsDropdownProps, Notification, NotificationType, NotificationSource } from "./NotificationsDropdown";
+
