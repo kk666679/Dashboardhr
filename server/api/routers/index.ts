@@ -1,0 +1,13 @@
+export { terminationRouter } from "./termination";
+export { automationRouter } from "./automation";
+export { companyRouter } from "./company";
+export { compensationRouter } from "./compensation";
+export { schedulingRouter } from "./scheduling";
+export { zakatRouter } from "./zakat";
+export { foreignWorkerRouter } from "./foreignWorker";
+export { documentsRouter } from "./documents";
+export { geolocationRouter } from "./geolocation";
+export { successionRouter } from "./succession";
+export { workflowRouter } from "./workflow";
+export { employeeRouter } from "./employee";
+export { adminRouter } from "./admin";
