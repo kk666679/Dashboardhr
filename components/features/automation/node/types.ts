@@ -1,0 +1,104 @@
+import type { Node } from "@xyflow/react";
+
+export interface AutomationNodeData extends Record<string, unknown> {
+  label?: string;
+  description?: string;
+  taskType?: string;
+  assignee?: string;
+  dueDate?: string;
+  status?: "pending" | "running" | "completed" | "failed" | "idle" | "waiting" | "triggered" | "timeout" | "active" | "inactive" | "on-leave" | "on-track" | "at-risk" | "behind";
+  priority?: "low" | "medium" | "high" | "critical";
+  condition?: string;
+  trueLabel?: string;
+  falseLabel?: string;
+  actionType?: string;
+  config?: Record<string, unknown>;
+  event?: string;
+  schedule?: string;
+  result?: string;
+  groupType?: "parallel" | "sequential" | "conditional";
+  collapsed?: boolean;
+  children?: string[];
+  waitType?: "time" | "event" | "condition";
+  duration?: number;
+  timeout?: number;
+  workflowId?: string;
+  workflowName?: string;
+  version?: string;
+  parameters?: Record<string, unknown>;
+  name?: string;
+  email?: string;
+  department?: string;
+  role?: string;
+  avatar?: string;
+  employeeCount?: number;
+  manager?: string;
+  color?: string;
+  value?: string | number;
+  subtitle?: string;
+  trend?: "up" | "down" | "neutral";
+  trendValue?: string;
+  icon?: string;
+  note?: string;
+  author?: string;
+  timestamp?: string;
+  metric?: string;
+  unit?: string;
+  change?: number;
+  target?: number;
+  origin?: string;
+  owner?: string;
+  rootCause?: string;
+  correctiveAction?: string;
+  category?: string;
+  severity?: string;
+  complianceDeadline?: string;
+  effectiveDate?: string;
+  jurisdiction?: string;
+  employee?: string;
+  course?: string;
+  provider?: string;
+  date?: string;
+  expiry?: string;
+  score?: number;
+  trainees?: string[];
+  trainer?: string;
+  scheduledDate?: string;
+  type?: string;
+  scope?: string;
+  auditor?: string;
+  scheduled?: string;
+  actionPlan?: string;
+  // Extra fields used by specific nodes
+  method?: string;
+  url?: string;
+  service?: string;
+  action?: string;
+  connection?: string;
+  query?: string;
+  trigger?: string;
+  to?: string;
+  subject?: string;
+  body?: string;
+  iterations?: string | number;
+  collection?: string;
+  channel?: string;
+  text?: string;
+  title?: string;
+  message?: string;
+  outputType?: string;
+  language?: string;
+  script?: string;
+  flowId?: string;
+  params?: Record<string, unknown>;
+  details?: string;
+  shape?: string;
+  yes?: string;
+  no?: string;
+}
+
+/**
+ * Proper xyflow Node type using AutomationNodeData as the data payload.
+ * Use this with NodeProps<AutomationNode> in node component signatures.
+ */
+export type AutomationNode = Node<AutomationNodeData, string | undefined>;
