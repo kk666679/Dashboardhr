@@ -1,0 +1,23 @@
+{
+    "required":"Kinakailangan ang field na ito",
+    "email":"Mangyaring maglagay ng wastong email address",
+    "minLength":"Hindi bababa sa {{min}} na karakter",
+    "maxLength":"Hindi hihigit sa {{max}} na karakter",
+    "pattern":"Mangyaring tumugma sa hinihinging format",
+    "match":"Hindi magkatugma ang mga halaga",
+    "unique":"Ginagamit na ang halagang ito",
+    "number":"Mangyaring maglagay ng wastong numero",
+    "integer":"Mangyaring maglagay ng wastong integer",
+    "url":"Mangyaring maglagay ng wastong URL",
+    "phone":"Mangyaring maglagay ng wastong numero ng telepono",
+    "date":"Mangyaring maglagay ng wastong petsa",
+    "dateRange":"Ang petsa ng pagsisimula ay dapat bago ang petsa ng pagtatapos",
+    "time":"Mangyaring maglagay ng wastong oras",
+    "fileSize":"Ang laki ng file ay hindi dapat lumagpas sa {{max}}",
+    "fileType":"Hindi suportado ang uri ng file",
+    "minValue":"Ang minimum na halaga ay {{min}}",
+    "maxValue":"Ang maximum na halaga ay {{max}}",
+    "minItems":"Mangyaring pumili ng hindi bababa sa {{min}} item",
+    "maxItems":"Mangyaring pumili ng hindi hihigit sa {{max}} item",
+    "custom":"Hindi wasto ang field na ito"
+}

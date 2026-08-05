@@ -1,0 +1,20 @@
+{
+    "greeting":"Mahal na {{name}},",
+    "farewell":"Lubos na gumagalang,",
+    "signature":"Team ng {{companyName}}",
+    "footerRights":"Nakalaan ang lahat ng karapatan",
+    "footerCompany":"© {{year}} {{companyName}}. Nakalaan ang lahat ng karapatan.",
+    "buttonText":"I-click dito",
+    "ignoreMessage":"Kung hindi mo ito hiniling, paki-ignore ang mensaheng ito.",
+    "automaticMessage":"Ito ay isang awtomatikong mensahe. Huwag direktang tumugon.",
+    "welcomeSubject":"Maligayang pagdating sa {{companyName}}!",
+    "welcomeBody":"Kami ay nasasabik na kayo ay sumama. Ang inyong paglalakbay ay magsisimula {{date}}.",
+    "passwordResetSubject":"I-reset ang Iyong Password",
+    "passwordResetBody":"I-click ang button sa ibaba upang i-reset ang iyong password. Ang link na ito ay mag-e-expire sa loob ng {{hours}} oras.",
+    "leaveApprovalSubject":"Kahilingan sa Bakasyon {{status}}",
+    "leaveApprovalBody":"Ang iyong kahilingan sa bakasyon mula {{startDate}} hanggang {{endDate}} ay {{status}}.","payslipSubject":"Payslip para sa {{period}}",
+    "payslipBody":"Ang iyong payslip para sa panahon ng {{period}} ay available na sa sistema.","notificationSubject":"Bagong Notipikasyon mula sa {{companyName}}",
+    "reminderSubject":"Paalala: {{subject}}",
+    "inviteSubject":"Imbitasyon na Sumali sa {{companyName}}",
+    "inviteBody":"Ikaw ay inimbitahan na sumali sa {{companyName}}. I-click ang button sa ibaba upang magsimula."
+}

@@ -1,0 +1,14 @@
+/* ==========================================================
+   ENTRY POINT – DO NOT ADD ANY RAW STYLES HERE
+   Order is critical for Tailwind v4 cascade:
+   1. Tailwind (includes Preflight & base)
+   2. theme.css   – extends @theme with custom tokens
+   3. utilities.css – adds @utility custom classes
+   4. components.css – low‑specificity global overrides
+   ========================================================== */
+
+@import "tailwindcss";
+@import "./theme.css";
+@import "./utilities.css";
+@import "./components.css";
+@import "./responsive.css";

@@ -1,0 +1,98 @@
+/* ==========================================================
+   RESPONSIVE UTILITIES – Mobile‑first, all breakpoints
+   ========================================================== */
+
+/* ── Container ── */
+.container {
+  width: 100%;
+  margin-inline: auto;
+  padding-inline: 1rem;
+  max-width: 1440px;
+}
+
+@media (min-width: 640px)  { .container { padding-inline: 1.5rem; } }
+@media (min-width: 768px)  { .container { padding-inline: 2rem; } }
+@media (min-width: 1024px) { .container { padding-inline: 2.5rem; } }
+@media (min-width: 1280px) { .container { padding-inline: 3rem; } }
+
+/* ── Responsive Grid (1–4 cols) ── */
+.grid-cols-1 { display: grid; grid-template-columns: 1fr; gap: 1rem; }
+.grid-cols-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+.grid-cols-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+.grid-cols-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
+
+/* Mobile-first overrides: start with 1 column, then expand */
+.responsive-grid-2 { display: grid; grid-template-columns: 1fr; gap: 1rem; }
+.responsive-grid-3 { display: grid; grid-template-columns: 1fr; gap: 1rem; }
+.responsive-grid-4 { display: grid; grid-template-columns: 1fr; gap: 1rem; }
+
+@media (min-width: 640px) {
+  .responsive-grid-2 { grid-template-columns: repeat(2, 1fr); }
+  .responsive-grid-3 { grid-template-columns: repeat(2, 1fr); }
+  .responsive-grid-4 { grid-template-columns: repeat(2, 1fr); }
+}
+@media (min-width: 768px) {
+  .responsive-grid-3 { grid-template-columns: repeat(3, 1fr); }
+  .responsive-grid-4 { grid-template-columns: repeat(3, 1fr); }
+}
+@media (min-width: 1024px) {
+  .responsive-grid-4 { grid-template-columns: repeat(4, 1fr); }
+}
+
+/* ── Visibility (display: none / block) ── */
+.hide-mobile  { display: none; }
+.show-mobile  { display: block; }
+
+.hide-sm      { display: none; }
+.show-sm      { display: block; }
+.hide-md      { display: none; }
+.show-md      { display: block; }
+.hide-lg      { display: none; }
+.show-lg      { display: block; }
+.hide-xl      { display: none; }
+.show-xl      { display: block; }
+
+@media (min-width: 640px) {
+  .hide-mobile  { display: block; }
+  .show-mobile  { display: none; }
+  .hide-sm      { display: none; }
+  .show-sm      { display: block; }
+}
+@media (min-width: 768px) {
+  .hide-sm      { display: block; }
+  .show-sm      { display: none; }
+  .hide-md      { display: none; }
+  .show-md      { display: block; }
+}
+@media (min-width: 1024px) {
+  .hide-md      { display: block; }
+  .show-md      { display: none; }
+  .hide-lg      { display: none; }
+  .show-lg      { display: block; }
+}
+@media (min-width: 1280px) {
+  .hide-lg      { display: block; }
+  .show-lg      { display: none; }
+  .hide-xl      { display: none; }
+  .show-xl      { display: block; }
+}
+
+/* ── Responsive spacing (margin / padding) ── */
+/* Example: .m-4 on all, .m-8-md on md+ */
+.m-1  { margin: 0.25rem; }  .p-1  { padding: 0.25rem; }
+.m-2  { margin: 0.5rem; }   .p-2  { padding: 0.5rem; }
+.m-3  { margin: 0.75rem; }  .p-3  { padding: 0.75rem; }
+.m-4  { margin: 1rem; }     .p-4  { padding: 1rem; }
+.m-6  { margin: 1.5rem; }   .p-6  { padding: 1.5rem; }
+.m-8  { margin: 2rem; }     .p-8  { padding: 2rem; }
+
+@media (min-width: 768px) {
+  .m-4-md  { margin: 1rem; }   .p-4-md  { padding: 1rem; }
+  .m-6-md  { margin: 1.5rem; } .p-6-md  { padding: 1.5rem; }
+  .m-8-md  { margin: 2rem; }   .p-8-md  { padding: 2rem; }
+}
+@media (min-width: 1024px) {
+  .m-4-lg  { margin: 1rem; }   .p-4-lg  { padding: 1rem; }
+  .m-6-lg  { margin: 1.5rem; } .p-6-lg  { padding: 1.5rem; }
+  .m-8-lg  { margin: 2rem; }   .p-8-lg  { padding: 2rem; }
+}
