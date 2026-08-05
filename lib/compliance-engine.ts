@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 import { prisma } from "@/lib/prisma";
+=======
+﻿import { prisma } from "@/lib/prisma";
+>>>>>>> 237f310 (Add libraries, services and application logic)
 
 export interface ComplianceRule {
   tenantId: string;
@@ -80,7 +84,11 @@ export async function checkComplianceStatus(
   }> = [];
 
   // Check visas
+<<<<<<< HEAD
   employee.visas.forEach((visa) => {
+=======
+  employee.visas.forEach((visa: any) => {
+>>>>>>> 237f310 (Add libraries, services and application logic)
     const daysLeft = Math.ceil(
       (visa.expiryDate.getTime() - now.getTime()) / (24 * 60 * 60 * 1000),
     );
@@ -109,7 +117,11 @@ export async function checkComplianceStatus(
   });
 
   // Check documents
+<<<<<<< HEAD
   employee.documents.forEach((doc) => {
+=======
+  employee.documents.forEach((doc: any) => {
+>>>>>>> 237f310 (Add libraries, services and application logic)
     if (doc.expiryDate) {
       const daysLeft = Math.ceil(
         (doc.expiryDate.getTime() - now.getTime()) / (24 * 60 * 60 * 1000),

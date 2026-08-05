@@ -268,7 +268,26 @@ async function detectIntents(
 
 // ── Dispatcher ─────────────────────────────────────────────────────────────────
 
+<<<<<<< HEAD
 function dispatch(intent: AgentKey, input: string, employeeId?: string) {
+=======
+/**
+ * Dispatch to the correct agent.
+ *
+ * All DB-touching agents are multi-tenant isolated. The signature is
+ * standardized as `(input, tenantId, employeeId?)` for tenant-aware agents.
+ * Agents that only return static/guidance content accept `(input)`.
+ *
+ * @param tenantId  Required tenant scope for tenant-aware agents.
+ */
+function dispatch(
+  intent: AgentKey,
+  input: string,
+  tenantId: string,
+  employeeId?: string,
+) {
+  const eid = employeeId ?? "";
+>>>>>>> 237f310 (Add libraries, services and application logic)
   switch (intent) {
     case "PAYROLL":
       return payrollAgent(input, employeeId);
@@ -277,6 +296,7 @@ function dispatch(intent: AgentKey, input: string, employeeId?: string) {
     case "IMMIGRATION":
       return immigrationAgent(input, employeeId);
     case "FOMEMA":
+<<<<<<< HEAD
       return fomemaAgent(input, employeeId);
     case "LEVY":
       return levyAgent(input, employeeId);
@@ -306,6 +326,41 @@ function dispatch(intent: AgentKey, input: string, employeeId?: string) {
 }
 
 export async function runHrOrchestrator(input: string, employeeId?: string) {
+=======
+      return fomemaAgent(input, tenantId, eid);
+    case "LEVY":
+      return levyAgent(input, employeeId, tenantId);
+    case "TALENT_ACQUISITION":
+      return talentAcquisitionAgent(input, tenantId);
+    case "COMPENSATION_BENEFITS":
+      return compensationBenefitsAgent(input, tenantId, eid);
+    case "EMPLOYEE_RELATIONS":
+      return employeeRelationsAgent(input, tenantId, eid);
+    case "LEARNING_DEVELOPMENT":
+      return learningDevelopmentAgent(input, tenantId, eid);
+    case "INDUSTRIAL_RELATIONS":
+      return industrialRelationsAgent(input, tenantId, eid);
+    case "HR_ANALYTICS":
+      return hrAnalyticsAgent(input, tenantId);
+    case "SUCCESSION_PLANNING":
+      return successionPlanningAgent(input, tenantId);
+    case "HR_COMPLIANCE":
+      return hrComplianceAgent(input, tenantId);
+    case "HR_QUALITY_MANAGEMENT":
+      return hrQualityManagementAgent(input, tenantId);
+    case "EMPLOYER_BRANDING":
+      return employerBrandingAgent(input, tenantId);
+    case "FOREIGN_WORKER_EXPATRIATE":
+      return foreignWorkerExpatriateAgent(input, tenantId, eid);
+  }
+}
+
+export async function runHrOrchestrator(
+  input: string,
+  tenantId: string,
+  employeeId?: string,
+) {
+>>>>>>> 237f310 (Add libraries, services and application logic)
   const intents = await detectIntents(input);
 
   if (!intents.length) {
@@ -318,7 +373,11 @@ export async function runHrOrchestrator(input: string, employeeId?: string) {
   }
 
   const results = await Promise.all(
+<<<<<<< HEAD
     intents.map((intent) => dispatch(intent, input, employeeId)),
+=======
+    intents.map((intent) => dispatch(intent, input, tenantId, employeeId)),
+>>>>>>> 237f310 (Add libraries, services and application logic)
   );
   return results.filter(Boolean);
 }

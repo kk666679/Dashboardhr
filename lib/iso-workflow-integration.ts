@@ -18,8 +18,13 @@ export interface ComplianceWorkflowTemplate {
   name: string;
   description: string;
   isoStandard: string;
+<<<<<<< HEAD
   defaultNodes: any[];
   defaultEdges: any[];
+=======
+  defaultNodes: Record<string, unknown>[];
+  defaultEdges: Record<string, unknown>[];
+>>>>>>> 237f310 (Add libraries, services and application logic)
 }
 
 export interface ISOComplianceFlow {
@@ -300,7 +305,11 @@ export function getComplianceWorkflowTemplate(
  */
 export function createWorkflowFromTemplate(
   template: ComplianceWorkflowTemplate
+<<<<<<< HEAD
 ): { nodes: any[]; edges: any[] } {
+=======
+): { nodes: unknown[]; edges: unknown[] } {
+>>>>>>> 237f310 (Add libraries, services and application logic)
   return {
     nodes: template.defaultNodes,
     edges: template.defaultEdges,
@@ -312,8 +321,14 @@ export function createWorkflowFromTemplate(
  */
 export function getComplianceIntegrationLinks() {
   return [
+<<<<<<< HEAD
     { label: 'ISO Compliance', href: '/iso' },
     { label: 'Flow Designer', href: '/flow-process' },
     { label: 'Enhanced Designer', href: '/flow-process/enhanced' },
+=======
+    { label: 'ISO Compliance', href: '/dashboard/iso' },
+    { label: 'Flow Designer', href: '/dashboard/flow-process' },
+    { label: 'Enhanced Designer', href: '/dashboard/flow-process/enhanced' },
+>>>>>>> 237f310 (Add libraries, services and application logic)
   ];
 }
