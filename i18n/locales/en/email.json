@@ -1,0 +1,23 @@
+{
+  "greeting": "Dear {{name}},",
+  "farewell": "Best regards,",
+  "signature": "{{companyName}} Team",
+  "footerRights": "All rights reserved",
+  "footerCompany": "© {{year}} {{companyName}}. All rights reserved.",
+  "buttonText": "Click here",
+  "ignoreMessage": "If you did not request this, please ignore this message.",
+  "automaticMessage": "This is an automated message. Please do not reply directly.",
+  "welcomeSubject": "Welcome to {{companyName}}!",
+  "welcomeBody": "We are excited to have you on board. Your journey with us begins {{date}}.",
+  "passwordResetSubject": "Reset Your Password",
+  "passwordResetBody": "Click the button below to reset your password. This link expires in {{hours}} hours.",
+  "leaveApprovalSubject": "Leave Request {{status}}",
+  "leaveApprovalBody": "Your leave request from {{startDate}} to {{endDate}} has been {{status}}.",
+  "payslipSubject": "Payslip for {{period}}",
+  "payslipBody": "Your payslip for the period {{period}} is now available in the system.",
+  "notificationSubject": "New Notification from {{companyName}}",
+  "reminderSubject": "Reminder: {{subject}}",
+  "inviteSubject": "You're Invited to Join {{companyName}}",
+  "inviteBody": "You have been invited to join {{companyName}}. Click the button below to get started."
+}
+

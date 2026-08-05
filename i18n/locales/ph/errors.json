@@ -1,0 +1,18 @@
+{
+    "generic":"May nagkamali. Mangyaring subukan muli.",
+    "notFound":"Hindi matagpuan ang hinihinging mapagkukunan.",
+    "forbidden":"Wala kang pahintulot na ma-access ang mapagkukunang ito.",
+    "unauthorized":"Mangyaring mag-login upang ma-access ang mapagkukunang ito.",
+    "serverError":"May panloob na error sa server. Subukan muli mamaya.",
+    "networkError":"May error sa network. Suriin ang iyong koneksyon.",
+    "timeout":"Nag-timeout ang kahilingan. Subukan muli.",
+    "validationError":"Pakitingnan ang iyong input at subukan muli.",
+    "sessionExpired":"Nag-expire na ang iyong sesyon. Mag-login muli.",
+    "maintenance":"Ang sistema ay nasa ilalim ng pagpapanatili. Subukan muli mamaya.",
+    "rateLimited":"Masyadong maraming kahilingan. Maghintay sandali.",
+    "conflict":"Ang data ay binago ng ibang user. I-refresh at subukan muli.",
+    "badRequest":"Hindi wasto ang kahilingan. Suriin ang iyong input.",
+    "unknown":"May hindi kilalang error. Makipag-ugnayan sa suporta.",
+    "retry":"Subukan Muli",
+    "contactSupport":"Makipag-ugnayan sa Suporta"
+}

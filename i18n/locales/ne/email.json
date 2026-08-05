@@ -1,0 +1,23 @@
+{
+  "greeting": "प्रिय {{name}},",
+  "farewell": "शुभकामना,",
+  "signature": "{{companyName}} टोली",
+  "footerRights": "सबै अधिकार सुरक्षित",
+  "footerCompany": "© {{year}} {{companyName}}। सबै अधिकार सुरक्षित।",
+  "buttonText": "यहाँ क्लिक गर्नुहोस्",
+  "ignoreMessage": "यदि तपाईंले यो अनुरोध गर्नुभएको छैन भने, कृपया यो सन्देशलाई बेवास्ता गर्नुहोस्।",
+  "automaticMessage": "यो स्वचालित सन्देश हो। कृपया सिधै जवाफ नदिनुहोस्।",
+  "welcomeSubject": "{{companyName}} मा स्वागत छ!",
+  "welcomeBody": "तपाईंलाई टोलीमा पाउँदा हामी उत्साहित छौं। {{date}} मा तपाईंको यात्रा सुरु हुनेछ।",
+  "passwordResetSubject": "तपाईंको पासवर्ड रिसेट गर्नुहोस्",
+  "passwordResetBody": "तपाईंको पासवर्ड रिसेट गर्न तलको बटन क्लिक गर्नुहोस्। यो लिङ्क {{hours}} घण्टामा समाप्त हुनेछ।",
+  "leaveApprovalSubject": "बिदा अनुरोध {{status}}",
+  "leaveApprovalBody": "{{startDate}} देखि {{endDate}} सम्मको तपाईंको बिदा अनुरोध {{status}} भएको छ।",
+  "payslipSubject": "{{period}} अवधिको तलब स्लिप",
+  "payslipBody": "{{period}} अवधिको तपाईंको तलब स्लिप अब प्रणालीमा उपलब्ध छ।",
+  "notificationSubject": "{{companyName}} बाट नयाँ सूचना",
+  "reminderSubject": "अनुस्मारक: {{subject}}",
+  "inviteSubject": "तपाईंलाई {{companyName}} मा सामेल हुन आमन्त्रित गरिएको छ",
+  "inviteBody": "तपाईंलाई {{companyName}} मा सामेल हुन आमन्त्रित गरिएको छ। सुरु गर्न तलको बटन क्लिक गर्नुहोस्।"
+}
+
