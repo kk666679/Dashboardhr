@@ -22,25 +22,26 @@ export interface WorkerComplianceReport {
 
 export class MalaysianComplianceChecker {
   // Immigration Act 1959/63 - Work Permit Requirements
-  static checkWorkPermitCompliance(worker: any): ComplianceCheck[] {
+  static checkWorkPermitCompliance(worker: unknown): ComplianceCheck[] {
     const checks: ComplianceCheck[] = [];
 
     // Valid work permit check
     checks.push({
       category: "Work Permit",
       requirement: "Valid Work Permit",
-      status: worker.permitStatus === "active" ? "compliant" : "non_compliant",
+      status: (worker as any).permitStatus === "active" ? "compliant" : "non_compliant",
       description:
         "Worker must have a valid work permit under Immigration Act 1959/63",
       actionRequired:
-        worker.permitStatus !== "active"
+        (worker as any).permitStatus !== "active"
           ? "Renew or apply for work permit"
           : undefined,
+
       reference: "Immigration Act 1959/63, Section 6",
     });
 
     // Permit expiry check
-    const permitExpiryDate = new Date(worker.permitExpiry);
+    const permitExpiryDate = new Date((worker as any).permitExpiry);
     const thirtyDaysFromNow = new Date();
     thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30);
 
@@ -53,7 +54,8 @@ export class MalaysianComplianceChecker {
         permitExpiryDate <= thirtyDaysFromNow
           ? "Initiate permit renewal process"
           : undefined,
-      deadline: worker.permitExpiry,
+
+      deadline: (worker as any).permitExpiry,
       reference: "Immigration Regulations 1963",
     });
 
@@ -61,25 +63,26 @@ export class MalaysianComplianceChecker {
   }
 
   // Foreign Workers (Medical Examination) Act 1997 - FOMEMA Requirements
-  static checkMedicalCompliance(worker: any): ComplianceCheck[] {
+  static checkMedicalCompliance(worker: unknown): ComplianceCheck[] {
     const checks: ComplianceCheck[] = [];
 
     // Valid medical certificate
     checks.push({
       category: "Medical",
       requirement: "Valid FOMEMA Certificate",
-      status: worker.medicalStatus === "valid" ? "compliant" : "non_compliant",
+      status: (worker as any).medicalStatus === "valid" ? "compliant" : "non_compliant",
       description: "Worker must have valid FOMEMA medical certificate",
       actionRequired:
-        worker.medicalStatus !== "valid"
+        (worker as any).medicalStatus !== "valid"
           ? "Schedule FOMEMA medical examination"
           : undefined,
+
       reference: "Foreign Workers (Medical Examination) Act 1997",
     });
 
     // Medical examination frequency
-    const lastMedicalDate = worker.lastMedicalDate
-      ? new Date(worker.lastMedicalDate)
+    const lastMedicalDate = (worker as any).lastMedicalDate
+      ? new Date((worker as any).lastMedicalDate)
       : null;
     const oneYearAgo = new Date();
     oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
@@ -99,24 +102,25 @@ export class MalaysianComplianceChecker {
   }
 
   // Workers' Minimum Standards of Housing and Amenities Act 1990
-  static checkAccommodationCompliance(worker: any): ComplianceCheck[] {
+  static checkAccommodationCompliance(worker: unknown): ComplianceCheck[] {
     const checks: ComplianceCheck[] = [];
 
     // Accommodation provision
     checks.push({
       category: "Accommodation",
       requirement: "Adequate Accommodation",
-      status: worker.accommodationInfo ? "compliant" : "warning",
+      status: (worker as any).accommodationInfo ? "compliant" : "warning",
       description:
         "Employer must provide adequate accommodation as per Act 446",
-      actionRequired: !worker.accommodationInfo
+      actionRequired: !(worker as any).accommodationInfo
         ? "Verify accommodation arrangements"
         : undefined,
+
       reference: "Workers' Minimum Standards of Housing and Amenities Act 1990",
     });
 
     // Accommodation standards
-    if (worker.accommodationInfo?.type === "company_provided") {
+    if ((worker as any).accommodationInfo?.type === "company_provided") {
       checks.push({
         category: "Accommodation",
         requirement: "Accommodation Standards",
@@ -132,7 +136,7 @@ export class MalaysianComplianceChecker {
   }
 
   // Employment Act 1955 - Labor Law Compliance
-  static checkEmploymentCompliance(worker: any): ComplianceCheck[] {
+  static checkEmploymentCompliance(worker: unknown): ComplianceCheck[] {
     const checks: ComplianceCheck[] = [];
 
     // Minimum wage compliance
@@ -141,19 +145,20 @@ export class MalaysianComplianceChecker {
       category: "Employment",
       requirement: "Minimum Wage Compliance",
       status:
-        worker.employmentInfo?.salary >= minimumWage
+        (worker as any).employmentInfo?.salary >= minimumWage
           ? "compliant"
           : "non_compliant",
       description: `Salary must meet minimum wage requirement of RM ${minimumWage}`,
       actionRequired:
-        worker.employmentInfo?.salary < minimumWage
+        (worker as any).employmentInfo?.salary < minimumWage
           ? "Adjust salary to meet minimum wage"
           : undefined,
+
       reference: "Employment Act 1955, Minimum Wages Order 2023",
     });
 
     // Contract validity
-    const contractEndDate = new Date(worker.employmentInfo?.contractEndDate);
+    const contractEndDate = new Date((worker as any).employmentInfo?.contractEndDate);
     const today = new Date();
 
     checks.push({
@@ -163,6 +168,7 @@ export class MalaysianComplianceChecker {
       description: "Worker must have valid employment contract",
       actionRequired:
         contractEndDate <= today ? "Renew employment contract" : undefined,
+
       reference: "Employment Act 1955",
     });
 
@@ -170,19 +176,20 @@ export class MalaysianComplianceChecker {
   }
 
   // Levy payment compliance
-  static checkLevyCompliance(worker: any): ComplianceCheck[] {
+  static checkLevyCompliance(worker: unknown): ComplianceCheck[] {
     const checks: ComplianceCheck[] = [];
 
     // Government levy payment
     checks.push({
       category: "Financial",
       requirement: "Government Levy Payment",
-      status: worker.levyStatus === "paid" ? "compliant" : "non_compliant",
+      status: (worker as any).levyStatus === "paid" ? "compliant" : "non_compliant",
       description: "Government levy must be paid for foreign worker",
       actionRequired:
-        worker.levyStatus !== "paid"
+        (worker as any).levyStatus !== "paid"
           ? "Pay outstanding government levy"
           : undefined,
+
       reference: "Immigration Act 1959/63, Immigration Regulations",
     });
 
@@ -190,7 +197,7 @@ export class MalaysianComplianceChecker {
   }
 
   // Generate comprehensive compliance report
-  static generateComplianceReport(worker: any): WorkerComplianceReport {
+  static generateComplianceReport(worker: unknown): WorkerComplianceReport {
     const allChecks = [
       ...this.checkWorkPermitCompliance(worker),
       ...this.checkMedicalCompliance(worker),
@@ -220,8 +227,8 @@ export class MalaysianComplianceChecker {
     }
 
     return {
-      workerId: worker.id,
-      workerName: worker.name,
+      workerId: (worker as any).id,
+      workerName: (worker as any).name,
       overallStatus,
       complianceScore,
       checks: allChecks,
@@ -230,7 +237,7 @@ export class MalaysianComplianceChecker {
   }
 
   // Get compliance summary for multiple workers
-  static getComplianceSummary(workers: any[]): {
+  static getComplianceSummary(workers: unknown[]): {
     totalWorkers: number;
     compliantWorkers: number;
     nonCompliantWorkers: number;
@@ -273,7 +280,7 @@ export class MalaysianComplianceChecker {
   }
 
   // Get upcoming compliance deadlines
-  static getUpcomingDeadlines(workers: any[]): Array<{
+  static getUpcomingDeadlines(workers: unknown[]): Array<{
     workerId: string;
     workerName: string;
     requirement: string;
@@ -307,8 +314,8 @@ export class MalaysianComplianceChecker {
           else priority = "low";
 
           deadlines.push({
-            workerId: worker.id,
-            workerName: worker.name,
+            workerId: (worker as any).id,
+            workerName: (worker as any).name,
             requirement: check.requirement,
             deadline: check.deadline,
             daysUntilDeadline,

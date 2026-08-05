@@ -57,6 +57,7 @@ export const ExpatStatsSchema = z.object({
   active: z.number(),
   onboarding: z.number(),
   renewalPending: z.number(),
+  byStatus: z.record(z.string(), z.number()).optional(),
 });
 
 export const ExpatStatus = {

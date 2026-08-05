@@ -1,5 +1,23 @@
 import { prisma } from "@/lib/prisma";
 
+// Basic employee fields used by the agent
+type EmployeeBasic = {
+  name: string;
+  position: string | null;
+  department: string | null;
+  hireDate: Date | null;
+};
+
+// Shape of a talent map entry
+interface TalentItem {
+  name: string;
+  position: string;
+  department: string;
+  serviceYears: number;
+  talentGrid: { box: string; label: string; action: string };
+  retentionRisk: string;
+}
+
 // 9-box grid classification based on service years and position level
 function classify9Box(
   serviceYears: number,
@@ -62,7 +80,7 @@ export async function successionPlanningAgent(
       orderBy: { hireDate: "asc" },
     });
 
-    const talentMap = employees.map((emp) => {
+    const talentMap: TalentItem[] = employees.map((emp: EmployeeBasic) => {
       const serviceYears = emp.hireDate
         ? Math.floor(
             (Date.now() - emp.hireDate.getTime()) / (1000 * 60 * 60 * 24 * 365),
@@ -82,10 +100,12 @@ export async function successionPlanningAgent(
       };
     });
 
-    const highPotential = talentMap.filter((e) =>
-      ["8", "9"].includes(e.talentGrid.box),
+    const highPotential = talentMap.filter(
+      (e: TalentItem) => ["8", "9"].includes(e.talentGrid.box),
     );
-    const highRisk = talentMap.filter((e) => e.retentionRisk === "High");
+    const highRisk = talentMap.filter(
+      (e: TalentItem) => e.retentionRisk === "High",
+    );
 
     return {
       type: "SUCCESSION_PLANNING",
@@ -95,14 +115,14 @@ export async function successionPlanningAgent(
           highPotentialCount: highPotential.length,
           highRetentionRiskCount: highRisk.length,
         },
-        highPotentialEmployees: highPotential.map((e) => ({
+        highPotentialEmployees: highPotential.map((e: TalentItem) => ({
           name: e.name,
           position: e.position,
           department: e.department,
           gridLabel: e.talentGrid.label,
           recommendedAction: e.talentGrid.action,
         })),
-        retentionRisks: highRisk.map((e) => ({
+        retentionRisks: highRisk.map((e: TalentItem) => ({
           name: e.name,
           position: e.position,
           serviceYears: e.serviceYears,

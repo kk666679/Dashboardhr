@@ -26,16 +26,16 @@ export async function loadAndIndexKnowledgeBase(): Promise<void> {
       .toUpperCase();
 
     const clausesKey = `${standard.toLowerCase()}_clauses`;
-    const clauses: any[] =
+    const clauses: unknown[] =
       data[clausesKey] ?? data.iso9001_clauses ?? (Array.isArray(data) ? data : []);
 
     for (const clause of clauses) {
-      const chunkId = `${standard}-${clause.clause}`;
+      const chunkId = `${standard}-${(clause as any).clause}`;
       const chunkContent = [
-        `Clause: ${clause.clause}`,
-        `Title: ${clause.title}`,
-        `Summary: ${clause.summary ?? ''}`,
-        `Requirements: ${Array.isArray(clause.requirements) ? clause.requirements.join('\n') : ''}`,
+        `Clause: ${(clause as any).clause}`,
+        `Title: ${(clause as any).title}`,
+        `Summary: ${(clause as any).summary ?? ''}`,
+        `Requirements: ${Array.isArray((clause as any).requirements) ? (clause as any).requirements.join('\n') : ''}`,
       ]
         .filter(Boolean)
         .join('\n');
@@ -46,8 +46,8 @@ export async function loadAndIndexKnowledgeBase(): Promise<void> {
         metadata: {
           source: file,
           standard,
-          clause: String(clause.clause),
-          title: String(clause.title ?? ''),
+          clause: String((clause as any).clause),
+          title: String((clause as any).title ?? ''),
           createdAt: new Date(),
         },
       });

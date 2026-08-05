@@ -62,7 +62,7 @@ export async function employerBrandingAgent(input: string, tenantId?: string) {
       }),
     ]);
 
-    const deptBreakdown = departments
+    const deptBreakdown = (departments as Array<{ department: string | null; _count: { department: number } }>)
       .filter((d) => d.department)
       .map((d) => ({
         department: d.department!,

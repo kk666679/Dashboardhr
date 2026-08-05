@@ -1,53 +1,85 @@
 "use client";
 
-import React, { ReactNode } from 'react';
-import { motion, AnimatePresence, LayoutGroup } from 'framer-motion';
+/**
+ * GlassmorphicCard — design-system aligned
+ *
+ * Uses CSS utilities from styles/utilities.css (@utility glass, glass-sm, etc.)
+ * and theme tokens from styles/theme.css rather than raw Tailwind colour strings.
+ * Framer Motion durations are synced with --duration-* tokens.
+ */
+
+import React, { ReactNode } from "react";
+import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
 import { cn } from "@/lib/utils";
+
+// ─── GlassmorphicCard ────────────────────────────────────────────────────────
 
 interface GlassmorphicCardProps {
   children: ReactNode;
   id?: string;
-  gradient?: string;
-  blur?: string;
+  /** Additional Tailwind / utility classes */
   className?: string;
-  animation?: 'scale' | 'fade' | 'slide' | 'none';
+  /** Framer Motion entrance animation style */
+  animation?: "scale" | "fade" | "slide" | "none";
+  /** Stagger delay in seconds */
   delay?: number;
+  /** Use heavier glass for text-heavy content */
+  heavy?: boolean;
+  /** Accepted but unused — gradient handled via CSS utilities */
+  gradient?: string;
+  /** Accepted but unused — blur handled via CSS utilities */
+  blur?: string;
 }
 
 export function GlassmorphicCard({
   children,
-  gradient = 'from-white/20 to-white/10',
-  blur = 'backdrop-blur-md',
-  className = '',
-  animation = 'fade',
+  className = "",
+  animation = "fade",
   delay = 0,
+  heavy = false,
 }: GlassmorphicCardProps) {
-  const variants = {
+  type AnimVariant = {
+    initial: Parameters<typeof motion.div>[0]["initial"];
+    animate: Parameters<typeof motion.div>[0]["animate"];
+    transition: Parameters<typeof motion.div>[0]["transition"];
+  };
+
+  const variants: Record<string, AnimVariant> = {
     scale: {
-      initial: { scale: 0.9, opacity: 0 },
+      initial: { scale: 0.95, opacity: 0 },
       animate: { scale: 1, opacity: 1 },
-      transition: { type: 'spring', stiffness: 300, damping: 30, delay },
+      transition: { type: "spring", stiffness: 300, damping: 30, delay },
     },
     fade: {
       initial: { opacity: 0 },
       animate: { opacity: 1 },
-      transition: { duration: 0.5, delay },
+      transition: { duration: 0.3, delay },
     },
     slide: {
-      initial: { y: 20, opacity: 0 },
+      initial: { y: 16, opacity: 0 },
       animate: { y: 0, opacity: 1 },
-      transition: { duration: 0.5, delay },
+      transition: { duration: 0.3, delay },
+    },
+    none: {
+      initial: false,
+      animate: {},
+      transition: {},
     },
   };
 
+  const anim = variants[animation];
+
   return (
     <motion.div
-      variants={variants[animation] || variants.fade}
-      initial="initial"
-      animate="animate"
+      initial={anim.initial}
+      animate={anim.animate}
+      transition={anim.transition}
       className={cn(
-        `bg-gradient-to-br ${gradient} border border-white/20 rounded-2xl shadow-2xl p-6 md:p-8 ${blur}`,
-        className
+        // Swap raw gradient strings for the design-system utility classes
+        heavy ? "glass-heavy" : "glass",
+        // Interactive hover/active states from utilities.css
+        "glass-interactive",
+        className,
       )}
     >
       {children}
@@ -55,20 +87,22 @@ export function GlassmorphicCard({
   );
 }
 
+// ─── StaggerContainer ────────────────────────────────────────────────────────
+
 interface StaggerContainerProps {
   children: ReactNode;
   className?: string;
 }
 
-export function StaggerContainer({ children, className = '' }: StaggerContainerProps) {
+export function StaggerContainer({ children, className = "" }: StaggerContainerProps) {
   return (
     <LayoutGroup>
-      <div className={cn('grid gap-6', className)}>
-        {children}
-      </div>
+      <div className={cn("grid gap-6", className)}>{children}</div>
     </LayoutGroup>
   );
 }
+
+// ─── StaggerItem ─────────────────────────────────────────────────────────────
 
 interface StaggerItemProps {
   children: ReactNode;
@@ -78,83 +112,90 @@ export function StaggerItem({ children }: StaggerItemProps) {
   return (
     <motion.div
       layout
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
+      transition={{ duration: 0.3 }}               // --duration-300
     >
       {children}
     </motion.div>
   );
 }
+
+// ─── SlideIn ─────────────────────────────────────────────────────────────────
 
 interface SlideInProps {
   children: ReactNode;
-  direction?: 'up' | 'down' | 'left' | 'right';
+  direction?: "up" | "down" | "left" | "right";
   delay?: number;
 }
 
-export function SlideIn({
-  children,
-  direction = 'up',
-  delay = 0,
-}: SlideInProps) {
-  const variants = {
-    up: { initial: { y: 50, opacity: 0 }, animate: { y: 0, opacity: 1 } },
-    down: { initial: { y: -50, opacity: 0 }, animate: { y: 0, opacity: 1 } },
-    left: { initial: { x: -50, opacity: 0 }, animate: { x: 0, opacity: 1 } },
-    right: { initial: { x: 50, opacity: 0 }, animate: { x: 0, opacity: 1 } },
-  };
+const SLIDE_VARIANTS = {
+  up:    { initial: { y: 40, opacity: 0 }, animate: { y: 0, opacity: 1 } },
+  down:  { initial: { y: -40, opacity: 0 }, animate: { y: 0, opacity: 1 } },
+  left:  { initial: { x: -40, opacity: 0 }, animate: { x: 0, opacity: 1 } },
+  right: { initial: { x: 40, opacity: 0 }, animate: { x: 0, opacity: 1 } },
+};
 
+export function SlideIn({ children, direction = "up", delay = 0 }: SlideInProps) {
+  const v = SLIDE_VARIANTS[direction];
   return (
     <motion.div
-      variants={variants[direction]}
-      initial="initial"
-      animate="animate"
-      transition={{ duration: 0.6, delay }}
+      initial={v.initial}
+      animate={v.animate}
+      transition={{ duration: 0.45, delay, type: "spring", stiffness: 260, damping: 26 }}
     >
       {children}
     </motion.div>
   );
 }
 
+// ─── GlassButton ─────────────────────────────────────────────────────────────
+// Uses the `.btn-glass` component class from components.css for glass-specific
+// styling and falls back to Tailwind for colour variants.
+
 interface GlassButtonProps {
   children: ReactNode;
-  variant?: 'primary' | 'secondary' | 'outline' | 'danger';
+  variant?: "primary" | "secondary" | "outline" | "danger";
   onClick?: () => void;
   className?: string;
   disabled?: boolean;
-  asChild?: boolean;
-  size?: string;
 }
+
+const GLASS_BUTTON_VARIANT: Record<string, string> = {
+  primary:   "bg-primary text-primary-foreground border-transparent hover:opacity-90",
+  secondary: "bg-white/10 text-foreground border-white/30 hover:bg-white/20",
+  outline:   "bg-transparent text-foreground border-white/30 hover:bg-white/10",
+  danger:    "bg-destructive text-destructive-foreground border-transparent hover:opacity-90",
+};
 
 export function GlassButton({
   children,
-  variant = 'primary',
+  variant = "primary",
   onClick,
-  className = '',
+  className = "",
   disabled = false,
 }: GlassButtonProps) {
-  const baseClasses = 'px-6 py-3 rounded-xl font-medium transition-all duration-300 shadow-lg hover:shadow-xl active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed';
-  
-  const variants = {
-    primary: 'bg-gradient-to-r from-purple-500 to-pink-500 text-white border-white/20 hover:from-purple-600 hover:to-pink-600',
-    secondary: 'bg-white/10 text-white border-white/30 hover:bg-white/20',
-    outline: 'bg-transparent text-white border-2 border-white/30 hover:bg-white/10',
-    danger: 'bg-gradient-to-r from-red-500 to-rose-500 text-white border-white/20 hover:from-red-600 hover:to-rose-600',
-  };
-
   return (
     <motion.button
       onClick={onClick}
       disabled={disabled}
-      className={cn(baseClasses, variants[variant], className)}
-      whileHover={{ scale: 1.02 }}
-      whileTap={{ scale: 0.98 }}
+      className={cn(
+        "btn-glass",
+        GLASS_BUTTON_VARIANT[variant],
+        disabled && "opacity-50 pointer-events-none",
+        className,
+      )}
+      whileHover={{ scale: disabled ? 1 : 1.02 }}
+      whileTap={{ scale: disabled ? 1 : 0.98 }}
+      transition={{ duration: 0.15 }}              // --duration-150
     >
       {children}
     </motion.button>
   );
 }
+
+// ─── GlassInput ──────────────────────────────────────────────────────────────
+// Fixed: was hardcoding `text-gray-900` which breaks in dark mode.
 
 interface GlassInputProps {
   type?: string;
@@ -166,17 +207,17 @@ interface GlassInputProps {
 }
 
 export function GlassInput({
-  type = 'text',
+  type = "text",
   value,
   onChange,
-  placeholder = '',
+  placeholder = "",
   icon,
-  className = '',
+  className = "",
 }: GlassInputProps) {
   return (
-    <div className={cn('relative group', className)}>
+    <div className={cn("relative group", className)}>
       {icon && (
-        <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-purple-400 transition-colors">
+        <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors duration-200">
           {icon}
         </div>
       )}
@@ -186,26 +227,36 @@ export function GlassInput({
         onChange={onChange}
         placeholder={placeholder}
         className={cn(
-          'w-full px-4 py-3 pl-12 bg-white/10 backdrop-blur-md border border-white/20 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-transparent transition-all duration-300',
-          'hover:bg-white/20'
+          // Use design-system glass surface
+          "glass-sm",
+          "w-full px-4 py-2.5 text-foreground placeholder:text-muted-foreground",
+          icon && "pl-10",
+          // Focus ring aligned with --ring token
+          "focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] focus-visible:ring-offset-1 focus-visible:ring-offset-transparent",
+          "transition-all duration-200",
+          "hover:border-white/35",
         )}
       />
     </div>
   );
 }
 
+// ─── AnimatedCounter ─────────────────────────────────────────────────────────
+
 interface AnimatedCounterProps {
   value: number;
+  /** Animation duration in seconds */
   duration?: number;
 }
 
-export function AnimatedCounter({ value, duration = 2 }: AnimatedCounterProps) {
+export function AnimatedCounter({ value, duration = 1.2 }: AnimatedCounterProps) {
   const [count, setCount] = React.useState(0);
 
   React.useEffect(() => {
     let start = 0;
     const end = value;
-    const increment = end / (duration * 60); // 60 FPS
+    const fps = 60;
+    const increment = end / (duration * fps);
 
     const timer = setInterval(() => {
       start += increment;
@@ -215,11 +266,10 @@ export function AnimatedCounter({ value, duration = 2 }: AnimatedCounterProps) {
       } else {
         setCount(Math.floor(start));
       }
-    }, 1000 / 60);
+    }, 1000 / fps);
 
     return () => clearInterval(timer);
   }, [value, duration]);
 
   return <span>{count.toLocaleString()}</span>;
 }
-

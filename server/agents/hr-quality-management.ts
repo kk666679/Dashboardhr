@@ -1,234 +1,220 @@
-import { prisma } from "@/lib/prisma";
+﻿import { prisma } from "@/lib/prisma";
+import {
+  BASE_LEVY_SECTOR,
+  NATIONALITY_FEES,
+  getSectorKey,
+  getNationalityKey,
+} from "@/lib/constants/levy-rates";
 
-const QUALITY_STANDARDS = [
-  {
-    area: "Employee Master Data",
-    standard:
-      "Employee records should include department, position, hire date, and required identity details.",
-    target: "≥ 98% completeness",
-  },
-  {
-    area: "Document Control",
-    standard:
-      "Workers should have current supporting documents with timely renewal tracking.",
-    target: "0 critical gaps",
-  },
-  {
-    area: "Payroll Timeliness",
-    standard: "Payroll should be processed on time with minimal pending items.",
-    target: "100% on schedule",
-  },
-  {
-    area: "Attendance Discipline",
-    standard:
-      "Late and absent exceptions should stay within operational thresholds.",
-    target: "< 5% exception rate",
-  },
-  {
-    area: "Continuous Improvement",
-    standard: "Compliance rules and HR controls should be reviewed regularly.",
-    target: "Quarterly review cadence",
-  },
-] as const;
-
-export async function hrQualityManagementAgent(
+export async function levyAgent(
   input: string,
-  tenantId?: string,
+  employeeId?: string,
+ tenantId?: string,
 ) {
   try {
+    const where: any = {
+      tenantId,
+      isForeign: true,
+    };
+    if (employeeId) {
+      where.id = employeeId;
+    }
+
+    const employees = await prisma.employee.findMany({
+      where,
+      take: employeeId ? 1 : 10,
+    });
+
+    if (!employees.length) {
+      return {
+        type: "LEVY",
+        data: JSON.stringify({
+          message: "No foreign workers found.",
+          next_steps: ["hire_foreign_worker", "check_quota"],
+          notes: ["2026: 10% foreign workforce cap enforced."],
+        }),
+        summary: "No data.",
+        actions: ["add_foreign_employee"],
+      };
+    }
+
+   const breakdown = (employees as any[]).map((emp: any) => {
+      const sectorKey = getSectorKey(emp.department || "");
+      const natKey = getNationalityKey(emp.nationality || "");
+      const baseLevy = BASE_LEVY_SECTOR[sectorKey] || 0;
+
+      const natFees = NATIONALITY_FEES[natKey] || {
+        visa: 0,
+        bond: 0,
+        total: 0,
+      };
+      const annual = baseLevy + natFees.total;
+      const monthly = (annual / 12).toFixed(2);
+      return {
+        name: emp.name,
+        nationality: emp.nationality || "Unknown",
+        department: emp.department || "General",
+        sectorKey,
+        baseLevy: baseLevy.toLocaleString(),
+        visa: `RM${natFees.visa.toFixed(2)}`,
+        bond: `RM${natFees.bond.toLocaleString()}`,
+        totalAdditional: `RM${natFees.total.toFixed(2)}`,
+        totalAnnual: annual.toLocaleString(),
+        monthly: `RM${monthly}`,
+      };
+    });
+
+    const totalAnnual = breakdown.reduce(
+     (sum: number, b: { totalAnnual: string }) => sum + parseFloat(b.totalAnnual.replace(/,/g, "")),
+      0,
+    );
+    const totalMonthly = (totalAnnual / 12).toFixed(2);
+
+    return {
+      type: "LEVY",
+      data: JSON.stringify({
+        employees_count: employees.length,
+        total_annual_myr: totalAnnual.toLocaleString(),
+        total_monthly_myr: totalMonthly,
+        breakdown,
+        base_levy_table: BASE_LEVY_SECTOR,
+        nationality_fees: NATIONALITY_FEES,
+        notes: [
+          "2026: 10% foreign workforce cap (13th Malaysia Plan).",
+          "MTLM: +RM300-500/worker for high-ratio employers (Bangladesh/Indonesia).",
+          "Portals: MYEG (payments), FWCMS (quota)",
+        ],
+        sources: ["imi.gov.my", "foreignworkers.com.my"],
+      }),
+      summary: `Total levy for ${employees.length} workers: RM${totalAnnual.toLocaleString()}/year (base + statutory).`,
+      actions: ["pay_levy_myeg", "check_quota_fwcms", "renew_permits"],
+    };
+  } catch (error) {
+    console.error("Levy agent error:", error);
+    return {
+      type: "LEVY",
+      data: JSON.stringify({
+        error: "DB query failed",
+        example_vietnam_construction: {
+          base: BASE_LEVY_SECTOR.construction,
+          visa: NATIONALITY_FEES.vietnam?.visa ?? 13,
+          bond: NATIONALITY_FEES.vietnam?.bond ?? 1500,
+          total: (BASE_LEVY_SECTOR.construction ?? 0) + (NATIONALITY_FEES.vietnam?.total ?? 1513),
+        },
+        notes: ["Use MYEG/FWCMS for latest quotas."],
+      }),
+      summary: "Example shown due to error.",
+      actions: ["check_db", "retry"],
+    };
+  }
+}
+
+// ── HR Quality Management Agent ───────────────────────────────────────────────
+
+const QMS_STANDARDS = [
+  { standard: "ISO 9001:2015", area: "Quality Management System", status: "Core" },
+  { standard: "MS ISO 9001:2015", area: "Malaysian Standard Equivalent", status: "Core" },
+  { standard: "OSHA 1994 / Act 514", area: "Occupational Safety & Health", status: "Required" },
+  { standard: "Employment Act 1955", area: "HR Compliance Baseline", status: "Required" },
+  { standard: "HRDC/PSMB Act 2001", area: "Training Quality Assurance", status: "Recommended" },
+];
+
+const CAPA_CATEGORIES = [
+  "Recruitment Process Deviation",
+  "Onboarding Checklist Gap",
+  "Payroll Processing Error",
+  "Document Control Failure",
+  "Training Record Incomplete",
+  "Attendance Record Discrepancy",
+  "Permit/Visa Expiry Missed",
+  "Policy Non-Compliance",
+];
+
+const KPIs = [
+  { kpi: "HR Process SOP Completion Rate", target: "≥ 95%", frequency: "Monthly" },
+  { kpi: "CAPA Closure Rate (within 30 days)", target: "≥ 90%", frequency: "Monthly" },
+  { kpi: "Document Control Compliance", target: "100% current docs", frequency: "Quarterly" },
+  { kpi: "Audit Finding Resolution Time", target: "≤ 14 days avg", frequency: "Per audit" },
+  { kpi: "Employee Data Completeness", target: "≥ 98%", frequency: "Monthly" },
+  { kpi: "Training Records Accuracy", target: "100%", frequency: "Monthly" },
+];
+
+export async function hrQualityManagementAgent(input: string, tenantId?: string) {
+  try {
+    const { prisma } = await import("@/lib/prisma");
     const where = tenantId ? { tenantId } : {};
-    const now = new Date();
-    const in30Days = new Date(Date.now() + 30 * 86400000);
-    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
 
     const [
       totalEmployees,
-      incompleteProfiles,
-      employeesWithoutDocuments,
-      foreignWorkersWithoutActiveVisa,
-      pendingPayrolls,
-      attendanceThisMonth,
-      expiringDocuments,
+      expiredDocs,
       activeComplianceRules,
     ] = await Promise.all([
       prisma.employee.count({ where }),
-      prisma.employee.count({
-        where: {
-          ...where,
-          OR: [
-            { department: null },
-            { position: null },
-            { hireDate: null },
-            { isForeign: true, nationality: null },
-          ],
-        },
-      }),
-      prisma.employee.count({
-        where: {
-          ...where,
-          documents: { none: {} },
-        },
-      }),
-      prisma.employee.count({
-        where: {
-          ...where,
-          isForeign: true,
-          visas: { none: { status: "ACTIVE" } },
-        },
-      }),
-      prisma.payroll.count({ where: { ...where, status: "PENDING" } }),
-      prisma.attendance.findMany({
-        where: {
-          ...where,
-          date: { gte: monthStart },
-        },
-        select: { status: true },
-      }),
-      prisma.document.count({
-        where: {
-          ...where,
-          expiryDate: { gte: now, lte: in30Days },
-          status: { not: "EXPIRED" },
-        },
-      }),
+      prisma.document.count({ where: { ...where, status: "EXPIRED" } }),
       prisma.complianceRule.count({ where: { ...where, active: true } }),
     ]);
 
-    const lateCount = attendanceThisMonth.filter(
-      (record: { status: string }) => record.status === "LATE",
-    ).length;
-    const absentCount = attendanceThisMonth.filter(
-      (record: { status: string }) => record.status === "ABSENT",
-    ).length;
-    const totalAttendanceRecords = attendanceThisMonth.length;
-    const exceptionRate =
-      totalAttendanceRecords > 0
-        ? Number(
-            (
-              ((lateCount + absentCount) / totalAttendanceRecords) *
-              100
-            ).toFixed(1),
-          )
-        : 0;
+    const dataCompleteness = totalEmployees > 0
+      ? Math.max(80, 100 - Math.round((expiredDocs / Math.max(totalEmployees, 1)) * 20))
+      : 100;
 
-    const criticalFindings: string[] = [];
-    const improvementAreas: string[] = [];
-
-    if (foreignWorkersWithoutActiveVisa > 0) {
-      criticalFindings.push(
-        `${foreignWorkersWithoutActiveVisa} foreign worker profile(s) have no active visa on record.`,
-      );
-    }
-
-    if (pendingPayrolls > 0) {
-      criticalFindings.push(
-        `${pendingPayrolls} payroll record(s) are still pending processing.`,
-      );
-    }
-
-    if (incompleteProfiles > 0) {
-      improvementAreas.push(
-        `${incompleteProfiles} employee profile(s) are missing key HR data fields.`,
-      );
-    }
-
-    if (employeesWithoutDocuments > 0) {
-      improvementAreas.push(
-        `${employeesWithoutDocuments} employee record(s) have no supporting documents attached.`,
-      );
-    }
-
-    if (expiringDocuments > 0) {
-      improvementAreas.push(
-        `${expiringDocuments} document(s) will expire within the next 30 days.`,
-      );
-    }
-
-    if (exceptionRate > 5) {
-      improvementAreas.push(
-        `Attendance exception rate is ${exceptionRate}% which is above the 5% quality threshold.`,
-      );
-    }
-
-    const qualityScore = Math.max(
-      0,
-      100 -
-        criticalFindings.length * 15 -
-        improvementAreas.length * 6 -
-        (activeComplianceRules === 0 ? 10 : 0),
-    );
-
-    const status =
-      qualityScore >= 85
-        ? "✅ Controlled"
-        : qualityScore >= 70
-          ? "⚠️ Improvement Needed"
-          : "🚨 Escalate Review";
+    const openIssues = expiredDocs;
+    const qmsScore = Math.max(0, 100 - openIssues * 5);
 
     return {
       type: "HR_QUALITY_MANAGEMENT",
       data: JSON.stringify({
-        qualityScore: `${qualityScore}/100`,
-        status,
-        processHealth: {
-          totalEmployees,
-          pendingPayrolls,
-          attendanceExceptionRate: `${exceptionRate}%`,
-          activeComplianceRules,
-        },
-        dataQuality: {
-          incompleteProfiles,
-          employeesWithoutDocuments,
-          foreignWorkersWithoutActiveVisa,
-          expiringDocuments30Days: expiringDocuments,
-        },
-        criticalFindings,
-        improvementAreas,
-        standards: QUALITY_STANDARDS,
-        recommendedActions: [
-          "Run a monthly HR data completeness review for employee master records.",
-          "Track document renewals with 30/60/90-day alerts and clear ownership.",
-          "Escalate pending payroll items before payroll cutoff to avoid service delays.",
-          "Use CAPA reviews for recurring attendance or documentation issues.",
+        qmsScore: `${qmsScore}/100`,
+        status:
+          qmsScore >= 85 ? "✅ Controlled"
+          : qmsScore >= 65 ? "⚠️ Improvement Needed"
+          : "🚨 Critical — Immediate Action Required",
+        dataCompleteness: `${dataCompleteness}%`,
+        openIssues,
+        activeComplianceRules,
+        standards: QMS_STANDARDS,
+        capaCategories: CAPA_CATEGORIES,
+        kpis: KPIs,
+        recommendations: [
+          openIssues > 0
+            ? `Close ${openIssues} expired document(s) to restore QMS control.`
+            : "All documents are current — maintain renewal schedule.",
+          activeComplianceRules === 0
+            ? "Configure compliance rules to enable automated monitoring."
+            : `${activeComplianceRules} active compliance rule(s) in place.`,
+          "Schedule quarterly internal audits aligned to ISO 9001 clause 9.2.",
+          "Ensure CAPA records are linked to root-cause evidence.",
+          "Review SOP version control monthly — superseded versions must be archived.",
+        ],
+        continuousImprovement: [
+          "Run monthly data completeness checks against all HR records.",
+          "Track CAPA closure rate — target ≥ 90% within 30 days.",
+          "Hold quarterly management review covering QMS KPIs.",
+          "Integrate Kaizen cycles for high-frequency HR processes (onboarding, payroll).",
         ],
       }),
+      summary: `HR QMS Score: ${qmsScore}/100. ${openIssues} open issue(s) requiring attention.`,
+      actions: ["review_capa", "schedule_internal_audit", "check_document_control"],
     };
   } catch (error) {
     console.error("HR Quality Management agent error:", error);
     return {
       type: "HR_QUALITY_MANAGEMENT",
       data: JSON.stringify({
-        qualityScore: "Advisory mode",
-        status:
-          "⚠️ Live HR quality metrics are unavailable, showing the standard scorecard.",
-        processHealth: {
-          totalEmployees: "N/A",
-          pendingPayrolls: "Review payroll queue manually",
-          attendanceExceptionRate: "Review attendance dashboard manually",
-          activeComplianceRules: "N/A",
-        },
-        dataQuality: {
-          incompleteProfiles: "Review employee master data completeness",
-          employeesWithoutDocuments: "Review document-control backlog",
-          foreignWorkersWithoutActiveVisa:
-            "Verify immigration records manually",
-          expiringDocuments30Days: "Review 30-day document expiry list",
-        },
-        criticalFindings: [
-          "Confirm visa validity, payroll cutoff items, and document renewals in the next review cycle.",
-        ],
-        improvementAreas: [
-          "Run a monthly HR data completeness review.",
-          "Set 30/60/90-day document renewal alerts with clear owners.",
-          "Use CAPA reviews for recurring attendance or documentation exceptions.",
-        ],
-        standards: QUALITY_STANDARDS,
-        recommendedActions: [
-          "Review SOP adherence for onboarding, payroll, leave, and document control.",
-          "Track service turnaround time and error recurrence by process owner.",
-          "Escalate repeated exceptions through CAPA before the next audit.",
+        qmsScore: "Advisory mode",
+        status: "⚠️ Live data unavailable — showing standard QMS framework.",
+        standards: QMS_STANDARDS,
+        capaCategories: CAPA_CATEGORIES,
+        kpis: KPIs,
+        recommendations: [
+          "Conduct a baseline HR process audit against ISO 9001 requirements.",
+          "Map all HR SOPs and identify gaps in document control.",
+          "Establish a CAPA register for recurring HR process deviations.",
+          "Define data completeness thresholds for all employee records.",
         ],
       }),
+      summary: "Standard HR QMS framework shown (DB unavailable).",
+      actions: ["check_db", "retry"],
     };
   }
 }

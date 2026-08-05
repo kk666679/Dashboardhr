@@ -52,9 +52,9 @@ export async function talentAcquisitionAgent(input: string, tenantId?: string) {
     ]);
 
     const openRoles = departments
-      .filter((d) => d.department && d._count.department < 3)
+      .filter((d: any) => d.department && d._count.department < 3)
       .slice(0, 5)
-      .map((d) => ({
+      .map((d: any) => ({
         title: `${d.department} Specialist`,
         department: d.department!,
         level: "Executive",

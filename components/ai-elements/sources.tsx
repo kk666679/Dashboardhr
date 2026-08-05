@@ -6,8 +6,9 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { cn } from "@/lib/utils";
-import { BookIcon, ChevronDownIcon } from "lucide-react";
-import type { ComponentProps } from "react";
+import { BookIcon, ChevronDownIcon, ExternalLinkIcon } from "lucide-react";
+import type { ComponentProps, MouseEventHandler } from "react";
+import { useLocalizedHref } from "@/hooks/useLocalizedHref";
 
 export type SourcesProps = ComponentProps<"div">;
 
@@ -57,21 +58,45 @@ export const SourcesContent = ({
   />
 );
 
-export type SourceProps = ComponentProps<"a">;
+export type SourceProps = ComponentProps<"a"> & {
+  /** Whether this source is a placeholder (href="#") */
+  isPlaceholder?: boolean;
+};
 
-export const Source = ({ href, title, children, ...props }: SourceProps) => (
-  <a
-    className="flex items-center gap-2"
-    href={href}
-    rel="noreferrer"
-    target="_blank"
-    {...props}
-  >
-    {children ?? (
-      <>
-        <BookIcon className="h-4 w-4" />
-        <span className="block font-medium">{title}</span>
-      </>
-    )}
-  </a>
-);
+// Default destination for placeholder source links — open the document library.
+const DOC_LIBRARY_HREF = "/dashboard/documents";
+
+export const Source = ({ href, title, children, isPlaceholder, onClick, ...props }: SourceProps) => {
+  const isPlaceholderLink = href === "#" || isPlaceholder;
+  const { href: localizedHref } = useLocalizedHref();
+
+  const handleClick: MouseEventHandler<HTMLAnchorElement> = (e) => {
+    onClick?.(e);
+  };
+
+  // Placeholder sources link to the document library so clicks always go somewhere.
+  const resolvedHref = isPlaceholderLink
+    ? localizedHref(DOC_LIBRARY_HREF)
+    : typeof href === "string"
+      ? localizedHref(href)
+      : href;
+
+  return (
+    <a
+      className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+      href={resolvedHref}
+      rel="noreferrer"
+      target="_blank"
+      onClick={handleClick}
+      {...props}
+    >
+      {children ?? (
+        <>
+          <BookIcon className="h-4 w-4" />
+          <span className="block font-medium">{title}</span>
+          <ExternalLinkIcon className="h-3 w-3 text-muted-foreground" />
+        </>
+      )}
+    </a>
+  );
+};

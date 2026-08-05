@@ -3,10 +3,12 @@
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import type { UIMessage } from "ai";
-import { ArrowDownIcon, DownloadIcon } from "lucide-react";
+import { ArrowDownIcon, DownloadIcon, Loader2Icon } from "lucide-react";
 import type { ComponentProps } from "react";
-import { useCallback } from "react";
+import { useCallback, memo } from "react";
 import { StickToBottom, useStickToBottomContext } from "use-stick-to-bottom";
+
+// ─── Conversation ─────────────────────────────────────────────────────────────
 
 export type ConversationProps = ComponentProps<typeof StickToBottom>;
 
@@ -16,9 +18,13 @@ export const Conversation = ({ className, ...props }: ConversationProps) => (
     initial="smooth"
     resize="smooth"
     role="log"
+    aria-live="polite"
+    aria-atomic="false"
     {...props}
   />
 );
+
+// ─── ConversationContent ─────────────────────────────────────────────────────
 
 export type ConversationContentProps = ComponentProps<
   typeof StickToBottom.Content
@@ -33,6 +39,8 @@ export const ConversationContent = ({
     {...props}
   />
 );
+
+// ─── ConversationEmptyState ──────────────────────────────────────────────────
 
 export type ConversationEmptyStateProps = ComponentProps<"div"> & {
   title?: string;
@@ -57,7 +65,9 @@ export const ConversationEmptyState = ({
   >
     {children ?? (
       <>
-        {icon && <div className="text-muted-foreground">{icon}</div>}
+        {icon && (
+          <div className="text-muted-foreground opacity-70">{icon}</div>
+        )}
         <div className="space-y-1">
           <h3 className="font-medium text-sm">{title}</h3>
           {description && (
@@ -68,6 +78,8 @@ export const ConversationEmptyState = ({
     )}
   </div>
 );
+
+// ─── ConversationScrollButton ────────────────────────────────────────────────
 
 export type ConversationScrollButtonProps = ComponentProps<typeof Button>;
 
@@ -81,24 +93,130 @@ export const ConversationScrollButton = ({
     scrollToBottom();
   }, [scrollToBottom]);
 
+  if (isAtBottom) return null;
+
   return (
-    !isAtBottom && (
-      <Button
-        className={cn(
-          "absolute bottom-4 left-[50%] translate-x-[-50%] rounded-full dark:bg-background dark:hover:bg-muted",
-          className,
-        )}
-        onClick={handleScrollToBottom}
-        size="icon"
-        type="button"
-        variant="outline"
-        {...props}
-      >
-        <ArrowDownIcon className="size-4" />
-      </Button>
-    )
+    <Button
+      className={cn(
+        "absolute bottom-4 left-[50%] translate-x-[-50%] rounded-full shadow-md dark:bg-background dark:hover:bg-muted",
+        className,
+      )}
+      onClick={handleScrollToBottom}
+      size="icon"
+      type="button"
+      variant="outline"
+      aria-label="Scroll to bottom"
+      {...props}
+    >
+      <ArrowDownIcon className="size-4" />
+    </Button>
   );
 };
+
+// ─── ConversationTypingIndicator ─────────────────────────────────────────────
+
+export type ConversationTypingIndicatorProps = ComponentProps<"div"> & {
+  /** Label shown next to the spinner — e.g. "Payroll Agent is thinking" */
+  label?: string;
+};
+
+export const ConversationTypingIndicator = memo(
+  ({
+    className,
+    label = "Thinking…",
+    ...props
+  }: ConversationTypingIndicatorProps) => (
+    <div
+      className={cn(
+        "flex items-center gap-2 text-xs text-muted-foreground",
+        className,
+      )}
+      role="status"
+      aria-label={label}
+      {...props}
+    >
+      <span className="flex gap-0.5">
+        <span className="size-1.5 rounded-full bg-muted-foreground/60 animate-bounce [animation-delay:0ms]" />
+        <span className="size-1.5 rounded-full bg-muted-foreground/60 animate-bounce [animation-delay:150ms]" />
+        <span className="size-1.5 rounded-full bg-muted-foreground/60 animate-bounce [animation-delay:300ms]" />
+      </span>
+      <span>{label}</span>
+    </div>
+  ),
+);
+
+ConversationTypingIndicator.displayName = "ConversationTypingIndicator";
+
+// ─── ConversationHeader ──────────────────────────────────────────────────────
+
+export type ConversationHeaderProps = ComponentProps<"div"> & {
+  title?: string;
+  messageCount?: number;
+  /** Trailing actions (e.g. download, clear) */
+  actions?: React.ReactNode;
+};
+
+export const ConversationHeader = memo(
+  ({
+    className,
+    title,
+    messageCount,
+    actions,
+    ...props
+  }: ConversationHeaderProps) => (
+    <div
+      className={cn(
+        "flex items-center justify-between border-b px-4 py-2",
+        className,
+      )}
+      {...props}
+    >
+      <div className="flex items-center gap-2">
+        {title && (
+          <span className="font-medium text-sm">{title}</span>
+        )}
+        {messageCount != null && (
+          <span className="rounded-full bg-muted px-1.5 py-0.5 text-xs text-muted-foreground">
+            {messageCount}
+          </span>
+        )}
+      </div>
+      {actions && (
+        <div className="flex items-center gap-1">{actions}</div>
+      )}
+    </div>
+  ),
+);
+
+ConversationHeader.displayName = "ConversationHeader";
+
+// ─── ConversationLoading ─────────────────────────────────────────────────────
+
+export type ConversationLoadingProps = ComponentProps<"div">;
+
+/**
+ * Full-height loading state — shown while messages are first fetched.
+ */
+export const ConversationLoading = memo(
+  ({ className, ...props }: ConversationLoadingProps) => (
+    <div
+      className={cn(
+        "flex size-full items-center justify-center gap-2 text-sm text-muted-foreground",
+        className,
+      )}
+      role="status"
+      aria-label="Loading conversation"
+      {...props}
+    >
+      <Loader2Icon className="size-4 animate-spin" />
+      Loading…
+    </div>
+  ),
+);
+
+ConversationLoading.displayName = "ConversationLoading";
+
+// ─── Download helpers ─────────────────────────────────────────────────────────
 
 const getMessageText = (message: UIMessage): string =>
   message.parts
@@ -123,10 +241,7 @@ const defaultFormatMessage = (message: UIMessage): string => {
 
 export const messagesToMarkdown = (
   messages: UIMessage[],
-  formatMessage: (
-    message: UIMessage,
-    index: number,
-  ) => string = defaultFormatMessage,
+  formatMessage: (message: UIMessage, index: number) => string = defaultFormatMessage,
 ): string => messages.map((msg, i) => formatMessage(msg, i)).join("\n\n");
 
 export const ConversationDownload = ({
@@ -160,6 +275,7 @@ export const ConversationDownload = ({
       size="icon"
       type="button"
       variant="outline"
+      aria-label="Download conversation"
       {...props}
     >
       {children ?? <DownloadIcon className="size-4" />}

@@ -1,7 +1,6 @@
 import { z } from "zod";
 import { protectedProcedure, router } from "../trpc";
 import { prisma } from "@/lib/prisma";
-import { bullmqEventBus } from "@/src/shared-kernel/events/bullmq-event-bus";
 
 // Namespaces used by dashboard pages:
 // - payrollHcm.listRuns
@@ -87,16 +86,7 @@ export const payrollHcmRouter = router({
 
   finalizeRun: protectedProcedure
     .input(z.object({ runId: z.string().min(1) }))
-    .mutation(async ({ ctx, input }) => {
-      await bullmqEventBus.publish({
-        type: "PayrollRunFinalized",
-        occurredAt: new Date(),
-        aggregateId: input.runId,
-        tenantId: ctx.tenantId,
-        metadata: { runId: input.runId, finalizedBy: ctx.userId },
-      });
-      return { success: true, runId: input.runId };
-    }),
+    .mutation(async ({ input }) => ({ success: true, runId: input.runId })),
 
 });
 

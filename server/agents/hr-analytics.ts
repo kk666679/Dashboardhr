@@ -1,4 +1,4 @@
-import { prisma } from "@/lib/prisma";
+﻿import { prisma } from "@/lib/prisma";
 
 export async function hrAnalyticsAgent(input: string, tenantId?: string) {
   try {
@@ -35,13 +35,13 @@ export async function hrAnalyticsAgent(input: string, tenantId?: string) {
     ]);
 
     const presentCount = attendanceThisMonth.filter(
-      (a) => a.status === "PRESENT",
+      (a: { status: string }) => a.status === "PRESENT",
     ).length;
     const absentCount = attendanceThisMonth.filter(
-      (a) => a.status === "ABSENT",
+      (a: { status: string }) => a.status === "ABSENT",
     ).length;
     const lateCount = attendanceThisMonth.filter(
-      (a) => a.status === "LATE",
+      (a: { status: string }) => a.status === "LATE",
     ).length;
     const totalRecords = attendanceThisMonth.length;
     const attendanceRate =

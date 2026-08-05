@@ -206,7 +206,7 @@ export const agentRouter = router({
       z.object({
         agentId: z.string(),
         toolId: z.string(),
-        parameters: z.record(z.any()),
+        parameters: z.record(z.string(), z.any()),
       })
     )
     .mutation(async ({ input }) => {
@@ -216,7 +216,7 @@ export const agentRouter = router({
         throw new Error(`Tool not found: ${input.toolId}`);
       }
 
-      const result = await (tool.run as (p: any) => Promise<any>)(input.parameters);
+      const result = await (tool.run as (p: unknown) => Promise<any>)(input.parameters);
 
       return {
         success: true,

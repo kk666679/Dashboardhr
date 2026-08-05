@@ -1,4 +1,4 @@
-import { Tool } from 'ai';
+import type { Tool } from 'ai';
 
 export interface ClaudeHookContext {
   sessionId?: string;
@@ -12,8 +12,8 @@ export interface ClaudeHookContext {
 
 export interface ClaudeHooksConfig {
   // Tool lifecycle
-  preToolUse?: (toolName: string, parameters: any, ctx: ClaudeHookContext) => Promise<boolean | void>;
-  postToolUse?: (toolName: string, result: any, ctx: ClaudeHookContext) => Promise<void>;
+  preToolUse?: (toolName: string, parameters: unknown, ctx: ClaudeHookContext) => Promise<boolean | void>;
+  postToolUse?: (toolName: string, result: unknown, ctx: ClaudeHookContext) => Promise<void>;
   postToolUseFailure?: (toolName: string, error: Error, ctx: ClaudeHookContext) => Promise<void>;
 
   // Permission & prompts
@@ -29,10 +29,10 @@ export interface ClaudeHooksConfig {
   subAgentStop?: (agentId: string, ctx: ClaudeHookContext) => Promise<void>;
 
   // Other
-  preCompact?: (messages: any[], ctx: ClaudeHookContext) => Promise<any[] | void>;
+  preCompact?: (messages: unknown[], ctx: ClaudeHookContext) => Promise<any[] | void>;
   stop?: (reason: string, ctx: ClaudeHookContext) => Promise<void>;
   notification?: (type: 'info' | 'warning' | 'error', message: string, ctx: ClaudeHookContext) => Promise<void>;
 }
 
-export type ClaudeHookFn = (ctx: ClaudeHookContext, ...args: any[]) => Promise<any>;
+export type ClaudeHookFn = (ctx: ClaudeHookContext, ...args: unknown[]) => Promise<any>;
 

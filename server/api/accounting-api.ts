@@ -1,4 +1,6 @@
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+"use client";
+
+import { useQuery, useMutation, buildQs } from "./_hooks";
 import type {
   Invoice,
   DeliveryOrder,
@@ -9,366 +11,121 @@ import type {
   TaxCalculation,
 } from "@/types/accounting";
 
-export const accountingApi = createApi({
-  reducerPath: "accountingApi",
-  baseQuery: fetchBaseQuery({
-    baseUrl: "/api/accounting",
-    prepareHeaders: (headers, { getState }) => {
-      const token = (getState() as any).auth?.token;
-      if (token) {
-        headers.set("authorization", `Bearer ${token}`);
-      }
-      return headers;
-    },
-  }),
-  tagTypes: [
-    "Invoice",
-    "DeliveryOrder",
-    "CreditNote",
-    "DebitNote",
-    "AccountingSummary",
-    "Payment",
-    "TaxCalculation",
-  ],
-  endpoints: (builder) => ({
-    // Invoice endpoints
-    getInvoices: builder.query<{ invoices: Invoice[]; total: number }, any>({
-      query: (params) => ({ url: "/invoices", params }),
-      providesTags: ["Invoice"],
-    }),
-    getInvoiceById: builder.query<Invoice, string>({
-      query: (id) => `/invoices/${id}`,
-      providesTags: (result, error, id) => [{ type: "Invoice", id }],
-    }),
-    createInvoice: builder.mutation<Invoice, Partial<Invoice>>({
-      query: (invoice) => ({
-        url: "/invoices",
-        method: "POST",
-        body: invoice,
-      }),
-      invalidatesTags: ["Invoice", "AccountingSummary"],
-    }),
-    updateInvoice: builder.mutation<
-      Invoice,
-      { id: string; invoice: Partial<Invoice> }
-    >({
-      query: ({ id, invoice }) => ({
-        url: `/invoices/${id}`,
-        method: "PUT",
-        body: invoice,
-      }),
-      invalidatesTags: (result, error, { id }) => [
-        { type: "Invoice", id },
-        "AccountingSummary",
-      ],
-    }),
-    deleteInvoice: builder.mutation<void, string>({
-      query: (id) => ({
-        url: `/invoices/${id}`,
-        method: "DELETE",
-      }),
-      invalidatesTags: ["Invoice", "AccountingSummary"],
-    }),
-    sendInvoice: builder.mutation<void, { id: string; email: string }>({
-      query: ({ id, email }) => ({
-        url: `/invoices/${id}/send`,
-        method: "POST",
-        body: { email },
-      }),
-      invalidatesTags: (result, error, { id }) => [{ type: "Invoice", id }],
-    }),
+const BASE = "/api/accounting";
 
-    // Delivery Order endpoints
-    getDeliveryOrders: builder.query<
-      { orders: DeliveryOrder[]; total: number },
-      any
-    >({
-      query: (params) => ({ url: "/delivery-orders", params }),
-      providesTags: ["DeliveryOrder"],
-    }),
-    getDeliveryOrderById: builder.query<DeliveryOrder, string>({
-      query: (id) => `/delivery-orders/${id}`,
-      providesTags: (result, error, id) => [{ type: "DeliveryOrder", id }],
-    }),
-    createDeliveryOrder: builder.mutation<
-      DeliveryOrder,
-      Partial<DeliveryOrder>
-    >({
-      query: (order) => ({
-        url: "/delivery-orders",
-        method: "POST",
-        body: order,
-      }),
-      invalidatesTags: ["DeliveryOrder", "AccountingSummary"],
-    }),
-    updateDeliveryOrder: builder.mutation<
-      DeliveryOrder,
-      { id: string; order: Partial<DeliveryOrder> }
-    >({
-      query: ({ id, order }) => ({
-        url: `/delivery-orders/${id}`,
-        method: "PUT",
-        body: order,
-      }),
-      invalidatesTags: (result, error, { id }) => [
-        { type: "DeliveryOrder", id },
-      ],
-    }),
-    updateDeliveryStatus: builder.mutation<
-      DeliveryOrder,
-      { id: string; status: string; notes?: string }
-    >({
-      query: ({ id, status, notes }) => ({
-        url: `/delivery-orders/${id}/status`,
-        method: "PATCH",
-        body: { status, notes },
-      }),
-      invalidatesTags: (result, error, { id }) => [
-        { type: "DeliveryOrder", id },
-      ],
-    }),
+// Invoice
+export function useGetInvoicesQuery(params?: Record<string, unknown>) {
+  return useQuery<{ invoices: Invoice[]; total: number }>(`${BASE}/invoices${buildQs(params ?? {})}`);
+}
+export function useGetInvoiceByIdQuery(id: string) {
+  return useQuery<Invoice>(`${BASE}/invoices/${id}`);
+}
+export function useCreateInvoiceMutation() {
+  return useMutation<Invoice, Partial<Invoice>>((body) => ({ url: `${BASE}/invoices`, method: "POST", body }));
+}
+export function useUpdateInvoiceMutation() {
+  return useMutation<Invoice, { id: string; invoice: Partial<Invoice> }>(({ id, invoice }) => ({ url: `${BASE}/invoices/${id}`, method: "PUT", body: invoice }));
+}
+export function useDeleteInvoiceMutation() {
+  return useMutation<void, string>((id) => ({ url: `${BASE}/invoices/${id}`, method: "DELETE" }));
+}
+export function useSendInvoiceMutation() {
+  return useMutation<void, { id: string; email: string }>(({ id, email }) => ({ url: `${BASE}/invoices/${id}/send`, method: "POST", body: { email } }));
+}
 
-    // Credit Note endpoints
-    getCreditNotes: builder.query<
-      { creditNotes: CreditNote[]; total: number },
-      any
-    >({
-      query: (params) => ({ url: "/credit-notes", params }),
-      providesTags: ["CreditNote"],
-    }),
-    getCreditNoteById: builder.query<CreditNote, string>({
-      query: (id) => `/credit-notes/${id}`,
-      providesTags: (result, error, id) => [{ type: "CreditNote", id }],
-    }),
-    createCreditNote: builder.mutation<CreditNote, Partial<CreditNote>>({
-      query: (creditNote) => ({
-        url: "/credit-notes",
-        method: "POST",
-        body: creditNote,
-      }),
-      invalidatesTags: ["CreditNote", "AccountingSummary"],
-    }),
-    approveCreditNote: builder.mutation<
-      CreditNote,
-      { id: string; approvedBy: string; notes?: string }
-    >({
-      query: ({ id, approvedBy, notes }) => ({
-        url: `/credit-notes/${id}/approve`,
-        method: "PATCH",
-        body: { approvedBy, notes },
-      }),
-      invalidatesTags: (result, error, { id }) => [{ type: "CreditNote", id }],
-    }),
-    rejectCreditNote: builder.mutation<
-      CreditNote,
-      { id: string; rejectedBy: string; reason: string }
-    >({
-      query: ({ id, rejectedBy, reason }) => ({
-        url: `/credit-notes/${id}/reject`,
-        method: "PATCH",
-        body: { rejectedBy, reason },
-      }),
-      invalidatesTags: (result, error, { id }) => [{ type: "CreditNote", id }],
-    }),
+// Delivery Order
+export function useGetDeliveryOrdersQuery(params?: Record<string, unknown>) {
+  return useQuery<{ orders: DeliveryOrder[]; total: number }>(`${BASE}/delivery-orders${buildQs(params ?? {})}`);
+}
+export function useGetDeliveryOrderByIdQuery(id: string) {
+  return useQuery<DeliveryOrder>(`${BASE}/delivery-orders/${id}`);
+}
+export function useCreateDeliveryOrderMutation() {
+  return useMutation<DeliveryOrder, Partial<DeliveryOrder>>((body) => ({ url: `${BASE}/delivery-orders`, method: "POST", body }));
+}
+export function useUpdateDeliveryOrderMutation() {
+  return useMutation<DeliveryOrder, { id: string; order: Partial<DeliveryOrder> }>(({ id, order }) => ({ url: `${BASE}/delivery-orders/${id}`, method: "PUT", body: order }));
+}
+export function useUpdateDeliveryStatusMutation() {
+  return useMutation<DeliveryOrder, { id: string; status: string; notes?: string }>(({ id, ...body }) => ({ url: `${BASE}/delivery-orders/${id}/status`, method: "PATCH", body }));
+}
 
-    // Debit Note endpoints
-    getDebitNotes: builder.query<
-      { debitNotes: DebitNote[]; total: number },
-      any
-    >({
-      query: (params) => ({ url: "/debit-notes", params }),
-      providesTags: ["DebitNote"],
-    }),
-    getDebitNoteById: builder.query<DebitNote, string>({
-      query: (id) => `/debit-notes/${id}`,
-      providesTags: (result, error, id) => [{ type: "DebitNote", id }],
-    }),
-    createDebitNote: builder.mutation<DebitNote, Partial<DebitNote>>({
-      query: (debitNote) => ({
-        url: "/debit-notes",
-        method: "POST",
-        body: debitNote,
-      }),
-      invalidatesTags: ["DebitNote", "AccountingSummary"],
-    }),
-    updateDebitNote: builder.mutation<
-      DebitNote,
-      { id: string; debitNote: Partial<DebitNote> }
-    >({
-      query: ({ id, debitNote }) => ({
-        url: `/debit-notes/${id}`,
-        method: "PUT",
-        body: debitNote,
-      }),
-      invalidatesTags: (result, error, { id }) => [{ type: "DebitNote", id }],
-    }),
+// Credit Note
+export function useGetCreditNotesQuery(params?: Record<string, unknown>) {
+  return useQuery<{ creditNotes: CreditNote[]; total: number }>(`${BASE}/credit-notes${buildQs(params ?? {})}`);
+}
+export function useGetCreditNoteByIdQuery(id: string) {
+  return useQuery<CreditNote>(`${BASE}/credit-notes/${id}`);
+}
+export function useCreateCreditNoteMutation() {
+  return useMutation<CreditNote, Partial<CreditNote>>((body) => ({ url: `${BASE}/credit-notes`, method: "POST", body }));
+}
+export function useApproveCreditNoteMutation() {
+  return useMutation<CreditNote, { id: string; approvedBy: string; notes?: string }>(({ id, ...body }) => ({ url: `${BASE}/credit-notes/${id}/approve`, method: "PATCH", body }));
+}
+export function useRejectCreditNoteMutation() {
+  return useMutation<CreditNote, { id: string; rejectedBy: string; reason: string }>(({ id, ...body }) => ({ url: `${BASE}/credit-notes/${id}/reject`, method: "PATCH", body }));
+}
 
-    // Payment endpoints
-    recordPayment: builder.mutation<PaymentRecord, Partial<PaymentRecord>>({
-      query: (payment) => ({
-        url: "/payments",
-        method: "POST",
-        body: payment,
-      }),
-      invalidatesTags: ["Invoice", "AccountingSummary", "Payment"],
-    }),
-    getPayments: builder.query<
-      { payments: PaymentRecord[]; total: number },
-      any
-    >({
-      query: (params) => ({ url: "/payments", params }),
-      providesTags: ["Payment"],
-    }),
+// Debit Note
+export function useGetDebitNotesQuery(params?: Record<string, unknown>) {
+  return useQuery<{ debitNotes: DebitNote[]; total: number }>(`${BASE}/debit-notes${buildQs(params ?? {})}`);
+}
+export function useGetDebitNoteByIdQuery(id: string) {
+  return useQuery<DebitNote>(`${BASE}/debit-notes/${id}`);
+}
+export function useCreateDebitNoteMutation() {
+  return useMutation<DebitNote, Partial<DebitNote>>((body) => ({ url: `${BASE}/debit-notes`, method: "POST", body }));
+}
+export function useUpdateDebitNoteMutation() {
+  return useMutation<DebitNote, { id: string; debitNote: Partial<DebitNote> }>(({ id, debitNote }) => ({ url: `${BASE}/debit-notes/${id}`, method: "PUT", body: debitNote }));
+}
 
-    // Tax calculation
-    calculateTax: builder.mutation<
-      TaxCalculation,
-      { items: any[]; customerType: string }
-    >({
-      query: (data) => ({
-        url: "/tax/calculate",
-        method: "POST",
-        body: data,
-      }),
-      invalidatesTags: ["TaxCalculation"],
-    }),
+// Payment
+export function useRecordPaymentMutation() {
+  return useMutation<PaymentRecord, Partial<PaymentRecord>>((body) => ({ url: `${BASE}/payments`, method: "POST", body }));
+}
+export function useGetPaymentsQuery(params?: Record<string, unknown>) {
+  return useQuery<{ payments: PaymentRecord[]; total: number }>(`${BASE}/payments${buildQs(params ?? {})}`);
+}
 
-    // Summary and reports
-    getAccountingSummary: builder.query<AccountingSummary, { period?: string }>(
-      {
-        query: (params) => ({ url: "/summary", params }),
-        providesTags: ["AccountingSummary"],
-      },
-    ),
+// Tax & Summary
+export function useCalculateTaxMutation() {
+  return useMutation<TaxCalculation, { items: unknown[]; customerType: string }>((body) => ({ url: `${BASE}/tax/calculate`, method: "POST", body }));
+}
+export function useGetAccountingSummaryQuery(params?: { period?: string }) {
+  return useQuery<AccountingSummary>(`${BASE}/summary${buildQs((params ?? {}) as Record<string, unknown>)}`);
+}
+export function useGetFinancialReportsQuery(params?: { period?: string; type?: string }) {
+  return useQuery<unknown>(`${BASE}/reports/financial${buildQs((params ?? {}) as Record<string, unknown>)}`);
+}
 
-    // PDF generation
-    generateInvoicePDF: builder.mutation<{ url: string }, string>({
-      query: (id) => ({
-        url: `/invoices/${id}/pdf`,
-        method: "POST",
-      }),
-    }),
-    generateDeliveryOrderPDF: builder.mutation<{ url: string }, string>({
-      query: (id) => ({
-        url: `/delivery-orders/${id}/pdf`,
-        method: "POST",
-      }),
-    }),
-    generateCreditNotePDF: builder.mutation<{ url: string }, string>({
-      query: (id) => ({
-        url: `/credit-notes/${id}/pdf`,
-        method: "POST",
-      }),
-    }),
-    generateDebitNotePDF: builder.mutation<{ url: string }, string>({
-      query: (id) => ({
-        url: `/debit-notes/${id}/pdf`,
-        method: "POST",
-      }),
-    }),
+// PDF Generation
+export function useGenerateInvoicePDFMutation() {
+  return useMutation<{ url: string }, string>((id) => ({ url: `${BASE}/invoices/${id}/pdf`, method: "POST" }));
+}
+export function useGenerateDeliveryOrderPDFMutation() {
+  return useMutation<{ url: string }, string>((id) => ({ url: `${BASE}/delivery-orders/${id}/pdf`, method: "POST" }));
+}
+export function useGenerateCreditNotePDFMutation() {
+  return useMutation<{ url: string }, string>((id) => ({ url: `${BASE}/credit-notes/${id}/pdf`, method: "POST" }));
+}
+export function useGenerateDebitNotePDFMutation() {
+  return useMutation<{ url: string }, string>((id) => ({ url: `${BASE}/debit-notes/${id}/pdf`, method: "POST" }));
+}
 
-    // Bulk operations
-    bulkUpdateInvoices: builder.mutation<
-      void,
-      { ids: string[]; updates: Partial<Invoice> }
-    >({
-      query: (data) => ({
-        url: "/invoices/bulk-update",
-        method: "PATCH",
-        body: data,
-      }),
-      invalidatesTags: ["Invoice", "AccountingSummary"],
-    }),
-    bulkDeleteInvoices: builder.mutation<void, string[]>({
-      query: (ids) => ({
-        url: "/invoices/bulk-delete",
-        method: "DELETE",
-        body: { ids },
-      }),
-      invalidatesTags: ["Invoice", "AccountingSummary"],
-    }),
+// Bulk Operations
+export function useBulkUpdateInvoicesMutation() {
+  return useMutation<void, { ids: string[]; updates: Partial<Invoice> }>((body) => ({ url: `${BASE}/invoices/bulk-update`, method: "PATCH", body }));
+}
+export function useBulkDeleteInvoicesMutation() {
+  return useMutation<void, string[]>((ids) => ({ url: `${BASE}/invoices/bulk-delete`, method: "DELETE", body: { ids } }));
+}
 
-    // Financial Reports
-    getFinancialReports: builder.query<any, { period?: string; type?: string }>(
-      {
-        query: (params) => ({ url: "/reports/financial", params }),
-        providesTags: ["AccountingSummary"],
-      },
-    ),
-
-    // Export functions
-    exportInvoices: builder.mutation<
-      { url: string },
-      { format: "csv" | "excel"; filters?: any }
-    >({
-      query: (data) => ({
-        url: "/invoices/export",
-        method: "POST",
-        body: data,
-      }),
-    }),
-    exportDeliveryOrders: builder.mutation<
-      { url: string },
-      { format: "csv" | "excel"; filters?: any }
-    >({
-      query: (data) => ({
-        url: "/delivery-orders/export",
-        method: "POST",
-        body: data,
-      }),
-    }),
-  }),
-});
-
-export const {
-  // Invoice hooks
-  useGetInvoicesQuery,
-  useGetInvoiceByIdQuery,
-  useCreateInvoiceMutation,
-  useUpdateInvoiceMutation,
-  useDeleteInvoiceMutation,
-  useSendInvoiceMutation,
-
-  // Delivery Order hooks
-  useGetDeliveryOrdersQuery,
-  useGetDeliveryOrderByIdQuery,
-  useCreateDeliveryOrderMutation,
-  useUpdateDeliveryOrderMutation,
-  useUpdateDeliveryStatusMutation,
-
-  // Credit Note hooks
-  useGetCreditNotesQuery,
-  useGetCreditNoteByIdQuery,
-  useCreateCreditNoteMutation,
-  useApproveCreditNoteMutation,
-  useRejectCreditNoteMutation,
-
-  // Debit Note hooks
-  useGetDebitNotesQuery,
-  useGetDebitNoteByIdQuery,
-  useCreateDebitNoteMutation,
-  useUpdateDebitNoteMutation,
-
-  // Payment hooks
-  useRecordPaymentMutation,
-  useGetPaymentsQuery,
-
-  // Tax and summary hooks
-  useCalculateTaxMutation,
-  useGetAccountingSummaryQuery,
-  useGetFinancialReportsQuery,
-
-  // PDF generation hooks
-  useGenerateInvoicePDFMutation,
-  useGenerateDeliveryOrderPDFMutation,
-  useGenerateCreditNotePDFMutation,
-  useGenerateDebitNotePDFMutation,
-
-  // Bulk operation hooks
-  useBulkUpdateInvoicesMutation,
-  useBulkDeleteInvoicesMutation,
-
-  // Export hooks
-  useExportInvoicesMutation,
-  useExportDeliveryOrdersMutation,
-} = accountingApi;
+// Export
+export function useExportInvoicesMutation() {
+  return useMutation<{ url: string }, { format: "csv" | "excel"; filters?: unknown }>((body) => ({ url: `${BASE}/invoices/export`, method: "POST", body }));
+}
+export function useExportDeliveryOrdersMutation() {
+  return useMutation<{ url: string }, { format: "csv" | "excel"; filters?: unknown }>((body) => ({ url: `${BASE}/delivery-orders/export`, method: "POST", body }));
+}

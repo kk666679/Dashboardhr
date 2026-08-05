@@ -6,35 +6,44 @@ const locationStore = new Map<string, LocationData[]>();
 
 export async function POST(request: NextRequest) {
   try {
-    const locationData: Partial<LocationData> = await request.json();
+    const locationData = (await request.json()) as Partial<LocationData>;
 
     // Validate required fields
     if (
-      !locationData.workerId ||
-      !locationData.latitude ||
-      !locationData.longitude
+      typeof locationData.workerId !== "string" ||
+      typeof locationData.latitude !== "number" ||
+      typeof locationData.longitude !== "number"
     ) {
-      return NextResponse.json(
-        { error: "Missing required fields" },
-        { status: 400 },
-      );
+      return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
     // Create location record
     const location: LocationData = {
       id: `loc_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      userId: locationData.workerId,
       workerId: locationData.workerId,
+
       latitude: locationData.latitude,
       longitude: locationData.longitude,
-      accuracy: locationData.accuracy || 0,
-      timestamp: locationData.timestamp || new Date().toISOString(),
-      source: locationData.source || "gps",
-      batteryLevel: locationData.batteryLevel,
+
+      accuracy: locationData.accuracy,
+      timestamp: locationData.timestamp ?? new Date().toISOString(),
+
+      isEmergency: locationData.isEmergency,
+      state: locationData.state,
+      sector: locationData.sector,
+      placeName: locationData.placeName,
       address: locationData.address,
+
+      batteryLevel: locationData.batteryLevel,
+      source: locationData.source ?? "gps",
+
+      createdAt: new Date(),
+      updatedAt: new Date(),
     };
 
     // Store location
-    const workerLocations = locationStore.get(location.workerId) || [];
+    const workerLocations = locationStore.get(location.workerId!) || [];
     workerLocations.push(location);
 
     // Keep only last 1000 locations per worker
@@ -42,7 +51,7 @@ export async function POST(request: NextRequest) {
       workerLocations.splice(0, workerLocations.length - 1000);
     }
 
-    locationStore.set(location.workerId, workerLocations);
+    locationStore.set(location.workerId!, workerLocations);
 
     // Check geofence violations
     await checkGeofenceViolations(location);
@@ -53,10 +62,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(location);
   } catch (error) {
     console.error("Location update error:", error);
-    return NextResponse.json(
-      { error: "Failed to update location" },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: "Failed to update location" }, { status: 500 });
   }
 }
 
@@ -124,12 +130,14 @@ async function syncLocationToHR(location: LocationData) {
     // })
 
     // removed console.log
+    void attendanceData;
   } catch (error) {
     console.error("HR sync failed:", error);
   }
 }
 
-async function createLocationAlert(alertData: any) {
+async function createLocationAlert(_alertData: unknown) {
   // Mock alert creation - implement actual alert system
   // removed console.log
 }
+

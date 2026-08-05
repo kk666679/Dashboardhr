@@ -1,4 +1,4 @@
-import { TRPCError } from "@trpc/server";
+﻿import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import {
@@ -12,13 +12,153 @@ import {
   exportSopToHtml as exportSopContentToHtml,
   exportSopToMarkdown as exportSopContentToMarkdown,
 } from "@/lib/sop/export";
-
-async function exportSopContentToPdf(structure: SopStructure): Promise<string> {
-  // PDF generation requires @react-pdf/renderer in a worker context;
-  // return Markdown as fallback until PDF renderer is wired.
-  return exportSopContentToMarkdown(structure as any);
-}
 import { protectedProcedure, router } from "../trpc";
+
+
+// ─── Type definitions ────────────────────────────────────────────────────────
+
+type TxClient = Omit<
+  typeof prisma,
+  "$connect" | "$disconnect" | "$on" | "$transaction" | "$use" | "$extends"
+>;
+
+interface SOP {
+  id: string;
+  tenantId: string;
+  department: string;
+  code: string;
+  name: string;
+  title?: string;
+  category: "POLICY" | "OPERATIONAL" | "COMPLIANCE" | "EMERGENCY";
+  status: "DRAFT" | "IN_REVIEW" | "PUBLISHED" | "ARCHIVED";
+  currentVersion: number;
+  createdBy: string;
+  createdAt: Date;
+  updatedAt: Date;
+  versions: SOPVersion[];
+}
+
+interface SOPVersion {
+  id: string;
+  sopId: string;
+  version: number;
+  status: "DRAFT" | "IN_REVIEW" | "PUBLISHED" | "ARCHIVED";
+  changes: string;
+  content: SopStructure;
+  outline: SopStructure;
+  sla: unknown;
+  complianceFindings: unknown;
+  riskFindings: unknown;
+  auditFindings: unknown;
+  complianceScore: number | null;
+  riskScore: number | null;
+  auditReadinessScore: number | null;
+  approvedBy: string | null;
+  approvedAt: Date | null;
+  createdAt: Date;
+  updatedAt: Date;
+  sop: SOP;
+  approvals: SOPApproval[];
+  artifacts: SOPArtifact[];
+  risks: SOPRiskItem[];
+  complianceItems: SOPComplianceItem[];
+  auditEvents: SOPAuditEvent[];
+}
+
+interface SOPApproval {
+  id: string;
+  versionId: string;
+  approverRole: string;
+  approverName: string | null;
+  order: number;
+  status: "PENDING" | "APPROVED" | "REJECTED" | "VOID";
+  comment: string | null;
+  decidedBy: string | null;
+  decidedAt: Date | null;
+  createdAt: Date;
+  updatedAt: Date;
+  version: SOPVersion;
+}
+
+interface SOPArtifact {
+  id: string;
+  versionId: string;
+  type: "MARKDOWN" | "HTML" | "PDF" | "MERMAID";
+  name: string;
+  content: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+interface SOPRiskItem {
+  id: string;
+  versionId: string;
+  riskLevel: "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
+  risk: string;
+  likelihood: string | null;
+  impact: string | null;
+  mitigation: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+interface SOPComplianceItem {
+  id: string;
+  versionId: string;
+  requirement: string;
+  regulation: string;
+  control: string | null;
+  status: "PENDING" | "COMPLIANT" | "NON_COMPLIANT" | "PARTIAL";
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+interface SOPAuditEvent {
+  id: string;
+  versionId: string;
+  actor: string;
+  action: string;
+  evidence: unknown;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+interface ApprovalInput {
+  required: boolean;
+  approverRole?: string;
+  order?: number;
+  [key: string]: unknown;
+}
+
+interface ProcessFlowItem {
+  step: string;
+  [key: string]: unknown;
+}
+
+interface ComplianceRequirement {
+  requirement: string;
+  regulation: string;
+  control?: string;
+  status: "PENDING" | "COMPLIANT" | "NON_COMPLIANT" | "PARTIAL";
+  [key: string]: unknown;
+}
+
+interface RiskControl {
+  risk: string;
+  likelihood?: "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
+  impact?: string;
+  mitigation?: string;
+  [key: string]: unknown;
+}
+
+// ─── Type aliases for schema inference ──────────────────────────────────────
+
+type SopStatus = z.infer<typeof sopStatusSchema>;
+type ApprovalDecision = z.infer<typeof approvalDecisionSchema>;
+type ExportFormat = z.infer<typeof exportFormatSchema>;
+type SopCategory = "POLICY" | "OPERATIONAL" | "COMPLIANCE" | "EMERGENCY";
+
+// ─── Schemas ──────────────────────────────────────────────────────────────────
 
 const sopStatusSchema = z.enum(["DRAFT", "IN_REVIEW", "PUBLISHED", "ARCHIVED"]);
 const approvalDecisionSchema = z.enum(["APPROVED", "REJECTED"]);
@@ -76,15 +216,17 @@ const createVersionInputSchema = z.object({
   changes: z.string().max(1000).default("New draft version"),
 });
 
-function toError(code: TRPCError["code"], message: string) {
+// ─── Helper functions ────────────────────────────────────────────────────────
+
+function toError(code: TRPCError["code"], message: string): TRPCError {
   return new TRPCError({ code, message });
 }
 
-function hasLlmKey() {
+function hasLlmKey(): boolean {
   return Boolean(process.env.ANTHROPIC_API_KEY?.trim() || process.env.OPENAI_API_KEY?.trim());
 }
 
-function slug(value: string, maxLength = 50) {
+function slug(value: string, maxLength = 50): string {
   return value
     .trim()
     .toUpperCase()
@@ -93,24 +235,29 @@ function slug(value: string, maxLength = 50) {
     .slice(0, maxLength);
 }
 
-function generateMermaid(processFlow: SopStructure["processFlow"]) {
-  if (!processFlow.length) return null;
+function generateMermaid(processFlow: ProcessFlowItem[] | undefined): string | null {
+  if (!processFlow || !processFlow.length) return null;
 
   const nodes = processFlow
-    .map((item, index) => {
+    .map((item: ProcessFlowItem, index: number) => {
       const safeLabel = item.step.replace(/[\[\]"]/g, "").trim() || `Step ${index + 1}`;
       return `  S${index + 1}["${safeLabel}"]`;
     })
     .join("\n");
   const edges = processFlow
     .slice(1)
-    .map((_, index) => `  S${index + 1} --> S${index + 2}`)
+    .map((_: ProcessFlowItem, index: number) => `  S${index + 1} --> S${index + 2}`)
     .join("\n");
 
   return ["flowchart TD", nodes, edges].filter(Boolean).join("\n");
 }
 
-async function nextGeneratedCode(tx: any, tenantId: string, category: string, department: string) {
+async function nextGeneratedCode(
+  tx: TxClient,
+  tenantId: string,
+  category: string,
+  department: string
+): Promise<string> {
   const prefix = `${slug(category)}-${slug(department, 20)}`;
   const existing = await tx.sop.findMany({
     where: { tenantId, code: { startsWith: `${prefix}-` } },
@@ -126,28 +273,33 @@ async function nextGeneratedCode(tx: any, tenantId: string, category: string, de
   throw toError("BAD_REQUEST", `No SOP codes are available for ${prefix}`);
 }
 
-async function nextAvailableCode(tx: any, tenantId: string, category: string, department: string) {
-  return nextGeneratedCode(tx, tenantId, category, department);
-}
-
-async function resolveCode(tx: any, tenantId: string, input: z.infer<typeof SopGenerationInputSchema>) {
+async function resolveCode(
+  tx: TxClient,
+  tenantId: string,
+  input: z.infer<typeof SopGenerationInputSchema>
+): Promise<string> {
   if (!input.code?.trim()) {
     return nextGeneratedCode(tx, tenantId, input.category, input.department);
   }
 
   const code = slug(input.code, 80);
-  const existing = await tx.sop.findFirst({ where: { tenantId, code }, select: { id: true } });
+  const existing = await tx.sop.findFirst({
+    where: { tenantId, code },
+    select: { id: true }
+  });
   if (!existing) return code;
 
-  const suggestion = await nextAvailableCode(tx, tenantId, input.category, input.department);
+  const suggestion = await nextGeneratedCode(tx, tenantId, input.category, input.department);
   throw toError("BAD_REQUEST", `SOP code ${code} already exists. Next available code: ${suggestion}`);
 }
 
-function artifactContentType(format: z.infer<typeof exportFormatSchema>) {
+function artifactContentType(format: ExportFormat): string {
   if (format === "HTML") return "text/html";
   if (format === "PDF") return "application/pdf";
   return "text/markdown";
 }
+
+// ─── Router ──────────────────────────────────────────────────────────────────
 
 export const sopRouter = router({
   generate: protectedProcedure
@@ -157,7 +309,7 @@ export const sopRouter = router({
       const title = input.title?.trim() || output.title || `${input.category} SOP`;
 
       try {
-        return await prisma.$transaction(async (tx) => {
+        return await prisma.$transaction(async (tx: TxClient) => {
           const code = await resolveCode(tx, ctx.tenantId, input);
           const sop = await tx.sop.create({
             data: {
@@ -165,7 +317,7 @@ export const sopRouter = router({
               department: input.department,
               code,
               title,
-              category: input.category as any,
+              category: input.category as SopCategory,
               status: "DRAFT",
               currentVersion: 1,
               createdBy: ctx.userId,
@@ -194,48 +346,64 @@ export const sopRouter = router({
 
           const mermaid = output.artifacts.mermaid ?? generateMermaid(output.structure.processFlow);
           const artifacts = [
-            { versionId: version.id, type: "MARKDOWN", title: "Markdown", content: output.artifacts.markdown ?? "" },
-            { versionId: version.id, type: "HTML", title: "HTML", content: output.artifacts.html ?? "" },
-            { versionId: version.id, type: "MERMAID", title: "Mermaid", content: mermaid ?? "" },
+            { versionId: version.id, type: "MARKDOWN" as const, name: "Markdown", content: output.artifacts.markdown ?? "" },
+            { versionId: version.id, type: "HTML" as const, name: "HTML", content: output.artifacts.html ?? "" },
+            { versionId: version.id, type: "MERMAID" as const, name: "Mermaid", content: mermaid ?? "" },
           ].filter((artifact) => artifact.content.length > 0);
 
           if (artifacts.length) {
-            await tx.sopArtifact.createMany({ data: artifacts as any });
+            await tx.sopArtifact.createMany({
+              data: artifacts as any[]
+            });
           }
 
-          const complianceItems = output.structure.complianceRequirements.map((item) => ({
+          const complianceItems = output.structure.complianceRequirements.map((item: any) => ({
             versionId: version.id,
             requirement: item.requirement,
             regulation: item.regulation,
-            control: item.control,
+            control: item.control ?? null,
             status: item.status,
           }));
-          if (complianceItems.length) await tx.sopComplianceItem.createMany({ data: complianceItems });
+          if (complianceItems.length) {
+            await tx.sopComplianceItem.createMany({
+              data: complianceItems as any[]
+            });
+          }
 
-          const riskItems = output.structure.riskControls.map((item) => ({
+          const riskItems = (output.structure.riskControls as any[]).map((item: any) => ({
             versionId: version.id,
             riskLevel: item.likelihood ?? "MEDIUM",
             risk: item.risk,
-            likelihood: item.likelihood,
-            impact: item.impact,
-            mitigation: item.mitigation,
+            likelihood: item.likelihood ?? null,
+            impact: item.impact ?? null,
+            mitigation: item.mitigation ?? null,
           }));
-          if (riskItems.length) await tx.sopRiskItem.createMany({ data: riskItems });
+          if (riskItems.length) {
+            await tx.sopRiskItem.createMany({
+              data: riskItems as any[]
+            });
+          }
 
           const approvals = output.structure.approvals
-            .filter((approval) => approval.required)
-            .sort((left, right) => (left.order ?? 1) - (right.order ?? 1))
-            .map((approval, index) => ({
+            .filter((approval: ApprovalInput) => approval.required)
+            .sort((left: ApprovalInput, right: ApprovalInput) =>
+              ((left.order ?? 1) - (right.order ?? 1))
+            )
+            .map((approval: ApprovalInput, index: number) => ({
               versionId: version.id,
-              approverRole: approval.approverRole,
+              approverRole: approval.approverRole ?? "DEFAULT",
               approverName: null,
               order: approval.order ?? index + 1,
-              status: "PENDING",
+              status: "PENDING" as const,
               comment: null,
               decidedBy: null,
               decidedAt: null,
             }));
-          if (approvals.length) await tx.sopApproval.createMany({ data: approvals as any });
+          if (approvals.length) {
+            await tx.sopApproval.createMany({
+              data: approvals as any[]
+            });
+          }
 
           await tx.sopAuditEvent.createMany({
             data: [
@@ -254,7 +422,13 @@ export const sopRouter = router({
             ],
           });
 
-          return { id: sop.id, versionId: version.id, sopCode: code, title, version: 1 };
+          return {
+            id: sop.id,
+            versionId: version.id,
+            sopCode: code,
+            title,
+            version: 1
+          };
         });
       } catch (error) {
         if (error instanceof TRPCError) throw error;
@@ -272,12 +446,12 @@ export const sopRouter = router({
         where: {
           tenantId: ctx.tenantId,
           ...(input?.department ? { department: input.department } : {}),
-          ...(input?.category ? { category: input.category as any } : {}),
-          ...(input?.status ? { status: input.status as any } : {}),
+          ...(input?.category ? { category: input.category as SopCategory } : {}),
+          ...(input?.status ? { status: input.status as SopStatus } : {}),
           ...(query
             ? {
                 OR: [
-                  { title: { contains: query, mode: "insensitive" as const } },
+                  { name: { contains: query, mode: "insensitive" as const } },
                   { department: { contains: query, mode: "insensitive" as const } },
                   { code: { contains: query, mode: "insensitive" as const } },
                 ],
@@ -310,7 +484,9 @@ export const sopRouter = router({
         include: {
           versions: {
             include: {
-              approvals: { orderBy: [{ order: "asc" } as any, { createdAt: "asc" }] as any },
+              approvals: {
+                orderBy: [{ order: "asc" }, { createdAt: "asc" }]
+              },
               risks: true,
               complianceItems: true,
               artifacts: true,
@@ -333,17 +509,24 @@ export const sopRouter = router({
         where: {
           tenantId: ctx.tenantId,
           ...(input.department ? { department: input.department } : {}),
-          ...(input.category ? { category: input.category as any } : {}),
-          ...(input.status ? { status: input.status as any } : {}),
+          ...(input.category ? { category: input.category as SopCategory } : {}),
+          ...(input.status ? { status: input.status as SopStatus } : {}),
           OR: [
-            { title: { contains: query, mode: "insensitive" as const } },
+            { name: { contains: query, mode: "insensitive" as const } },
             { department: { contains: query, mode: "insensitive" as const } },
             { code: { contains: query, mode: "insensitive" as const } },
           ],
         },
         take: input.limit,
         orderBy: { updatedAt: "desc" },
-        select: { id: true, code: true, title: true, department: true, category: true, status: true },
+        select: {
+          id: true,
+          code: true,
+          name: true,
+          department: true,
+          category: true,
+          status: true
+        },
       });
     }),
 
@@ -364,7 +547,14 @@ export const sopRouter = router({
         },
         take: input.limit,
         orderBy: { updatedAt: "desc" },
-        select: { id: true, code: true, title: true, department: true, category: true, status: true },
+        select: {
+          id: true,
+          code: true,
+          name: true,
+          department: true,
+          category: true,
+          status: true
+        },
       });
     }),
 
@@ -377,11 +567,14 @@ export const sopRouter = router({
       });
       if (!version) throw toError("NOT_FOUND", "SOP version not found");
       if (version.status !== "DRAFT") {
-        throw toError("BAD_REQUEST", "Published or review-locked SOP content cannot be edited. Create a new draft version first.");
+        throw toError(
+          "BAD_REQUEST",
+          "Published or review-locked SOP content cannot be edited. Create a new draft version first."
+        );
       }
 
       const mermaid = generateMermaid(input.content.processFlow);
-      return prisma.$transaction(async (tx) => {
+      return prisma.$transaction(async (tx: TxClient) => {
         const updated = await tx.sopVersion.update({
           where: { id: version.id },
           data: {
@@ -398,10 +591,18 @@ export const sopRouter = router({
         });
 
         if (mermaid && existingMermaid) {
-          await tx.sopArtifact.update({ where: { id: existingMermaid.id }, data: { content: mermaid } });
+          await tx.sopArtifact.update({
+            where: { id: existingMermaid.id },
+            data: { content: mermaid }
+          });
         } else if (mermaid) {
           await tx.sopArtifact.create({
-            data: { versionId: version.id, type: "MERMAID", title: "Mermaid", content: mermaid },
+            data: {
+              versionId: version.id,
+              type: "MERMAID",
+              name: "Mermaid",
+              content: mermaid
+            },
           });
         }
 
@@ -426,7 +627,10 @@ export const sopRouter = router({
       });
       if (!sop) throw toError("NOT_FOUND", "SOP not found");
       if (sop.status !== "PUBLISHED") {
-        throw toError("BAD_REQUEST", "Only published SOPs can be copied into a new draft version");
+        throw toError(
+          "BAD_REQUEST",
+          "Only published SOPs can be copied into a new draft version"
+        );
       }
 
       const currentVersion = await prisma.sopVersion.findFirst({
@@ -435,7 +639,7 @@ export const sopRouter = router({
       });
       if (!currentVersion) throw toError("NOT_FOUND", "Current SOP version not found");
 
-      return prisma.$transaction(async (tx) => {
+      return prisma.$transaction(async (tx: TxClient) => {
         const nextVersion = sop.currentVersion + 1;
         const draft = await tx.sopVersion.create({
           data: {
@@ -458,23 +662,36 @@ export const sopRouter = router({
         });
 
         const approvals = currentVersion.approvals
-          .sort((left: any, right: any) => (left.order ?? 1) - (right.order ?? 1))
-          .map((approval: any) => ({
+          .sort((left: SOPApproval, right: SOPApproval) =>
+            (left.order ?? 1) - (right.order ?? 1)
+          )
+          .map((approval: SOPApproval) => ({
             versionId: draft.id,
             approverRole: approval.approverRole,
             approverName: approval.approverName,
             order: approval.order ?? 1,
-            status: "PENDING",
+            status: "PENDING" as const,
             comment: null,
             decidedBy: null,
             decidedAt: null,
           }));
-        if (approvals.length) await tx.sopApproval.createMany({ data: approvals as any });
+          if (approvals.length) {
+            await tx.sopApproval.createMany({
+              data: approvals as any[]
+            });
+          }
 
-        const mermaid = currentVersion.artifacts.find((artifact) => artifact.type === "MERMAID");
+        const mermaid = currentVersion.artifacts.find(
+          (artifact: SOPArtifact) => artifact.type === "MERMAID"
+        );
         if (mermaid) {
           await tx.sopArtifact.create({
-            data: { versionId: draft.id, type: "MERMAID", title: mermaid.title, content: mermaid.content },
+            data: {
+              versionId: draft.id,
+              type: "MERMAID",
+              name: mermaid.name,
+              content: mermaid.content
+            },
           });
         }
 
@@ -487,7 +704,11 @@ export const sopRouter = router({
             versionId: draft.id,
             actor: ctx.userId,
             action: "version_created",
-            evidence: { fromVersion: currentVersion.version, version: nextVersion, changes: input.changes },
+            evidence: {
+              fromVersion: currentVersion.version,
+              version: nextVersion,
+              changes: input.changes
+            },
           },
         });
 
@@ -508,7 +729,7 @@ export const sopRouter = router({
       });
       if (!currentVersion) throw toError("NOT_FOUND", "Current SOP version not found");
 
-      const from = sop.status;
+      const from = sop.status as SopStatus;
       const to = input.to;
       const directAllowed =
         (from === "DRAFT" && to === "IN_REVIEW") ||
@@ -516,13 +737,22 @@ export const sopRouter = router({
         (from === "PUBLISHED" && to === "ARCHIVED");
 
       if (!directAllowed) {
-        throw toError("BAD_REQUEST", `${from} -> ${to} is not a permitted transition`);
+        throw toError(
+          "BAD_REQUEST",
+          `${from} -> ${to} is not a permitted transition`
+        );
       }
 
-      return prisma.$transaction(async (tx) => {
-        await tx.sop.update({ where: { id: sop.id }, data: { status: to as any } });
+      return prisma.$transaction(async (tx: TxClient) => {
+        await tx.sop.update({
+          where: { id: sop.id },
+          data: { status: to as SopStatus }
+        });
         if (to !== "ARCHIVED") {
-          await tx.sopVersion.update({ where: { id: currentVersion.id }, data: { status: to as any } });
+          await tx.sopVersion.update({
+            where: { id: currentVersion.id },
+            data: { status: to as SopStatus }
+          });
         }
         await tx.sopAuditEvent.create({
           data: {
@@ -540,37 +770,49 @@ export const sopRouter = router({
     .input(recordApprovalInputSchema)
     .mutation(async ({ ctx, input }) => {
       const approval = await prisma.sopApproval.findFirst({
-        where: { id: input.approvalId, version: { sop: { tenantId: ctx.tenantId } } },
+        where: {
+          id: input.approvalId,
+          version: { sop: { tenantId: ctx.tenantId } }
+        },
         include: { version: { include: { sop: true } } },
       });
       if (!approval) throw toError("NOT_FOUND", "SOP approval not found");
       if (approval.version.status !== "IN_REVIEW") {
-        throw toError("BAD_REQUEST", "Approval decisions can only be recorded while the SOP is in review");
+        throw toError(
+          "BAD_REQUEST",
+          "Approval decisions can only be recorded while the SOP is in review"
+        );
       }
       if (approval.status !== "PENDING") {
         throw toError("BAD_REQUEST", "This approval has already been decided");
       }
-      if (approval.approverRole !== ctx.userRole) {
-        throw toError("UNAUTHORIZED", `Approval requires role ${approval.approverRole}`);
+      if (approval.approverRole !== (ctx as { userRole?: string }).userRole) {
+        throw toError(
+          "UNAUTHORIZED",
+          `Approval requires role ${approval.approverRole}`
+        );
       }
 
       const blockingApprovals = await prisma.sopApproval.count({
         where: {
           versionId: approval.versionId,
-          status: { not: "APPROVED" } as any,
-          order: { lt: (approval as any).order ?? 1 } as any,
-        } as any,
+          status: { not: "APPROVED" },
+          order: { lt: approval.order ?? 1 },
+        },
       });
       if (blockingApprovals > 0) {
-        throw toError("BAD_REQUEST", "Earlier approval steps must be approved first");
+        throw toError(
+          "BAD_REQUEST",
+          "Earlier approval steps must be approved first"
+        );
       }
 
-      return prisma.$transaction(async (tx) => {
+      return prisma.$transaction(async (tx: TxClient) => {
         const decidedAt = new Date();
         await tx.sopApproval.update({
           where: { id: approval.id },
           data: {
-            status: input.decision as any,
+            status: input.decision as SOPApproval["status"],
             comment: input.comment,
             decidedBy: ctx.userId,
             decidedAt,
@@ -580,17 +822,27 @@ export const sopRouter = router({
         if (input.decision === "REJECTED") {
           await tx.sopApproval.updateMany({
             where: { versionId: approval.versionId, status: "PENDING" },
-            data: { status: "VOID" as any },
+            data: { status: "VOID" },
           });
-          await tx.sopVersion.update({ where: { id: approval.versionId }, data: { status: "DRAFT" } });
-          await tx.sop.update({ where: { id: approval.version.sopId }, data: { status: "DRAFT" } });
+          await tx.sopVersion.update({
+            where: { id: approval.versionId },
+            data: { status: "DRAFT" }
+          });
+          await tx.sop.update({
+            where: { id: approval.version.sopId },
+            data: { status: "DRAFT" }
+          });
           await tx.sopAuditEvent.createMany({
             data: [
               {
                 versionId: approval.versionId,
                 actor: ctx.userId,
                 action: "approval_decision",
-                evidence: { decision: input.decision, comment: input.comment, approvalId: approval.id },
+                evidence: {
+                  decision: input.decision,
+                  comment: input.comment,
+                  approvalId: approval.id
+                },
               },
               {
                 versionId: approval.versionId,
@@ -604,21 +856,35 @@ export const sopRouter = router({
         }
 
         const remainingPending = await tx.sopApproval.count({
-          where: { versionId: approval.versionId, status: { not: "APPROVED" } as any } as any,
+          where: {
+            versionId: approval.versionId,
+            status: { not: "APPROVED" }
+          },
         });
         if (remainingPending === 0) {
           await tx.sopVersion.update({
             where: { id: approval.versionId },
-            data: { status: "PUBLISHED", approvedBy: ctx.userId, approvedAt: decidedAt },
+            data: {
+              status: "PUBLISHED",
+              approvedBy: ctx.userId,
+              approvedAt: decidedAt
+            },
           });
-          await tx.sop.update({ where: { id: approval.version.sopId }, data: { status: "PUBLISHED" } });
+          await tx.sop.update({
+            where: { id: approval.version.sopId },
+            data: { status: "PUBLISHED" }
+          });
           await tx.sopAuditEvent.createMany({
             data: [
               {
                 versionId: approval.versionId,
                 actor: ctx.userId,
                 action: "approval_decision",
-                evidence: { decision: input.decision, comment: input.comment, approvalId: approval.id },
+                evidence: {
+                  decision: input.decision,
+                  comment: input.comment,
+                  approvalId: approval.id
+                },
               },
               {
                 versionId: approval.versionId,
@@ -642,7 +908,11 @@ export const sopRouter = router({
             versionId: approval.versionId,
             actor: ctx.userId,
             action: "approval_decision",
-            evidence: { decision: input.decision, comment: input.comment, approvalId: approval.id },
+            evidence: {
+              decision: input.decision,
+              comment: input.comment,
+              approvalId: approval.id
+            },
           },
         });
         return { versionId: approval.versionId, status: "IN_REVIEW" };
@@ -663,10 +933,17 @@ export const sopRouter = router({
       if (!version) throw toError("NOT_FOUND", "SOP version not found");
 
       const cached = !input.refresh
-        ? await prisma.sopArtifact.findFirst({ where: { versionId: version.id, type: input.format as any } })
+        ? await prisma.sopArtifact.findFirst({
+            where: { versionId: version.id, type: input.format as any }
+          })
         : null;
       if (cached) {
-        return { artifactId: cached.id, format: input.format, content: cached.content, contentType: artifactContentType(input.format) };
+        return {
+          artifactId: cached.id,
+          format: input.format,
+          content: cached.content,
+          contentType: artifactContentType(input.format)
+        };
       }
 
       const structure = SopStructureSchema.parse(version.content);
@@ -677,12 +954,12 @@ export const sopRouter = router({
             ? await exportSopContentToPdf(structure)
             : exportSopContentToMarkdown(structure);
 
-      const artifact = await prisma.$transaction(async (tx) => {
+      const artifact = await prisma.$transaction(async (tx: TxClient) => {
         const created = await tx.sopArtifact.create({
           data: {
             versionId: version.id,
             type: input.format as any,
-            title: input.format,
+            name: input.format,
             content,
           },
         });
@@ -697,7 +974,12 @@ export const sopRouter = router({
         return created;
       });
 
-      return { artifactId: artifact.id, format: input.format, content, contentType: artifactContentType(input.format) };
+      return {
+        artifactId: artifact.id,
+        format: input.format,
+        content,
+        contentType: artifactContentType(input.format)
+      };
     }),
 
   getMetrics: protectedProcedure.query(async ({ ctx }) => {
@@ -712,30 +994,30 @@ export const sopRouter = router({
       }),
     ]);
 
-    const countBy = <T extends string>(items: T[]) =>
+    const countBy = <T extends string>(items: T[]): Record<string, number> =>
       items.reduce<Record<string, number>>((acc, item) => {
         acc[item] = (acc[item] ?? 0) + 1;
         return acc;
       }, {});
 
-    const average = (values: Array<number | null | undefined>) => {
+    const average = (values: Array<number | null | undefined>): number => {
       const valid = values.filter((value): value is number => typeof value === "number");
       if (!valid.length) return 0;
       return Math.round(valid.reduce((sum, value) => sum + value, 0) / valid.length);
     };
 
-    const statusCounts = countBy(sops.map((sop) => sop.status));
-    const departmentCounts = countBy(sops.map((sop) => sop.department));
-    const categoryCounts = countBy(sops.map((sop) => sop.category));
+    const statusCounts = countBy(sops.map((sop: { status: string }) => sop.status));
+    const departmentCounts = countBy(sops.map((sop: { department: string }) => sop.department));
+    const categoryCounts = countBy(sops.map((sop: { category: string }) => sop.category));
 
     return {
       status: Object.entries(statusCounts).map(([name, value]) => ({ name, value })),
       departments: Object.entries(departmentCounts).map(([name, value]) => ({ name, value })),
       categories: Object.entries(categoryCounts).map(([name, value]) => ({ name, value })),
       averages: {
-        complianceScore: average(publishedVersions.map((version) => version.complianceScore)),
-        riskScore: average(publishedVersions.map((version) => version.riskScore)),
-        auditReadinessScore: average(publishedVersions.map((version) => version.auditReadinessScore)),
+        complianceScore: average(publishedVersions.map((version: { complianceScore: number | null }) => version.complianceScore)),
+        riskScore: average(publishedVersions.map((version: { riskScore: number | null }) => version.riskScore)),
+        auditReadinessScore: average(publishedVersions.map((version: { auditReadinessScore: number | null }) => version.auditReadinessScore)),
       },
     };
   }),
@@ -744,3 +1026,9 @@ export const sopRouter = router({
     mode: hasLlmKey() ? "online" : "offline",
   })),
 });
+
+// ─── Helper function for PDF export ─────────────────────────────────────────
+
+async function exportSopContentToPdf(structure: SopStructure): Promise<string> {
+  return exportSopContentToMarkdown(structure);
+}

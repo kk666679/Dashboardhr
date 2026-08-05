@@ -1,48 +1,43 @@
-import { prisma } from "@/lib/prisma";
+﻿import { prisma } from "@/lib/prisma";
+import {
+  BASE_LEVY_SECTOR,
+  NATIONALITY_FEES,
+  getSectorKey,
+  getNationalityKey,
+} from "@/lib/constants/levy-rates";
 
-// Malaysian foreign worker levy & statutory fees 2026 (IMI/MYEG data)
-const BASE_LEVY_SECTOR: Record<string, number> = {
-  manufacturing: 1850,
-  construction: 1850,
-  plantation: 640,
-  agriculture: 640,
-  services: 1850,
-  domestic: 1850,
-};
+/**
+ * Levy agent – calculates foreign worker levy for a given tenant.
+ *
+ * @param input - The user's input prompt (unused but kept for consistency).
+ * @param employeeId - Optional employee ID to filter a single worker.
+ * @param tenantId - **Required** – tenant ID for multi‑tenancy isolation.
+ * @returns An object with levy breakdown and actions.
+ */
+export async function levyAgent(
+  input: string,
+  employeeId?: string,
+  tenantId?: string,
+) {
+  // Guard against missing tenantId
+  if (!tenantId) {
+    throw new Error("levyAgent: tenantId is required");
+  }
 
-const NATIONALITY_FEES: Record<
-  string,
-  { visa: number; bond: number; total: number }
-> = {
-  vietnam: { visa: 13, bond: 1500, total: 1513 },
-  philippines: { visa: 36, bond: 1000, total: 1036 },
-  india: { visa: 50, bond: 750, total: 800 },
-  myanmar: { visa: 19.5, bond: 750, total: 769.5 },
-  bangladesh: { visa: 20, bond: 500, total: 520 },
-  cambodia: { visa: 20, bond: 250, total: 270 },
-  indonesia: { visa: 15, bond: 250, total: 265 },
-  thailand: { visa: 0, bond: 250, total: 250 },
-};
-
-function getSectorKey(department: string): string {
-  const sector = department?.toLowerCase() || "";
-  return (
-    Object.keys(BASE_LEVY_SECTOR).find((k) => sector.includes(k)) || "services"
-  );
-}
-
-function getNationalityKey(nationality: string): string {
-  return (nationality || "").toLowerCase().replace(/\s/g, "");
-}
-
-export async function levyAgent(input: string, employeeId?: string) {
   try {
-    const where = employeeId
-      ? { id: employeeId, isForeign: true }
-      : { isForeign: true };
-    const employees = employeeId
-      ? await prisma.employee.findMany({ where, take: 1 })
-      : await prisma.employee.findMany({ where, take: 10 });
+    // Build a type‑safe where clause
+    const where: Record<string, unknown> = {
+      tenantId,
+      isForeign: true,
+    };
+    if (employeeId) {
+      where.id = employeeId;
+    }
+
+    const employees = await prisma.employee.findMany({
+      where,
+      take: employeeId ? 1 : 10,
+    });
 
     if (!employees.length) {
       return {
@@ -57,18 +52,19 @@ export async function levyAgent(input: string, employeeId?: string) {
       };
     }
 
-    const breakdown = employees.map((emp) => {
+    const breakdown = (employees as any[]).map((emp: any) => {
       const sectorKey = getSectorKey(emp.department || "");
       const natKey = getNationalityKey(emp.nationality || "");
-      const baseLevy = BASE_LEVY_SECTOR[sectorKey];
+      const baseLevy = BASE_LEVY_SECTOR[sectorKey] ?? 0;
 
-      const natFees = NATIONALITY_FEES[natKey] || {
+      const natFees = NATIONALITY_FEES[natKey] ?? {
         visa: 0,
         bond: 0,
         total: 0,
       };
       const annual = baseLevy + natFees.total;
-      const monthly = (annual / 12).toFixed(2);
+      const monthly = annual / 12;
+
       return {
         name: emp.name,
         nationality: emp.nationality || "Unknown",
@@ -79,22 +75,24 @@ export async function levyAgent(input: string, employeeId?: string) {
         bond: `RM${natFees.bond.toLocaleString()}`,
         totalAdditional: `RM${natFees.total.toFixed(2)}`,
         totalAnnual: annual.toLocaleString(),
-        monthly: `RM${monthly}`,
+        monthly: `RM${monthly.toFixed(2)}`,
       };
     });
 
-    const totalAnnual = breakdown.reduce(
-      (sum, b) => sum + parseInt(b.totalAnnual.replace(/,/g, "")),
-      0,
-    );
-    const totalMonthly = (totalAnnual / 12).toFixed(2);
+    // Safely sum total annual amounts (remove commas, parse as float)
+    const totalAnnual = breakdown.reduce((sum: number, b: { totalAnnual: string }) => {
+      const numeric = parseFloat(b.totalAnnual.replace(/,/g, ""));
+      return sum + (isNaN(numeric) ? 0 : numeric);
+    }, 0);
+
+    const totalMonthly = totalAnnual / 12;
 
     return {
       type: "LEVY",
       data: JSON.stringify({
         employees_count: employees.length,
         total_annual_myr: totalAnnual.toLocaleString(),
-        total_monthly_myr: totalMonthly,
+        total_monthly_myr: totalMonthly.toFixed(2),
         breakdown,
         base_levy_table: BASE_LEVY_SECTOR,
         nationality_fees: NATIONALITY_FEES,
@@ -115,10 +113,10 @@ export async function levyAgent(input: string, employeeId?: string) {
       data: JSON.stringify({
         error: "DB query failed",
         example_vietnam_construction: {
-          base: 1850,
-          visa: 13,
-          bond: 1500,
-          total: 1850 + 1513,
+          base: BASE_LEVY_SECTOR.construction,
+          visa: NATIONALITY_FEES.vietnam?.visa ?? 13,
+          bond: NATIONALITY_FEES.vietnam?.bond ?? 1500,
+          total: (BASE_LEVY_SECTOR.construction ?? 0) + (NATIONALITY_FEES.vietnam?.total ?? 1513),
         },
         notes: ["Use MYEG/FWCMS for latest quotas."],
       }),

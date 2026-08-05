@@ -20,8 +20,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { SignJWT } from "jose";
 import { prisma } from "@/lib/prisma";
-import { createSession, requiresMfa } from "@/lib/session";
-import { MFA_REQUIRED_ROLES } from "@/src/shared-kernel/security/permission-types";
+import { MFA_REQUIRED_ROLES } from "@/lib/shared-kernel/security/permission-types";
 
 const JWT_SECRET = new TextEncoder().encode(
   process.env.JWT_SECRET ?? "dev-secret-replace-in-production-min-32-chars"
@@ -73,10 +72,9 @@ async function handleLocalLogin(email: string, password: string) {
 
   if (!user) return null;
 
-  // NOTE: local-password authentication must use a strong hash.
-  // This project previously allowed an insecure dev backdoor; that has been removed.
-  // If you still need dev accounts, create them by hashing passwords at user creation time.
-  const valid = user.password === password;
+  // Secure password verification via bcryptjs (supports legacy plain-text fallback)
+  const { verifyPassword } = await import("@/lib/server/password");
+  const valid = await verifyPassword(password, user.password ?? "");
   if (!valid) return null;
 
   return user;
@@ -98,10 +96,22 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       return NextResponse.json({ error: "Email and password are required" }, { status: 400 });
     }
 
+    // M17: Rate limit — 5 attempts per 15 minutes per IP
+    const { rateLimit } = await import("@/lib/server/rate-limit");
+    const rl = await rateLimit(request, { key: "login", limit: 5, windowSec: 900, identifier: email.toLowerCase() });
+    if (!rl.allowed) {
+      return NextResponse.json(
+        { error: "Too many login attempts. Please try again later." },
+        { status: 429, headers: rl.headers }
+      );
+    }
+
     const user = await handleLocalLogin(email, password);
     if (!user) {
-      return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
+      return NextResponse.json({ error: "Invalid credentials" }, { status: 401, headers: rl.headers });
     }
+
+    const { requiresMfa } = await import("@/lib/session");
 
     // Req 28.3: Check if MFA is required for this role
     const mfaRequired = requiresMfa(user.role);
@@ -114,6 +124,8 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
 
       return NextResponse.json({ mfaRequired: true, tempToken }, { status: 200 });
     }
+
+    const { createSession } = await import("@/lib/session");
 
     // Create full session
     const sessionId = await createSession({
@@ -191,14 +203,16 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       });
     }
 
+    const { createSession } = await import("@/lib/session");
     const sessionId = await createSession({
       userId:   user.id,
       role:     user.role,
       tenantId: user.tenantId,
     });
 
+    const preferredLocale = url.pathname?.split("/")[1] || "en";
     const response = NextResponse.redirect(
-      new URL(process.env.NEXTAUTH_URL ?? "http://localhost:3000")
+      new URL(`/${preferredLocale}/dashboard`, process.env.NEXTAUTH_URL ?? "http://localhost:3000")
     );
     response.cookies.set("__session", sessionId, {
       httpOnly: true,
@@ -228,6 +242,28 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
 export async function GET(request: NextRequest, ctx: { params: Promise<{ nextauth: string[] }> }) {
   const segments = (await ctx.params).nextauth;
   const action   = segments[0];
+
+  // ── Session check ─────────────────────────────────────────────────────────
+
+  if (action === "session") {
+    const sessionId = request.cookies.get("__session")?.value;
+    if (!sessionId) {
+      return NextResponse.json({ user: null }, { status: 200 });
+    }
+    try {
+      const { getSession } = await import("@/lib/session");
+      const session = await getSession(sessionId);
+      if (!session) return NextResponse.json({ user: null }, { status: 200 });
+
+      const user = await prisma.user.findUnique({
+        where: { id: session.userId },
+        select: { id: true, email: true, role: true, tenantId: true },
+      });
+      return NextResponse.json({ user: user ?? null }, { status: 200 });
+    } catch {
+      return NextResponse.json({ user: null }, { status: 200 });
+    }
+  }
 
   // ── OIDC authorization redirect ───────────────────────────────────────────
 

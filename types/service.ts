@@ -25,7 +25,7 @@ export async function getDashboardData(tenantId: string): Promise<DashboardData>
     prisma.employee.count({ where: { tenantId } }),
   ]);
 
-  const mapped = employees.map((e) => ({
+  const mapped = employees.map((e: any) => ({
     id: e.id,
     name: e.name,
     email: e.email,

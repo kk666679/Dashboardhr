@@ -11,7 +11,6 @@ export type WorkerCreateInput = z.infer<typeof WorkerCreateSchema>;
 export { WorkerCreateSchema };
 
 export {
-  fwmsApi as workersApi,
   useGetWorkerByIdQuery,
   useGetWorkersQuery,
   useCreateWorkerMutation,

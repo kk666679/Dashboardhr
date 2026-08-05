@@ -1,4 +1,6 @@
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+"use client";
+
+import { useQuery, useMutation, buildQs } from "./_hooks";
 import type {
   PayrollRecord,
   MalaysianTaxRates,
@@ -11,428 +13,144 @@ import type {
   ComplianceAlert,
 } from "@/types/accounting-enhanced";
 
-export const accountingEnhancedApi = createApi({
-  reducerPath: "accountingEnhancedApi",
-  baseQuery: fetchBaseQuery({
-    baseUrl: "/api/accounting-enhanced",
-    prepareHeaders: (headers, { getState }) => {
-      const token = (getState() as any).auth?.token;
-      if (token) {
-        headers.set("authorization", `Bearer ${token}`);
-      }
-      return headers;
-    },
-  }),
-  tagTypes: [
-    "Payroll",
-    "ChartOfAccounts",
-    "GeneralLedger",
-    "BankRec",
-    "GovSubmission",
-    "EInvoice",
-    "Report",
-    "Compliance",
-  ],
-  endpoints: (builder) => ({
-    // Payroll Management
-    getPayrollRecords: builder.query<
-      { records: PayrollRecord[]; total: number },
-      any
-    >({
-      query: (params) => ({ url: "/payroll", params }),
-      providesTags: ["Payroll"],
-    }),
-    createPayrollRecord: builder.mutation<
-      PayrollRecord,
-      Partial<PayrollRecord>
-    >({
-      query: (record) => ({
-        url: "/payroll",
-        method: "POST",
-        body: record,
-      }),
-      invalidatesTags: ["Payroll"],
-    }),
-    calculatePayroll: builder.mutation<
-      PayrollRecord,
-      { workerId: string; payPeriod: string }
-    >({
-      query: (data) => ({
-        url: "/payroll/calculate",
-        method: "POST",
-        body: data,
-      }),
-    }),
-    approvePayroll: builder.mutation<
-      PayrollRecord,
-      { id: string; approvedBy: string }
-    >({
-      query: ({ id, approvedBy }) => ({
-        url: `/payroll/${id}/approve`,
-        method: "PATCH",
-        body: { approvedBy },
-      }),
-      invalidatesTags: ["Payroll"],
-    }),
-    processPayrollPayment: builder.mutation<
-      any,
-      { ids: string[]; paymentMethod: string }
-    >({
-      query: (data) => ({
-        url: "/payroll/process-payment",
-        method: "POST",
-        body: data,
-      }),
-      invalidatesTags: ["Payroll"],
-    }),
+const BASE = "/api/accounting-enhanced";
 
-    // Malaysian Tax Rates
-    getTaxRates: builder.query<MalaysianTaxRates, void>({
-      query: () => "/tax-rates",
-    }),
-    updateTaxRates: builder.mutation<
-      MalaysianTaxRates,
-      Partial<MalaysianTaxRates>
-    >({
-      query: (rates) => ({
-        url: "/tax-rates",
-        method: "PUT",
-        body: rates,
-      }),
-    }),
+// Payroll
+export function useGetPayrollRecordsQuery(params?: Record<string, unknown>) {
+  return useQuery<{ records: PayrollRecord[]; total: number }>(`${BASE}/payroll${buildQs(params ?? {})}`);
+}
+export function useCreatePayrollRecordMutation() {
+  return useMutation<PayrollRecord, Partial<PayrollRecord>>((body) => ({ url: `${BASE}/payroll`, method: "POST", body }));
+}
+export function useCalculatePayrollMutation() {
+  return useMutation<PayrollRecord, { workerId: string; payPeriod: string }>((body) => ({ url: `${BASE}/payroll/calculate`, method: "POST", body }));
+}
+export function useApprovePayrollMutation() {
+  return useMutation<PayrollRecord, { id: string; approvedBy: string }>(({ id, approvedBy }) => ({ url: `${BASE}/payroll/${id}/approve`, method: "PATCH", body: { approvedBy } }));
+}
+export function useProcessPayrollPaymentMutation() {
+  return useMutation<unknown, { ids: string[]; paymentMethod: string }>((body) => ({ url: `${BASE}/payroll/process-payment`, method: "POST", body }));
+}
 
-    // Chart of Accounts
-    getChartOfAccounts: builder.query<ChartOfAccounts[], void>({
-      query: () => "/chart-of-accounts",
-      providesTags: ["ChartOfAccounts"],
-    }),
-    createAccount: builder.mutation<ChartOfAccounts, Partial<ChartOfAccounts>>({
-      query: (account) => ({
-        url: "/chart-of-accounts",
-        method: "POST",
-        body: account,
-      }),
-      invalidatesTags: ["ChartOfAccounts"],
-    }),
-    updateAccount: builder.mutation<
-      ChartOfAccounts,
-      { id: string; account: Partial<ChartOfAccounts> }
-    >({
-      query: ({ id, account }) => ({
-        url: `/chart-of-accounts/${id}`,
-        method: "PUT",
-        body: account,
-      }),
-      invalidatesTags: ["ChartOfAccounts"],
-    }),
+// Tax Rates
+export function useGetTaxRatesQuery() {
+  return useQuery<MalaysianTaxRates>(`${BASE}/tax-rates`);
+}
+export function useUpdateTaxRatesMutation() {
+  return useMutation<MalaysianTaxRates, Partial<MalaysianTaxRates>>((body) => ({ url: `${BASE}/tax-rates`, method: "PUT", body }));
+}
 
-    // General Ledger
-    getGeneralLedger: builder.query<
-      { entries: GeneralLedger[]; total: number },
-      any
-    >({
-      query: (params) => ({ url: "/general-ledger", params }),
-      providesTags: ["GeneralLedger"],
-    }),
-    createJournalEntry: builder.mutation<GeneralLedger, Partial<GeneralLedger>>(
-      {
-        query: (entry) => ({
-          url: "/general-ledger",
-          method: "POST",
-          body: entry,
-        }),
-        invalidatesTags: ["GeneralLedger", "ChartOfAccounts"],
-      },
-    ),
-    postJournalEntry: builder.mutation<
-      GeneralLedger,
-      { id: string; approvedBy: string }
-    >({
-      query: ({ id, approvedBy }) => ({
-        url: `/general-ledger/${id}/post`,
-        method: "PATCH",
-        body: { approvedBy },
-      }),
-      invalidatesTags: ["GeneralLedger", "ChartOfAccounts"],
-    }),
+// Chart of Accounts
+export function useGetChartOfAccountsQuery() {
+  return useQuery<ChartOfAccounts[]>(`${BASE}/chart-of-accounts`);
+}
+export function useCreateAccountMutation() {
+  return useMutation<ChartOfAccounts, Partial<ChartOfAccounts>>((body) => ({ url: `${BASE}/chart-of-accounts`, method: "POST", body }));
+}
+export function useUpdateAccountMutation() {
+  return useMutation<ChartOfAccounts, { id: string; account: Partial<ChartOfAccounts> }>(({ id, account }) => ({ url: `${BASE}/chart-of-accounts/${id}`, method: "PUT", body: account }));
+}
 
-    // Bank Reconciliation
-    getBankReconciliations: builder.query<
-      { reconciliations: BankReconciliation[]; total: number },
-      any
-    >({
-      query: (params) => ({ url: "/bank-reconciliation", params }),
-      providesTags: ["BankRec"],
-    }),
-    importBankStatement: builder.mutation<
-      any,
-      { bankAccount: string; file: File }
-    >({
-      query: ({ bankAccount, file }) => {
-        const formData = new FormData();
-        formData.append("file", file);
-        formData.append("bankAccount", bankAccount);
-        return {
-          url: "/bank-reconciliation/import",
-          method: "POST",
-          body: formData,
-        };
-      },
-      invalidatesTags: ["BankRec"],
-    }),
-    matchTransactions: builder.mutation<
-      any,
-      { reconciliationId: string; matches: any[] }
-    >({
-      query: ({ reconciliationId, matches }) => ({
-        url: `/bank-reconciliation/${reconciliationId}/match`,
-        method: "POST",
-        body: { matches },
-      }),
-      invalidatesTags: ["BankRec"],
-    }),
+// General Ledger
+export function useGetGeneralLedgerQuery(params?: Record<string, unknown>) {
+  return useQuery<{ entries: GeneralLedger[]; total: number }>(`${BASE}/general-ledger${buildQs(params ?? {})}`);
+}
+export function useCreateJournalEntryMutation() {
+  return useMutation<GeneralLedger, Partial<GeneralLedger>>((body) => ({ url: `${BASE}/general-ledger`, method: "POST", body }));
+}
+export function usePostJournalEntryMutation() {
+  return useMutation<GeneralLedger, { id: string; approvedBy: string }>(({ id, approvedBy }) => ({ url: `${BASE}/general-ledger/${id}/post`, method: "PATCH", body: { approvedBy } }));
+}
 
-    // Government Submissions
-    getGovernmentSubmissions: builder.query<
-      { submissions: GovernmentSubmission[]; total: number },
-      any
-    >({
-      query: (params) => ({ url: "/government-submissions", params }),
-      providesTags: ["GovSubmission"],
-    }),
-    submitToGovernment: builder.mutation<
-      GovernmentSubmission,
-      { type: string; period: string; data: any }
-    >({
-      query: (submission) => ({
-        url: "/government-submissions",
-        method: "POST",
-        body: submission,
-      }),
-      invalidatesTags: ["GovSubmission"],
-    }),
-    generateEPFForm: builder.mutation<any, { period: string }>({
-      query: ({ period }) => ({
-        url: "/government-submissions/epf-form",
-        method: "POST",
-        body: { period },
-      }),
-    }),
-    generateSOCSO: builder.mutation<any, { period: string }>({
-      query: ({ period }) => ({
-        url: "/government-submissions/socso",
-        method: "POST",
-        body: { period },
-      }),
-    }),
-    generatePCBForm: builder.mutation<any, { period: string }>({
-      query: ({ period }) => ({
-        url: "/government-submissions/pcb",
-        method: "POST",
-        body: { period },
-      }),
-    }),
+// Bank Reconciliation
+export function useGetBankReconciliationsQuery(params?: Record<string, unknown>) {
+  return useQuery<{ reconciliations: BankReconciliation[]; total: number }>(`${BASE}/bank-reconciliation${buildQs(params ?? {})}`);
+}
+export function useImportBankStatementMutation() {
+  return useMutation<unknown, { bankAccount: string; file: File }>(({ bankAccount, file }) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("bankAccount", bankAccount);
+    return { url: `${BASE}/bank-reconciliation/import`, method: "POST", body: formData };
+  });
+}
+export function useMatchTransactionsMutation() {
+  return useMutation<unknown, { reconciliationId: string; matches: unknown[] }>(({ reconciliationId, matches }) => ({ url: `${BASE}/bank-reconciliation/${reconciliationId}/match`, method: "POST", body: { matches } }));
+}
 
-    // E-Invoice (MyInvois)
-    getEInvoices: builder.query<{ einvoices: EInvoice[]; total: number }, any>({
-      query: (params) => ({ url: "/einvoice", params }),
-      providesTags: ["EInvoice"],
-    }),
-    submitEInvoice: builder.mutation<EInvoice, { invoiceId: string }>({
-      query: ({ invoiceId }) => ({
-        url: "/einvoice/submit",
-        method: "POST",
-        body: { invoiceId },
-      }),
-      invalidatesTags: ["EInvoice"],
-    }),
-    validateEInvoice: builder.mutation<any, { id: string }>({
-      query: ({ id }) => ({
-        url: `/einvoice/${id}/validate`,
-        method: "POST",
-      }),
-      invalidatesTags: ["EInvoice"],
-    }),
-    cancelEInvoice: builder.mutation<EInvoice, { id: string; reason: string }>({
-      query: ({ id, reason }) => ({
-        url: `/einvoice/${id}/cancel`,
-        method: "POST",
-        body: { reason },
-      }),
-      invalidatesTags: ["EInvoice"],
-    }),
+// Government Submissions
+export function useGetGovernmentSubmissionsQuery(params?: Record<string, unknown>) {
+  return useQuery<{ submissions: GovernmentSubmission[]; total: number }>(`${BASE}/government-submissions${buildQs(params ?? {})}`);
+}
+export function useSubmitToGovernmentMutation() {
+  return useMutation<GovernmentSubmission, { type: string; period: string; data: unknown }>((body) => ({ url: `${BASE}/government-submissions`, method: "POST", body }));
+}
+export function useGenerateEPFFormMutation() {
+  return useMutation<unknown, { period: string }>((body) => ({ url: `${BASE}/government-submissions/epf-form`, method: "POST", body }));
+}
+export function useGenerateSOCSOMutation() {
+  return useMutation<unknown, { period: string }>((body) => ({ url: `${BASE}/government-submissions/socso`, method: "POST", body }));
+}
+export function useGeneratePCBFormMutation() {
+  return useMutation<unknown, { period: string }>((body) => ({ url: `${BASE}/government-submissions/pcb`, method: "POST", body }));
+}
 
-    // Financial Reports
-    getFinancialReports: builder.query<
-      { reports: FinancialReport[]; total: number },
-      any
-    >({
-      query: (params) => ({ url: "/reports", params }),
-      providesTags: ["Report"],
-    }),
-    generateProfitLoss: builder.mutation<
-      FinancialReport,
-      { startDate: string; endDate: string; filters?: any }
-    >({
-      query: (data) => ({
-        url: "/reports/profit-loss",
-        method: "POST",
-        body: data,
-      }),
-      invalidatesTags: ["Report"],
-    }),
-    generateBalanceSheet: builder.mutation<
-      FinancialReport,
-      { asOfDate: string; filters?: any }
-    >({
-      query: (data) => ({
-        url: "/reports/balance-sheet",
-        method: "POST",
-        body: data,
-      }),
-      invalidatesTags: ["Report"],
-    }),
-    generateCashFlow: builder.mutation<
-      FinancialReport,
-      { startDate: string; endDate: string; method: "direct" | "indirect" }
-    >({
-      query: (data) => ({
-        url: "/reports/cash-flow",
-        method: "POST",
-        body: data,
-      }),
-      invalidatesTags: ["Report"],
-    }),
-    generateTrialBalance: builder.mutation<
-      FinancialReport,
-      { asOfDate: string }
-    >({
-      query: (data) => ({
-        url: "/reports/trial-balance",
-        method: "POST",
-        body: data,
-      }),
-      invalidatesTags: ["Report"],
-    }),
+// E-Invoice
+export function useGetEInvoicesQuery(params?: Record<string, unknown>) {
+  return useQuery<{ einvoices: EInvoice[]; total: number }>(`${BASE}/einvoice${buildQs(params ?? {})}`);
+}
+export function useSubmitEInvoiceMutation() {
+  return useMutation<EInvoice, { invoiceId: string }>((body) => ({ url: `${BASE}/einvoice/submit`, method: "POST", body }));
+}
+export function useValidateEInvoiceMutation() {
+  return useMutation<unknown, { id: string }>(({ id }) => ({ url: `${BASE}/einvoice/${id}/validate`, method: "POST" }));
+}
+export function useCancelEInvoiceMutation() {
+  return useMutation<EInvoice, { id: string; reason: string }>(({ id, reason }) => ({ url: `${BASE}/einvoice/${id}/cancel`, method: "POST", body: { reason } }));
+}
 
-    // Compliance Monitoring
-    getComplianceAlerts: builder.query<
-      { alerts: ComplianceAlert[]; total: number },
-      any
-    >({
-      query: (params) => ({ url: "/compliance-alerts", params }),
-      providesTags: ["Compliance"],
-    }),
-    resolveComplianceAlert: builder.mutation<
-      ComplianceAlert,
-      { id: string; resolution: string }
-    >({
-      query: ({ id, resolution }) => ({
-        url: `/compliance-alerts/${id}/resolve`,
-        method: "PATCH",
-        body: { resolution },
-      }),
-      invalidatesTags: ["Compliance"],
-    }),
-    runComplianceCheck: builder.mutation<any, void>({
-      query: () => ({
-        url: "/compliance-alerts/check",
-        method: "POST",
-      }),
-      invalidatesTags: ["Compliance"],
-    }),
+// Financial Reports
+export function useGetFinancialReportsQuery(params?: Record<string, unknown>) {
+  return useQuery<{ reports: FinancialReport[]; total: number }>(`${BASE}/reports${buildQs(params ?? {})}`);
+}
+export function useGenerateProfitLossMutation() {
+  return useMutation<FinancialReport, { startDate: string; endDate: string; filters?: unknown }>((body) => ({ url: `${BASE}/reports/profit-loss`, method: "POST", body }));
+}
+export function useGenerateBalanceSheetMutation() {
+  return useMutation<FinancialReport, { asOfDate: string; filters?: unknown }>((body) => ({ url: `${BASE}/reports/balance-sheet`, method: "POST", body }));
+}
+export function useGenerateCashFlowMutation() {
+  return useMutation<FinancialReport, { startDate: string; endDate: string; method: "direct" | "indirect" }>((body) => ({ url: `${BASE}/reports/cash-flow`, method: "POST", body }));
+}
+export function useGenerateTrialBalanceMutation() {
+  return useMutation<FinancialReport, { asOfDate: string }>((body) => ({ url: `${BASE}/reports/trial-balance`, method: "POST", body }));
+}
 
-    // Multi-currency & Exchange Rates
-    getExchangeRates: builder.query<
-      any,
-      { baseCurrency: string; targetCurrencies: string[] }
-    >({
-      query: (params) => ({ url: "/exchange-rates", params }),
-    }),
-    updateExchangeRates: builder.mutation<any, void>({
-      query: () => ({
-        url: "/exchange-rates/update",
-        method: "POST",
-      }),
-    }),
+// Compliance
+export function useGetComplianceAlertsQuery(params?: Record<string, unknown>) {
+  return useQuery<{ alerts: ComplianceAlert[]; total: number }>(`${BASE}/compliance-alerts${buildQs(params ?? {})}`);
+}
+export function useResolveComplianceAlertMutation() {
+  return useMutation<ComplianceAlert, { id: string; resolution: string }>(({ id, resolution }) => ({ url: `${BASE}/compliance-alerts/${id}/resolve`, method: "PATCH", body: { resolution } }));
+}
+export function useRunComplianceCheckMutation() {
+  return useMutation<unknown, void>(() => ({ url: `${BASE}/compliance-alerts/check`, method: "POST" }));
+}
 
-    // Audit Trail
-    getAuditTrail: builder.query<
-      any,
-      {
-        entityType: string;
-        entityId?: string;
-        startDate?: string;
-        endDate?: string;
-      }
-    >({
-      query: (params) => ({ url: "/audit-trail", params }),
-    }),
+// Exchange Rates
+export function useGetExchangeRatesQuery(params: { baseCurrency: string; targetCurrencies: string[] }) {
+  return useQuery<unknown>(`${BASE}/exchange-rates${buildQs(params as unknown as Record<string, unknown>)}`);
+}
+export function useUpdateExchangeRatesMutation() {
+  return useMutation<unknown, void>(() => ({ url: `${BASE}/exchange-rates/update`, method: "POST" }));
+}
 
-    // Dashboard Analytics
-    getAccountingDashboard: builder.query<any, { period?: string }>({
-      query: (params) => ({ url: "/dashboard", params }),
-    }),
-  }),
-});
+// Audit Trail
+export function useGetAuditTrailQuery(params: { entityType: string; entityId?: string; startDate?: string; endDate?: string }) {
+  return useQuery<unknown>(`${BASE}/audit-trail${buildQs(params as Record<string, unknown>)}`);
+}
 
-export const {
-  // Payroll
-  useGetPayrollRecordsQuery,
-  useCreatePayrollRecordMutation,
-  useCalculatePayrollMutation,
-  useApprovePayrollMutation,
-  useProcessPayrollPaymentMutation,
-
-  // Tax Rates
-  useGetTaxRatesQuery,
-  useUpdateTaxRatesMutation,
-
-  // Chart of Accounts
-  useGetChartOfAccountsQuery,
-  useCreateAccountMutation,
-  useUpdateAccountMutation,
-
-  // General Ledger
-  useGetGeneralLedgerQuery,
-  useCreateJournalEntryMutation,
-  usePostJournalEntryMutation,
-
-  // Bank Reconciliation
-  useGetBankReconciliationsQuery,
-  useImportBankStatementMutation,
-  useMatchTransactionsMutation,
-
-  // Government Submissions
-  useGetGovernmentSubmissionsQuery,
-  useSubmitToGovernmentMutation,
-  useGenerateEPFFormMutation,
-  useGenerateSOCSOMutation,
-  useGeneratePCBFormMutation,
-
-  // E-Invoice
-  useGetEInvoicesQuery,
-  useSubmitEInvoiceMutation,
-  useValidateEInvoiceMutation,
-  useCancelEInvoiceMutation,
-
-  // Financial Reports
-  useGetFinancialReportsQuery,
-  useGenerateProfitLossMutation,
-  useGenerateBalanceSheetMutation,
-  useGenerateCashFlowMutation,
-  useGenerateTrialBalanceMutation,
-
-  // Compliance
-  useGetComplianceAlertsQuery,
-  useResolveComplianceAlertMutation,
-  useRunComplianceCheckMutation,
-
-  // Exchange Rates
-  useGetExchangeRatesQuery,
-  useUpdateExchangeRatesMutation,
-
-  // Audit & Dashboard
-  useGetAuditTrailQuery,
-  useGetAccountingDashboardQuery,
-} = accountingEnhancedApi;
+// Dashboard
+export function useGetAccountingDashboardQuery(params?: { period?: string }) {
+  return useQuery<unknown>(`${BASE}/dashboard${buildQs((params ?? {}) as Record<string, unknown>)}`);
+}

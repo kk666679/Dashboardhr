@@ -1,5 +1,7 @@
 // Malaysian Foreign Worker Management System Compliance Utilities
 
+import { BASE_LEVY_SECTOR } from "@/lib/constants/levy-rates";
+
 export interface MalaysianComplianceConfig {
   immigration: {
     plksValidityPeriod: number;
@@ -36,19 +38,23 @@ export interface MalaysianComplianceConfig {
   };
 }
 
+// Derive the levy-rate table from the canonical single source of truth so the
+// two configurations can never drift apart (MD-5).
+const LEVY_RATES = {
+  construction: BASE_LEVY_SECTOR.construction,
+  manufacturing: BASE_LEVY_SECTOR.manufacturing,
+  plantation: BASE_LEVY_SECTOR.plantation,
+  services: BASE_LEVY_SECTOR.services,
+  agriculture: BASE_LEVY_SECTOR.agriculture,
+};
+
 export const MALAYSIAN_COMPLIANCE_CONFIG: MalaysianComplianceConfig = {
   immigration: {
     plksValidityPeriod: 12,
     evalValidityPeriod: 12,
     visaValidityPeriod: 12,
     renewalNotificationPeriod: 60,
-    levyRates: {
-      construction: 1850,
-      manufacturing: 1850,
-      plantation: 640,
-      services: 1650,
-      agriculture: 640,
-    },
+    levyRates: LEVY_RATES,
   },
 
   fomema: {
@@ -89,13 +95,13 @@ export const MALAYSIAN_COMPLIANCE_CONFIG: MalaysianComplianceConfig = {
   },
 };
 
-export function checkPermitCompliance(permit: any): {
+export function checkPermitCompliance(permit: unknown): {
   isCompliant: boolean;
   issues: string[];
   daysToExpiry: number;
 } {
   const issues: string[] = [];
-  const expiryDate = new Date(permit.expiryDate);
+  const expiryDate = new Date((permit as any).expiryDate);
   const today = new Date();
   const daysToExpiry = Math.ceil(
     (expiryDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24),
@@ -110,7 +116,7 @@ export function checkPermitCompliance(permit: any): {
     issues.push(`Permit expires in ${daysToExpiry} days - renewal required`);
   }
 
-  if (permit.levyPaid < permit.levyAmount) {
+  if ((permit as any).levyPaid < (permit as any).levyAmount) {
     issues.push("Outstanding levy payment");
   }
 

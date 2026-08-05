@@ -31,6 +31,8 @@ async function verifyTotp(userId: string, token: string): Promise<boolean> {
       return false;
     }
 
+    if (!authenticator) return false;
+
     const user = await prisma.user.findUnique({
       where: { id: userId },
     });
@@ -50,6 +52,16 @@ async function verifyTotp(userId: string, token: string): Promise<boolean> {
 // ─── POST /api/auth/mfa ───────────────────────────────────────────────────────
 
 export async function POST(request: NextRequest) {
+  // M17: Rate limit MFA — 10 attempts per 15 minutes per IP
+  const { rateLimit } = await import("@/lib/server/rate-limit");
+  const rl = await rateLimit(request, { key: "mfa", limit: 10, windowSec: 900 });
+  if (!rl.allowed) {
+    return NextResponse.json(
+      { error: "Too many MFA attempts. Please try again later." },
+      { status: 429, headers: rl.headers }
+    );
+  }
+
   const body = await request.json() as {
     tempToken: string;
     method: "totp" | "sms" | "webauthn";
@@ -82,6 +94,7 @@ export async function POST(request: NextRequest) {
     const storedOtp = process.env[`SMS_OTP_${userId}`];
     verified = storedOtp === code;
   } else if (method === "webauthn") {
+// AUTO-FLAG: TODO - needs implementation
     // TODO: implement @simplewebauthn/server verification flow
     verified = false;
   }
@@ -97,6 +110,7 @@ export async function POST(request: NextRequest) {
   });
   if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
 
+  const { createSession } = await import("@/lib/session");
   const sessionId = await createSession({
     userId:      user.id,
     role:        user.role,
@@ -136,6 +150,8 @@ export async function PUT(request: NextRequest) {
     } catch {
       return NextResponse.json({ error: "otplib not installed" }, { status: 501 });
     }
+
+    if (!authenticator) return NextResponse.json({ error: "otplib not installed" }, { status: 501 });
 
     const secret = authenticator.generateSecret();
     const otpauthUrl = authenticator.keyuri(

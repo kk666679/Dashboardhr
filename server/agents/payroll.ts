@@ -49,7 +49,7 @@ export async function payrollAgent(input: string, employeeId?: string) {
       };
     }
 
-    const records = payrolls.map((p) => {
+    const records = payrolls.map((p: any) => {
       const gross = +p.basicSalary.toString();
       const deductions = calcDeductions(gross);
       const net = +(
@@ -72,10 +72,10 @@ export async function payrollAgent(input: string, employeeId?: string) {
       };
     });
 
-    const totalNet = records.reduce((s, r) => s + r.netSalary, 0);
+    const totalNet = records.reduce((s: any, r: any) => s + r.netSalary, 0);
     const anomalies = records
-      .filter((r) => r.netSalary < STATUTORY_RATES.minWage)
-      .map((r) => `${r.employee}: net RM${r.netSalary} below minimum wage`);
+      .filter((r: any) => r.netSalary < STATUTORY_RATES.minWage)
+      .map((r: any) => `${r.employee}: net RM${r.netSalary} below minimum wage`);
 
     return {
       type: "PAYROLL",

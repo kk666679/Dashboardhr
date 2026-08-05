@@ -2,15 +2,23 @@ import { NextRequest, NextResponse } from "next/server";
 import {
   uploadDocument,
   getUploadedDocuments,
-} from "@/components/features/employee/ess/ess-service";
+} from "@/components/features/ess/ess-service";
+import { withTenant } from "@/lib/prisma";
 
 export async function POST(request: NextRequest) {
   const employeeId = request.headers.get("X-Employee-ID");
-  const tenantId = request.headers.get("X-Tenant-ID") || "tenant1";
+  const tenantId = request.headers.get("X-Tenant-ID");
 
   if (!employeeId) {
     return NextResponse.json(
       { error: "Employee ID required" },
+      { status: 400 },
+    );
+  }
+
+  if (!tenantId) {
+    return NextResponse.json(
+      { error: "Tenant ID required" },
       { status: 400 },
     );
   }
@@ -28,13 +36,15 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const doc = await uploadDocument({
-      employeeId,
-      tenantId,
-      documentType,
-      file,
-      expiryDate: expiryDateStr ? new Date(expiryDateStr) : undefined,
-    });
+    const doc = await withTenant(tenantId, () =>
+      uploadDocument({
+        employeeId,
+        tenantId,
+        documentType,
+        file,
+        expiryDate: expiryDateStr ? new Date(expiryDateStr) : undefined,
+      }),
+    );
 
     return NextResponse.json({ document: doc }, { status: 201 });
   } catch (error) {
@@ -48,6 +58,7 @@ export async function POST(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   const employeeId = request.headers.get("X-Employee-ID");
+  const tenantId = request.headers.get("X-Tenant-ID");
 
   if (!employeeId) {
     return NextResponse.json(
@@ -56,8 +67,17 @@ export async function GET(request: NextRequest) {
     );
   }
 
+  if (!tenantId) {
+    return NextResponse.json(
+      { error: "Tenant ID required" },
+      { status: 400 },
+    );
+  }
+
   try {
-    const documents = await getUploadedDocuments(employeeId);
+    const documents = await withTenant(tenantId, () =>
+      getUploadedDocuments(employeeId),
+    );
     return NextResponse.json({ documents }, { status: 200 });
   } catch (error) {
     console.error("Failed to fetch documents:", error);

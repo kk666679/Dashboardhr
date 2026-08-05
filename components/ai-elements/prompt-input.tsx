@@ -501,6 +501,8 @@ export type PromptInputProps = Omit<
   maxFiles?: number;
   // bytes
   maxFileSize?: number;
+  // Optional placeholder forwarded to the inner textarea when no children provided
+  placeholder?: string;
   onError?: (err: {
     code: "max_files" | "max_file_size" | "accept";
     message: string;
@@ -522,6 +524,7 @@ export const PromptInput = ({
   onError,
   onSubmit,
   children,
+  placeholder,
   ...props
 }: PromptInputProps) => {
   // Try to use a provider controller if present
@@ -921,7 +924,11 @@ export const PromptInput = ({
         ref={formRef}
         {...props}
       >
-        <InputGroup className="overflow-hidden">{children}</InputGroup>
+        <InputGroup className="overflow-hidden">
+          {children ?? (
+            <PromptInputTextarea placeholder={placeholder} />
+          )}
+        </InputGroup>
       </form>
     </>
   );

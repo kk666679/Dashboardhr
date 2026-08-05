@@ -36,7 +36,12 @@ services:
       dockerfile: Dockerfile
       target: development
     environment:
-      DATABASE_URL: postgresql://hcm:${POSTGRES_PASSWORD:-hcm_dev_password}@postgres:5432/hcm_dev
+      # Default: local docker-compose Postgres
+      # Override for Neon/PostgreSQL by setting NEON_DATABASE_URL.
+      # Example:
+      #   NEON_DATABASE_URL="postgresql://neondb_owner:npg_ZSGepJktWy57@ep-winter-morning-azvq5t0s-pooler.c-3.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require"
+      DATABASE_URL: ${NEON_DATABASE_URL:-postgresql://hcm:${POSTGRES_PASSWORD:-hcm_dev_password}@postgres:5432/hcm_dev}
+
       REDIS_URL: redis://redis:6379
       SECRETS_PROVIDER: env
       NEXT_PUBLIC_TENANT_ID: tenant1
@@ -60,7 +65,8 @@ services:
       dockerfile: Dockerfile
       target: development
     environment:
-      DATABASE_URL: postgresql://hcm:${POSTGRES_PASSWORD:-hcm_dev_password}@postgres:5432/hcm_dev
+      # Same DATABASE_URL override for the worker.
+      DATABASE_URL: ${NEON_DATABASE_URL:-postgresql://hcm:${POSTGRES_PASSWORD:-hcm_dev_password}@postgres:5432/hcm_dev}
       REDIS_URL: redis://redis:6379
       SECRETS_PROVIDER: env
       NODE_ENV: development
@@ -73,6 +79,7 @@ services:
       redis:
         condition: service_healthy
     command: npx tsx workers/index.ts
+
 
 volumes:
   pgdata:

@@ -1,11 +1,12 @@
 import { z } from "zod";
 import { protectedProcedure, router } from "../trpc";
 import { prisma } from "@/lib/prisma";
-import { writeAuditEntry } from "@/src/shared-kernel/audit/audit-middleware";
+import { writeAuditEntry } from "@/lib/shared-kernel/audit/audit-middleware";
 
 const nodeSchema = z.object({
   name: z.string(),
   level: z.enum(["GROUP", "LEGAL_ENTITY", "BUSINESS_UNIT", "DEPARTMENT", "BRANCH", "COST_CENTER"]),
+  code: z.string().optional(),
   parentId: z.string().optional(),
   country: z.string().optional(),
   currency: z.string().optional(),

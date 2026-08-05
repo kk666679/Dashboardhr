@@ -189,12 +189,7 @@ result="blur"/>
 
 
 
-<!-- Background -->
-
-<rect width="512"
-      height="512"
-      rx="120"
-      fill="url(#bg)"/>
+<!-- Background (removed for transparency compatibility with light/dark) -->
 
 
 

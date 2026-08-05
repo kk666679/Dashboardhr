@@ -4,6 +4,7 @@ export type AgentOutput = {
   type: string;
   message: string;
   source?: string;
+  sanitized?: boolean;
 };
 
 export interface HRAgentResult {

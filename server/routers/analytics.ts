@@ -30,16 +30,19 @@ export const analyticsRouter = router({
   getDepartmentBreakdown: protectedProcedure
     .input(z.object({}).optional())
     .query(async ({ ctx }) => {
-      // Placeholder until Department/Employee relations are exact.
       const employees = await prisma.employee.findMany({
         where: { tenantId: ctx.tenantId },
-        select: { department: true, isForeign: true, id: true },
+        select: {
+          id:         true,
+          department: true,
+          isForeign:  true,
+        },
       });
 
-      const map = new Map<string, { department: string; total: number; foreign: number; male: number; female: number }>();
+      const map = new Map<string, { department: string; total: number; foreign: number }>();
       for (const e of employees) {
         const dep = (e.department ?? "UNASSIGNED") as string;
-        const cur = map.get(dep) ?? { department: dep, total: 0, foreign: 0, male: 0, female: 0 };
+        const cur = map.get(dep) ?? { department: dep, total: 0, foreign: 0 };
         cur.total += 1;
         if (e.isForeign) cur.foreign += 1;
         map.set(dep, cur);
