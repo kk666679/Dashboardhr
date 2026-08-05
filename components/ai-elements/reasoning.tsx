@@ -10,7 +10,6 @@ import { cn } from "@/lib/utils";
 import { cjk } from "@streamdown/cjk";
 import { code } from "@streamdown/code";
 import { math } from "@streamdown/math";
-import { mermaid } from "@streamdown/mermaid";
 import { BrainIcon, ChevronDownIcon } from "lucide-react";
 import type { ComponentProps, ReactNode } from "react";
 import {
@@ -72,8 +71,8 @@ export const Reasoning = memo(
 
     const [isOpen, setIsOpen] = useControllableState<boolean>({
       defaultProp: resolvedDefaultOpen,
-      onChange: onOpenChange,
-      prop: open,
+      ...(onOpenChange ? { onChange: onOpenChange } : {}),
+      ...(open !== undefined ? { prop: open } : {}),
     });
     const [duration, setDuration] = useControllableState<number | undefined>({
       defaultProp: undefined,
@@ -201,10 +200,10 @@ export const ReasoningTrigger = memo(
 export type ReasoningContentProps = ComponentProps<
   typeof CollapsibleContent
 > & {
-  children: string;
+  children: ReactNode;
 };
 
-const streamdownPlugins = { cjk, code, math, mermaid };
+const streamdownPlugins = { cjk, code, math } as never;
 
 export const ReasoningContent = memo(
   ({ className, children, ...props }: ReasoningContentProps) => (
@@ -216,7 +215,7 @@ export const ReasoningContent = memo(
       )}
       {...props}
     >
-      <Streamdown plugins={streamdownPlugins}>{children}</Streamdown>
+<Streamdown plugins={streamdownPlugins}>{children as string}</Streamdown>
     </CollapsibleContent>
   ),
 );

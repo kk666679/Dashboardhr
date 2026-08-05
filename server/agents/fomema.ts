@@ -1,10 +1,17 @@
 import { prisma } from "@/lib/prisma";
 
-export async function fomemaAgent(input: string, employeeId?: string) {
+export async function fomemaAgent(
+  input: string,
+  tenantId: string,
+  employeeId?: string,
+) {
   try {
     const employee = employeeId
-      ? await prisma.employee.findUnique({ where: { id: employeeId } })
-      : await prisma.employee.findFirst();
+      ? await prisma.employee.findUnique({ where: { id: employeeId, tenantId } })
+      : await prisma.employee.findFirst({
+          where: { tenantId },
+          orderBy: { createdAt: "desc" },
+        });
 
     if (!employee) {
       return {
@@ -14,7 +21,7 @@ export async function fomemaAgent(input: string, employeeId?: string) {
     }
 
     const medicalDoc = await prisma.document.findFirst({
-      where: { employeeId: employee.id, type: "CERTIFICATE" },
+      where: { employeeId: employee.id, tenantId, type: "CERTIFICATE" },
       orderBy: { createdAt: "desc" },
     });
 

@@ -5,6 +5,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { AIDocRequestSchema } from "@/types/ai-docs";
 import { PDFGenerator } from "@/utils/pdf/pdf-generator";
 import type { DeliveryOrderPDFData } from "@/utils/pdf/delivery-order-pdf";
+import { resolveDocumentAIProvider } from "@/lib/ai/provider";
 
 export const runtime = "nodejs";
 
@@ -28,18 +29,25 @@ export async function POST(req: NextRequest) {
     const body = AIDocRequestSchema.parse(await req.json());
     const { docType, context, instructions, provider } = body;
 
-    const claudeKey = process.env.ANTHROPIC_API_KEY?.trim();
-    const hasClaude = Boolean(claudeKey?.startsWith("sk-ant-"));
+    const selectedProvider = resolveDocumentAIProvider({
+      provider,
+      claudeKey: process.env.ANTHROPIC_API_KEY,
+      openAiKey: process.env.OPENAI_API_KEY,
+    });
 
-    const openAiKey = process.env.OPENAI_API_KEY?.trim();
-    const hasOpenAi = Boolean(openAiKey?.startsWith("sk-"));
-
-    // Determine provider: explicit > Claude > OpenAI
-    const selectedProvider = provider === "claude" && hasClaude ? "claude" : "openai";
+    if (selectedProvider.provider === "none") {
+      return NextResponse.json(
+        {
+          error: "AI provider unavailable",
+          details: selectedProvider.error,
+        },
+        { status: 503 },
+      );
+    }
 
     let text: string;
-    if (selectedProvider === "claude") {
-      const claude = createAnthropic({ apiKey: claudeKey });
+    if (selectedProvider.provider === "claude") {
+      const claude = createAnthropic({ apiKey: process.env.ANTHROPIC_API_KEY!.trim() });
       const result = await generateText({
         model: claude("claude-3-5-sonnet-20241022"),
         system: SYSTEM_PROMPT,
@@ -48,7 +56,7 @@ export async function POST(req: NextRequest) {
       });
       text = result.text;
     } else {
-      const openai = createOpenAI({ apiKey: openAiKey });
+      const openai = createOpenAI({ apiKey: process.env.OPENAI_API_KEY!.trim() });
       const result = await generateText({
         model: openai("gpt-4o-mini"),
         system: SYSTEM_PROMPT,
@@ -76,7 +84,7 @@ export async function POST(req: NextRequest) {
 
     const base64 = Buffer.from(await pdfBlob.arrayBuffer()).toString("base64");
 
-    return NextResponse.json({ success: true, pdfBase64: base64, data, provider: selectedProvider });
+    return NextResponse.json({ success: true, pdfBase64: base64, data, provider: selectedProvider.provider });
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : "Unknown error";
     console.error("AI Doc Gen failed:", error);

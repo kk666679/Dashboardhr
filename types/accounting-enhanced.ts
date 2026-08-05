@@ -154,7 +154,7 @@ export interface GovernmentSubmission {
   submissionDate?: string;
   referenceNumber?: string;
   amount: number;
-  data: any;
+  data: unknown;
   errorMessage?: string;
   retryCount: number;
 }
@@ -175,7 +175,7 @@ export interface FinancialReport {
   id: string;
   type: "profit_loss" | "balance_sheet" | "cash_flow" | "trial_balance";
   period: string;
-  data: any;
+  data: unknown;
   generatedAt: string;
   generatedBy: string;
 }

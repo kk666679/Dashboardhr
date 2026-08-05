@@ -10,16 +10,20 @@ const LETTER_TEMPLATES = {
 
 export async function employeeRelationsAgent(
   input: string,
+  tenantId: string,
   employeeId?: string,
 ) {
   try {
     const employee = employeeId
-      ? await prisma.employee.findUnique({ where: { id: employeeId } })
-      : await prisma.employee.findFirst();
+      ? await prisma.employee.findUnique({ where: { id: employeeId, tenantId } })
+      : await prisma.employee.findFirst({
+          where: { tenantId },
+          orderBy: { createdAt: "desc" },
+        });
 
     const contract = employee
       ? await prisma.contract.findFirst({
-          where: { employeeId: employee.id, status: "ACTIVE" },
+          where: { employeeId: employee.id, tenantId, status: "ACTIVE" },
           orderBy: { startDate: "desc" },
         })
       : null;

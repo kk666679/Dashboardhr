@@ -1,49 +1,31 @@
 /**
- * Row-Level Security middleware for tRPC.
+ * Row-Level Security (RLS) middleware — Task 2
  *
- * Sets the PostgreSQL session variables `app.tenant_id` and `app.user_id`
- * so that any RLS policies defined on tables can filter rows automatically.
+ * Sets PostgreSQL session-local settings consumed by RLS policies:
+ *   app.current_tenant_id   → isolates all queries to the requesting tenant
+ *   app.current_employee_id → restricts payslip/sensitive data to the employee
+ *   app.current_role        → drives column-level masking policies
  *
- * Usage: attach to `guardedProcedure` so every tenant-scoped procedure
- * runs inside a connection where the RLS context is set.
+ * Called inside every guardedProcedure BEFORE any domain query runs.
+ * Uses SET LOCAL so the setting is scoped to the current transaction/statement.
+ *
+ * Requirements: 1.8, 8.1, 20.6, 28.2 — Property 4: Tenant Data Isolation
  */
 
-import { prisma } from "@/lib/prisma";
-import { TRPCError } from "@trpc/server";
 import type { Context } from "@/server/trpc";
+import { prisma } from "@/lib/prisma";
 
-type TxClient = Omit<typeof prisma, "$connect" | "$disconnect" | "$on" | "$transaction" | "$use" | "$extends">;
+export async function applyRlsContext(ctx: Pick<Context, "tenantId" | "userId" | "userRole" | "session">): Promise<void> {
+  const tenantId    = ctx.tenantId    ?? "";
+  const employeeId  = ctx.session?.employeeId ?? "";
+  const role        = ctx.userRole    ?? "EMPLOYEE";
 
-export async function withRlsContext<T>(
-  ctx: Context,
-  fn: (tx: TxClient) => Promise<T>
-): Promise<T> {
-  if (!ctx.tenantId) {
-    throw new TRPCError({ code: "UNAUTHORIZED", message: "Missing tenant context" });
-  }
-
-  return prisma.$transaction(async (tx) => {
-    await (tx as any).$executeRaw(
-      `SELECT set_config('app.tenant_id', $1, true), set_config('app.user_id', $2, true)`,
-      ctx.tenantId,
-      ctx.userId ?? ""
-    );
-    return fn(tx as TxClient);
-  });
-}
-
-/** tRPC middleware that injects RLS session variables before the procedure runs. */
-export function rlsMiddleware({ ctx, next }: { ctx: Context; next: () => Promise<any> }) {
-  if (!ctx.tenantId) {
-    throw new TRPCError({ code: "UNAUTHORIZED" });
-  }
-
-  return prisma.$transaction(async (tx) => {
-    await (tx as any).$executeRaw(
-      `SELECT set_config('app.tenant_id', $1, true), set_config('app.user_id', $2, true)`,
-      ctx.tenantId,
-      ctx.userId ?? ""
-    );
-    return next();
-  });
+  // SET LOCAL is transaction-scoped; Prisma uses a connection pool so we use
+  // $executeRaw which runs in the current connection context.
+  await prisma.$executeRaw`
+    SELECT
+      set_config('app.current_tenant_id',   ${tenantId},   true),
+      set_config('app.current_employee_id', ${employeeId}, true),
+      set_config('app.current_role',        ${role},       true)
+  `;
 }

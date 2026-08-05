@@ -10,12 +10,20 @@
 
 import { Worker, Queue } from "bullmq";
 import { Decimal } from "decimal.js";
-import IORedis from "ioredis";
 import { prisma } from "@/lib/prisma";
+import { createBullMqConnection } from "@/lib/queues/bullmq-connection";
 
-const connection = new IORedis(process.env.REDIS_URL ?? "redis://localhost:6379", {
-  maxRetriesPerRequest: null,
-});
+// Lazy import for payroll queue to avoid circular deps
+let _payrollQueue: Queue | undefined;
+function getPayrollQueue(): Queue {
+  if (_payrollQueue) return _payrollQueue;
+  const connection = createBullMqConnection();
+  _payrollQueue = new Queue("payroll", { connection });
+  _payrollQueue.on("error", () => {});
+  return _payrollQueue;
+}
+
+const connection = createBullMqConnection();
 
 export const leaveQueue = new Queue("leave", { connection });
 
@@ -94,7 +102,8 @@ async function runMonthlyAccrual(tenantId: string): Promise<void> {
     }
   }
 
-  console.log(`[leave-worker] Monthly accrual complete for tenant ${tenantId}`);
+  const safeTenantId = String(tenantId).replace(/[\r\n\t]/g, "_").slice(0, 64);
+  console.log(`[leave-worker] Monthly accrual complete for tenant ${safeTenantId}`);
 }
 
 /**
@@ -136,15 +145,15 @@ async function runYearEnd(tenantId: string, closingYear: number): Promise<void> 
     // Encashment amount
     const encashmentAmount = excessDays.mul(policy.encashmentRate).toDecimalPlaces(2);
 
-    await prisma.$transaction(async (tx) => {
+    await prisma.$transaction(async (tx: unknown) => {
       // Update closing year balance
-      await tx.leaveBalance.update({
+      await (tx as any).leaveBalance.update({
         where: { id: balance.id },
         data: { carryForward },
       });
 
       // Create next year balance with carry-forward
-      await tx.leaveBalance.upsert({
+      await (tx as any).leaveBalance.upsert({
         where: {
           tenantId_employeeId_leaveType_year: {
             tenantId,
@@ -168,19 +177,51 @@ async function runYearEnd(tenantId: string, closingYear: number): Promise<void> 
 
       // Post encashment to payroll queue if > 0
       if (encashmentAmount.gt(0)) {
-        // TODO: enqueue payrollQueue.add('encashment', { employeeId, amount, tenantId })
+// AUTO-FLAG: Enqueue payroll encashment job
+        try {
+          const payrollQueue = getPayrollQueue();
+          await payrollQueue.add(
+            "encashment",
+            {
+              type: "encashment",
+              employeeId: balance.employeeId,
+              tenantId,
+              leaveType: balance.leaveType,
+              amount: encashmentAmount.toNumber(),
+              year: closingYear,
+            },
+            {
+              attempts: 3,
+              backoff: { type: "fixed", delay: 30_000 },
+            }
+          );
+        } catch (qErr) {
+          console.warn(
+            `[leave-worker] Failed to enqueue encashment for ${String(balance.employeeId).replace(/[\r\n\t]/g, "_").slice(0, 64)}:`,
+            qErr
+          );
+        }
         console.log(
-          `[leave-worker] Encashment: ${balance.employeeId} ${balance.leaveType} = ${encashmentAmount}`
+          `[leave-worker] Encashment: ${String(balance.employeeId).replace(/[\r\n\t]/g, "_").slice(0, 64)} ${String(balance.leaveType).replace(/[\r\n\t]/g, "_")} = ${encashmentAmount}`
         );
       }
     });
   }
 
-  console.log(`[leave-worker] Year-end close complete for tenant ${tenantId}, year ${closingYear}`);
+  const safeTenantId2 = String(tenantId).replace(/[\r\n\t]/g, "_").slice(0, 64);
+  const safeYear = String(closingYear).replace(/[\r\n\t]/g, "_").slice(0, 16);
+  console.log(`[leave-worker] Year-end close complete for tenant ${safeTenantId2}, year ${safeYear}`);
 }
 
 leaveWorker.on("failed", (job, err) => {
-  console.error(`[leave-worker] Job failed: ${job?.id}`, err.message);
+  const safeJobId = String(job?.id ?? "").replace(/[\r\n\t]/g, "_").slice(0, 64);
+  console.error(`[leave-worker] Job failed: ${safeJobId}`, err.message);
 });
 
+export async function stopWorker() {
+  try { await leaveWorker.close(); } catch {}
+  try { await leaveQueue.close(); } catch {}
+}
+
 console.log("[leave-worker] Started");
+

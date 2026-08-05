@@ -1,209 +1,100 @@
-// Core Accounting Types for FWMS Accounting Module
+/**
+ * Accounting type definitions used by dashboard pages and RTK Query API.
+ * These match the shapes returned by the accounting tRPC router procedures
+ * and the REST accounting API routes.
+ */
 
-export interface Transaction {
+export interface AdjustmentNote {
   id: string;
-  type: "invoice" | "payment" | "credit_note" | "debit_note" | "delivery_order";
-  reference: string;
-  description: string;
+  customer: string;
   amount: number;
+  status: "PENDING" | "PROCESSED" | "CANCELLED";
+  reason: string;
+  originalInvoice?: string;
   date: string;
-  status: string;
-  customerId: string;
-  customerName: string;
+  [key: string]: unknown;
 }
 
-export interface Invoice extends Transaction {
-  type: "invoice";
-  transactionNumber: string;
+export interface DeliveryOrder {
+  id: string;
+  customer: string;
+  recipient: string;
+  items: number;
+  totalAmount: number;
+  deliveryDate: string;
+  status: "draft" | "pending" | "confirmed" | "completed";
+  deliveryStatus: "pending" | "scheduled" | "in_transit" | "delivered" | "failed";
+  [key: string]: unknown;
+}
+
+export interface Invoice {
+  id: string;
   invoiceNumber: string;
-  transactionDate: string;
-  customerId: string;
   customerName: string;
-  customerEmail?: string;
-  customerAddress: string;
   customerTaxId?: string;
-  billingAddress?: string;
-  paymentTerms?: number;
-  issueDate?: string;
-  dueDate: string;
-  status: "draft" | "sent" | "paid" | "overdue" | "cancelled";
-  paymentStatus?: string;
-  totalAmount?: number;
-  netAmount?: number;
-  lineItems?: any[];
-  taxDetails?: any;
-  supplierTin?: string;
-  buyerTin?: string;
-  createdBy?: string;
-  lastModifiedBy?: string;
-  items?: InvoiceItem[];
-  subtotal?: number;
-  taxAmount: number;
-  taxRate?: number;
-  discount?: number;
-  total?: number;
-  currency: "MYR" | "USD" | "SGD";
-  notes?: string;
-  terms?: string;
-  paymentMethod?: string;
-  paidDate?: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface InvoiceItem {
-  id: string;
-  description: string;
-  quantity: number;
-  unitPrice: number;
-  total: number;
-  taxable: boolean;
-  category?: string;
-}
-
-export interface DeliveryOrder extends Transaction {
-  type: "delivery_order";
-  doNumber: string;
-  customerId: string;
-  customerName: string;
-  customerAddress: string;
-  deliveryAddress: string;
-  orderDate: string;
-  deliveryDate?: string;
-  status: "pending" | "in_transit" | "delivered" | "cancelled";
-  items: DeliveryOrderItem[];
-  assignedWorkers: string[];
-  driverName?: string;
-  vehicleNumber?: string;
-  notes?: string;
-  trackingNumber?: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface DeliveryOrderItem {
-  id: string;
-  description: string;
-  quantity: number;
-  unit: string;
-  weight?: number;
-  dimensions?: string;
-  specialInstructions?: string;
-}
-
-export interface CreditNote extends Transaction {
-  type: "credit_note";
-  creditNoteNumber: string;
-  invoiceId?: string;
-  customerId: string;
-  customerName: string;
-  issueDate: string;
-  status: "pending" | "approved" | "rejected" | "processed";
-  reason: "return" | "discount" | "error" | "cancellation" | "other";
-  reasonDescription: string;
-  items: CreditNoteItem[];
-  subtotal: number;
-  taxAmount: number;
-  total: number;
-  refundAmount: number;
-  refundMethod?: "bank_transfer" | "cash" | "credit_adjustment";
-  approvedBy?: string;
-  approvedDate?: string;
-  processedDate?: string;
-  notes?: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface CreditNoteItem {
-  id: string;
-  description: string;
-  quantity: number;
-  unitPrice: number;
-  total: number;
-  originalInvoiceItemId?: string;
-}
-
-export interface DebitNote extends Transaction {
-  type: "debit_note";
-  debitNoteNumber: string;
-  customerId: string;
-  customerName: string;
-  issueDate: string;
-  dueDate: string;
-  status: "pending" | "sent" | "paid" | "overdue";
-  typeNote: "penalty" | "additional_charge" | "late_fee" | "compliance_fee";
-  description: string;
   amount: number;
-  penaltyRate?: number;
-  basedOnAmount?: number;
-  daysOverdue?: number;
-  complianceReference?: string;
-  paymentDate?: string;
-  notes?: string;
-  createdAt: string;
-  updatedAt: string;
+  totalAmount?: number;
+  status: string;
+  paymentStatus?: string;
+  transactionDate: string;
+  dueDate: string;
+  currency?: string;
+  [key: string]: unknown;
 }
 
-export interface TaxCalculation {
-  subtotal: number;
-  taxableAmount: number;
-  exemptAmount: number;
-  sstRate: number;
-  sstAmount: number;
-  serviceTaxRate: number;
-  serviceTaxAmount: number;
-  totalTax: number;
-  grandTotal: number;
+export interface CreditNote {
+  id: string;
+  customer: string;
+  amount: number;
+  status: "PENDING" | "APPROVED" | "REJECTED" | "CANCELLED";
+  reason: string;
+  originalInvoiceId?: string;
+  date: string;
+  approvedBy?: string;
+  rejectedBy?: string;
+  notes?: string;
+  [key: string]: unknown;
+}
+
+export interface DebitNote {
+  id: string;
+  customer: string;
+  amount: number;
+  status: "PENDING" | "APPROVED" | "REJECTED" | "CANCELLED";
+  reason: string;
+  originalInvoiceId?: string;
+  date: string;
+  [key: string]: unknown;
 }
 
 export interface AccountingSummary {
-  totalInvoices: number;
   totalRevenue: number;
-  outstandingAmount: number;
-  overdueAmount: number;
-  paidInvoices: number;
-  pendingInvoices: number;
-  deliveryOrders: number;
-  creditNotes: number;
-  debitNotes: number;
-  monthlyRevenue: number[];
-  recentTransactions: Transaction[];
+  totalOutstanding: number;
+  totalOverdue: number;
+  invoiceCount: number;
+  paidCount: number;
+  overdueCount: number;
+  period?: string;
+  [key: string]: unknown;
 }
 
 export interface PaymentRecord {
   id: string;
   invoiceId: string;
   amount: number;
+  currency: string;
   paymentDate: string;
-  paymentMethod: "bank_transfer" | "cash" | "cheque" | "credit_card" | "online";
-  reference: string;
-  notes?: string;
-  createdAt: string;
+  paymentMethod: string;
+  reference?: string;
+  status: "PENDING" | "COMPLETED" | "FAILED" | "REFUNDED";
+  [key: string]: unknown;
 }
 
-export interface MalaysianTaxConfig {
-  sstRate: number;
-  serviceTaxRate: number;
-  exemptCategories: string[];
-  taxRegistrationNumber: string;
-  businessRegistrationNumber: string;
-  companyName: string;
-  companyAddress: string;
+export interface TaxCalculation {
+  subtotal: number;
+  taxRate: number;
+  taxAmount: number;
+  total: number;
+  taxBreakdown?: Array<{ type: string; rate: number; amount: number }>;
+  [key: string]: unknown;
 }
-
-// Zakat Management Types - Islamic Finance Compliance
-export interface ZakatRecord {
-  employeeId: string;
-  name: string;
-  month: string;
-  zakatableIncome: number;
-  zakatRate: number;
-  zakatAmount: number;
-  state: string;
-  institution: string;
-  status: 'Paid' | 'Pending' | 'Calculated' | 'Failed';
-  paidDate: string | null;
-  receiptNo: string | null;
-}
-

@@ -12,14 +12,13 @@
  */
 
 import { Worker, Queue } from "bullmq";
-import IORedis from "ioredis";
 import { Decimal } from "decimal.js";
 import { createHash, createCipheriv, randomBytes } from "crypto";
+import { put } from "@vercel/blob";
 import { prisma } from "@/lib/prisma";
+import { createBullMqConnection } from "@/lib/queues/bullmq-connection";
 
-const connection = new IORedis(process.env.REDIS_URL ?? "redis://localhost:6379", {
-  maxRetriesPerRequest: null,
-});
+const connection = createBullMqConnection();
 
 export const payrollQueue     = new Queue("payroll",      { connection });
 export const payrollBatchQueue = new Queue("payroll-batch", { connection });
@@ -80,7 +79,7 @@ async function initiateBatches(runId: string, tenantId: string): Promise<void> {
   });
   if (!run) throw new Error(`PayrollRun ${runId} not found`);
 
-  const employeeIds = run.lineItems.map((li) => li.employeeId);
+  const employeeIds = run.lineItems.map((li: { employeeId: string }) => li.employeeId);
   const totalBatches = Math.ceil(employeeIds.length / BATCH_SIZE);
 
   // Enqueue one job per batch
@@ -151,7 +150,7 @@ async function calculateBatch(
     await prisma.payrollLineItem.upsert({
       where: {
         // Use a synthetic unique key by looking for existing NET item
-        id: existingItems.find((i) => i.componentType === "NET")?.id ?? "new",
+        id: existingItems.find((i: { componentType: string; id: string }) => i.componentType === "NET")?.id ?? "new",
       },
       update: { amount: netPay },
       create: {
@@ -191,7 +190,7 @@ async function fanIn(runId: string, tenantId: string, _totalBatches: number): Pr
   });
 
   const checksumInput = lineItems
-    .map((li) => `${li.employeeId}:${li.componentType}:${new Decimal(li.amount).toFixed(2)}`)
+    .map((li: { employeeId: string; componentType: string; amount: string | number }) => `${li.employeeId}:${li.componentType}:${new Decimal(li.amount).toFixed(2)}`)
     .join("|");
   const checksum = createHash("sha256").update(checksumInput).digest("hex");
 
@@ -203,6 +202,7 @@ async function fanIn(runId: string, tenantId: string, _totalBatches: number): Pr
   // Enqueue payslip generation
   await payrollQueue.add("payroll", { type: "generate-payslips", runId, tenantId });
 
+  // amazonq-ignore-next-line
   console.log(`[payroll-worker] Fan-in complete for run ${runId}, checksum: ${checksum.slice(0, 8)}…`);
 }
 
@@ -232,7 +232,7 @@ async function generatePayslips(runId: string, tenantId: string): Promise<void> 
       runId,
       periodStart: run.periodStart,
       periodEnd: run.periodEnd,
-      lineItems: items.map((i) => ({
+      lineItems: items.map((i: { componentType: string; amount: string | number; currency: string }) => ({
         type: i.componentType,
         amount: new Decimal(i.amount).toFixed(2),
         currency: i.currency,
@@ -246,11 +246,29 @@ async function generatePayslips(runId: string, tenantId: string): Promise<void> 
     const encrypted = Buffer.concat([cipher.update(payslipData, "utf8"), cipher.final()]);
     const payslipBlob = `${iv.toString("hex")}:${encrypted.toString("hex")}`;
 
-    // TODO: upload to @vercel/blob and store URL in a Payslip model
-    // For now log it
-    console.log(`[payroll-worker] Payslip generated for employee ${employeeId}`);
+    // Upload encrypted payslip to Vercel Blob
+    const blobPath = `payslips/${tenantId}/${runId}/${employeeId}.enc`;
+    const { url: payslipUrl } = await put(blobPath, payslipBlob, {
+      access: "public",
+      token: process.env.BLOB_READ_WRITE_TOKEN,
+    });
 
-    // TODO: dispatch notification to employee via notification queue (Req 8.6)
+    console.log(`[payroll-worker] Payslip uploaded for employee ${employeeId}: ${payslipUrl}`);
+
+    // AUTO-FLAG: Dispatch notification to employee via notification queue (Req 8.6)
+    try {
+      const { dispatchNotification } = await import("@/lib/notification-dispatch");
+      await dispatchNotification({
+        tenantId,
+        recipientId: employeeId,
+        eventType: "payslip.generated",
+        channel: "IN_APP",
+        subject: "New payslip available",
+        body: `Your payslip for ${new Date(run.periodStart).toLocaleDateString("en-MY", { month: "long", year: "numeric" })} is now available.`,
+      });
+    } catch (notifErr) {
+      console.warn(`[payroll-worker] Failed to dispatch notification for employee ${employeeId}:`, notifErr);
+    }
   }
 
   console.log(`[payroll-worker] All payslips generated for run ${runId}`);
@@ -267,7 +285,7 @@ async function recalcAudit(runId: string, tenantId: string): Promise<void> {
 
   // Recompute checksum from current line items
   const checksumInput = run.lineItems
-    .map((li) => `${li.employeeId}:${li.componentType}:${new Decimal(li.amount).toFixed(2)}`)
+    .map((li: { employeeId: string; componentType: string; amount: string | number }) => `${li.employeeId}:${li.componentType}:${new Decimal(li.amount).toFixed(2)}`)
     .join("|");
   const recomputedChecksum = createHash("sha256").update(checksumInput).digest("hex");
 
@@ -288,18 +306,29 @@ async function recalcAudit(runId: string, tenantId: string): Promise<void> {
         idempotent: matches,
         lineItemCount: run.lineItems.length,
       },
+      changedFields: [],
     },
   });
 
+  const safeRunId = String(runId).replace(/[\r\n\t]/g, "_").slice(0, 64);
+
   if (!matches) {
-    console.error(`[payroll-worker] CHECKSUM MISMATCH for run ${runId}!`);
+    console.error(`[payroll-worker] CHECKSUM MISMATCH for run ${safeRunId}!`);
   } else {
-    console.log(`[payroll-worker] Recalculation audit passed for run ${runId}`);
+    console.log(`[payroll-worker] Recalculation audit passed for run ${safeRunId}`);
   }
 }
 
 payrollWorker.on("failed", (job, err) => {
-  console.error(`[payroll-worker] Job failed: ${job?.id}`, err.message);
+  const safeJobId = String(job?.id ?? "").replace(/[\r\n\t]/g, "_").slice(0, 64);
+  console.error(`[payroll-worker] Job failed: ${safeJobId}`, err.message);
 });
 
+export async function stopWorker() {
+  try { await payrollWorker.close(); } catch {}
+  try { await payrollQueue.close(); } catch {}
+  try { await payrollBatchQueue.close(); } catch {}
+}
+
 console.log("[payroll-worker] Started");
+

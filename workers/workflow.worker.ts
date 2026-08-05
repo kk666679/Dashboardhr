@@ -12,14 +12,12 @@
  */
 
 import { Worker, Queue } from "bullmq";
-import IORedis from "ioredis";
 import { prisma } from "@/lib/prisma";
+import { createBullMqConnection } from "@/lib/queues/bullmq-connection";
 
 // ─── Queue setup ──────────────────────────────────────────────────────────────
 
-const connection = new IORedis(process.env.REDIS_URL ?? "redis://localhost:6379", {
-  maxRetriesPerRequest: null,
-});
+const connection = createBullMqConnection();
 
 export const workflowQueue    = new Queue("workflow", { connection });
 export const workflowSlaQueue = new Queue("workflow-sla", { connection });
@@ -45,6 +43,7 @@ const parallelVoteKey = (instanceId: string, nodeId: string) =>
 export const workflowWorker = new Worker<WorkflowJob>(
   "workflow",
   async (job) => {
+
     const { type, instanceId, stepId } = job.data;
 
     if (type === "sla-check") {
@@ -69,20 +68,20 @@ export const workflowWorker = new Worker<WorkflowJob>(
     const currentStep = instance.steps[0];
     if (!currentStep) return;
 
-    const currentNode = graph.nodes?.find((n: any) => n.id === currentStep.stepId);
+    const currentNode = graph.nodes?.find((n: unknown) => (n as any).id === currentStep.stepId);
     if (!currentNode) return;
 
     // Handle auto steps — resolve automatically
     if (currentNode.type === "auto") {
-      await prisma.$transaction(async (tx) => {
+      await prisma.$transaction(async (tx: any) => {
         await tx.workflowInstanceStep.update({
           where: { id: currentStep.id },
           data: { status: "COMPLETED", decidedAt: new Date(), decision: "APPROVED" },
         });
 
-        const nextEdge = graph.edges?.find((e: any) => e.source === currentStep.stepId);
+        const nextEdge = graph.edges?.find((e: unknown) => (e as any).source === currentStep.stepId);
         if (nextEdge) {
-          const nextNode = graph.nodes?.find((n: any) => n.id === nextEdge.target);
+          const nextNode = graph.nodes?.find((n: unknown) => (n as any).id === nextEdge.target);
           if (nextNode) {
             const slaConfig = (instance.definition.slaConfig as any)?.[nextNode.id];
             const slaDeadline = slaConfig?.durationMinutes
@@ -160,7 +159,7 @@ async function handleEscalation(instanceId: string, stepId: string): Promise<voi
   const slaConfig = (instance.definition.slaConfig as any)?.[stepId];
   const fallbackAssigneeId = slaConfig?.fallbackAssigneeId;
 
-  await prisma.$transaction(async (tx) => {
+  await prisma.$transaction(async (tx: any) => {
     await tx.workflowInstanceStep.updateMany({
       where: { instanceId, stepId, status: "ACTIVE" },
       data: {
@@ -192,7 +191,8 @@ async function handleEscalation(instanceId: string, stepId: string): Promise<voi
         actorId: "system",
         actorRole: "system",
         newValue: { escalated: true, stepId, fallbackAssigneeId },
-        metadata: { reason: "SLA_BREACH", path: "workflow.worker.escalation", changedFields: ["status"] },
+        changedFields: ["status"],
+        metadata: { reason: "SLA_BREACH", path: "workflow.worker.escalation" },
       },
     });
   });
@@ -204,4 +204,12 @@ workflowWorker.on("failed", (job, err) => {
   console.error(`[workflow-worker] Job failed: ${job?.id}`, err.message);
 });
 
+export async function stopWorker() {
+  try { await workflowWorker.close(); } catch {}
+  try { await workflowQueue.close(); } catch {}
+  try { await workflowSlaQueue.close(); } catch {}
+}
+
+
 console.log("[workflow-worker] Started");
+

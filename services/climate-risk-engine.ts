@@ -43,21 +43,51 @@ export interface ClimateRisk {
 }
 
 // Climate Risk Score Functions
-function getClimateScore(likelihood: z.infer<typeof ClimateLikelihoodSchema>, severity: z.infer<typeof VulnerabilitySchema>): number {
-  const likelihoodScores: Record<string, number> = { unlikely: 1, possible: 2, likely: 3, very_likely: 4 };
-  const severityScores: Record<string, number> = { low: 1, moderate: 2, high: 3, very_high: 4 };
+function getClimateScore(
+  likelihood: z.infer<typeof ClimateLikelihoodSchema>,
+  severity: z.infer<typeof VulnerabilitySchema>,
+): number {
+  const likelihoodScores: Record<z.infer<typeof ClimateLikelihoodSchema>, number> = {
+    unlikely: 1,
+    possible: 2,
+    likely: 3,
+    very_likely: 4,
+  };
+  const severityScores: Record<z.infer<typeof VulnerabilitySchema>, number> = {
+    low: 1,
+    moderate: 2,
+    high: 3,
+    very_high: 4,
+  };
+
   return likelihoodScores[likelihood] * severityScores[severity];
 }
 
-function getVulnerabilityRating(severity: z.infer<typeof VulnerabilitySchema>, adaptiveCapacity: z.infer<typeof VulnerabilitySchema>): z.infer<typeof VulnerabilitySchema> {
-  const severityScores: Record<string, number> = { low: 1, moderate: 2, high: 3, very_high: 4 };
-  const capacityScores: Record<string, number> = { low: 4, moderate: 3, high: 2, very_high: 1 };
+
+function getVulnerabilityRating(
+  severity: z.infer<typeof VulnerabilitySchema>,
+  adaptiveCapacity: z.infer<typeof VulnerabilitySchema>,
+): z.infer<typeof VulnerabilitySchema> {
+  const severityScores: Record<z.infer<typeof VulnerabilitySchema>, number> = {
+    low: 1,
+    moderate: 2,
+    high: 3,
+    very_high: 4,
+  };
+  const capacityScores: Record<z.infer<typeof VulnerabilitySchema>, number> = {
+    low: 4,
+    moderate: 3,
+    high: 2,
+    very_high: 1,
+  };
+
   const combinedScore = severityScores[severity] + capacityScores[adaptiveCapacity];
   if (combinedScore <= 3) return 'low';
   if (combinedScore <= 5) return 'moderate';
   if (combinedScore <= 7) return 'high';
   return 'very_high';
 }
+
 
 function getPriority(score: number): 'low' | 'medium' | 'high' | 'critical' {
   if (score <= 4) return 'low';
@@ -94,9 +124,10 @@ export class ClimateRiskEngine {
     const hazard = climateHazards.find(h => h.id === hazardId);
     if (!hazard) return null;
 
-    const likelihood = customFields.likelihood || 'likely';
-    const severity = customFields.severity || 'moderate';
-    const adaptiveCapacity = customFields.adaptiveCapacity || 'moderate';
+    const likelihood = customFields.likelihood ?? 'likely';
+    const severity = customFields.severity ?? 'moderate';
+    const adaptiveCapacity = customFields.adaptiveCapacity ?? 'moderate';
+
 
     const score = getClimateScore(likelihood, severity);
     const vulnerabilityRating = getVulnerabilityRating(severity, adaptiveCapacity);

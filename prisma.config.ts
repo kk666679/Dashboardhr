@@ -1,4 +1,3 @@
-import "dotenv/config";
 import { defineConfig } from "prisma/config";
 
 export default defineConfig({
@@ -7,7 +6,6 @@ export default defineConfig({
     path: "prisma/migrations",
   },
   datasource: {
-    url: process.env["DATABASE_URL"]!,
-    // adapter removed – it belongs in the PrismaClient constructor
+    url: (process.env.ORM_PRISMA_URL ?? process.env.DATABASE_URL ?? 'postgresql://localhost/dev') as string,
   },
 });

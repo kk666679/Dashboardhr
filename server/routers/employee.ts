@@ -48,7 +48,7 @@ export const employeeRouter = router({
       z.object({
         id: z.string().min(1),
         data: z
-          .record(z.any())
+.record(z.string(), z.any())
           .optional()
           .default({}),
       }),

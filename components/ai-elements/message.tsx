@@ -12,7 +12,6 @@ import { cn } from "@/lib/utils";
 import { cjk } from "@streamdown/cjk";
 import { code } from "@streamdown/code";
 import { math } from "@streamdown/math";
-import { mermaid } from "@streamdown/mermaid";
 import type { UIMessage } from "ai";
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 import type { ComponentProps, HTMLAttributes, ReactElement } from "react";
@@ -28,19 +27,35 @@ import {
 import { Streamdown } from "streamdown";
 
 export type MessageProps = HTMLAttributes<HTMLDivElement> & {
-  from: UIMessage["role"];
+  /**
+   * Streamdown/Ai role discriminator.
+   * Many call sites only pass `role`, so we keep `from` compatible.
+   */
+  from?: UIMessage["role"];
+  /** Back-compat for legacy call sites that pass `role` instead of `from`. */
+  role?: UIMessage["role"];
+  /**
+   * Some UI usages treat messages as “loading/thinking”.
+   * It's safe to ignore for rendering, but must exist in the props type.
+   */
+  isLoading?: boolean;
 };
 
-export const Message = ({ className, from, ...props }: MessageProps) => (
-  <div
-    className={cn(
-      "group flex w-full max-w-[95%] flex-col gap-2",
-      from === "user" ? "is-user ml-auto justify-end" : "is-assistant",
-      className,
-    )}
-    {...props}
-  />
-);
+export const Message = ({ className, from, role, isLoading: _isLoading, ...props }: MessageProps) => {
+  const resolvedFrom = role ?? from ?? "assistant";
+
+  return (
+    <div
+      className={cn(
+        "group flex w-full max-w-[95%] flex-col gap-2",
+        resolvedFrom === "user" ? "is-user ml-auto justify-end" : "is-assistant",
+        className,
+      )}
+      {...props}
+    />
+  );
+};
+
 
 export type MessageContentProps = HTMLAttributes<HTMLDivElement>;
 
@@ -318,7 +333,7 @@ export const MessageBranchPage = ({
 
 export type MessageResponseProps = ComponentProps<typeof Streamdown>;
 
-const streamdownPlugins = { cjk, code, math, mermaid };
+const streamdownPlugins = { cjk, code, math } as never;
 
 export const MessageResponse = memo(
   ({ className, ...props }: MessageResponseProps) => (
@@ -355,3 +370,183 @@ export const MessageToolbar = ({
     {children}
   </div>
 );
+
+// ─── MessageTimestamp ────────────────────────────────────────────────────────
+
+export type MessageTimestampProps = HTMLAttributes<HTMLTimeElement> & {
+  date: Date | string | number;
+  /** Format: "time" (13:45), "relative" (2 min ago), "datetime" (full) */
+  format?: "time" | "relative" | "datetime";
+};
+
+function formatRelative(date: Date): string {
+  const diff = Math.floor((Date.now() - date.getTime()) / 1000);
+  if (diff < 60) return "just now";
+  if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
+  if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
+  return `${Math.floor(diff / 86400)}d ago`;
+}
+
+export const MessageTimestamp = ({
+  date,
+  format = "time",
+  className,
+  ...props
+}: MessageTimestampProps) => {
+  const d = new Date(date);
+  const text =
+    format === "relative"
+      ? formatRelative(d)
+      : format === "datetime"
+      ? d.toLocaleString()
+      : d.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" });
+
+  return (
+    <time
+      dateTime={d.toISOString()}
+      className={cn("text-[10px] text-muted-foreground/60", className)}
+      title={d.toLocaleString()}
+      {...props}
+    >
+      {text}
+    </time>
+  );
+};
+
+// ─── MessageCopyButton ───────────────────────────────────────────────────────
+
+import { useState as _useState } from "react";
+import { CopyIcon, CheckIcon } from "lucide-react";
+
+export type MessageCopyButtonProps = ComponentProps<typeof Button> & {
+  text: string;
+};
+
+export const MessageCopyButton = ({
+  text,
+  className,
+  size = "icon",
+  variant = "ghost",
+  ...props
+}: MessageCopyButtonProps) => {
+  const [copied, setCopied] = _useState(false);
+
+  const handleCopy = useCallback(async () => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    } catch {
+      // fallback: select + execCommand
+      const el = document.createElement("textarea");
+      el.value = text;
+      el.style.position = "fixed";
+      el.style.opacity = "0";
+      document.body.appendChild(el);
+      el.select();
+      document.execCommand("copy");
+      document.body.removeChild(el);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    }
+  }, [text]);
+
+  return (
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            size={size}
+            type="button"
+            variant={variant}
+            onClick={handleCopy}
+            aria-label="Copy message"
+            className={cn("size-7 transition-colors", className)}
+            {...props}
+          >
+            {copied ? (
+              <CheckIcon className="size-3 text-green-500" />
+            ) : (
+              <CopyIcon className="size-3" />
+            )}
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent>{copied ? "Copied!" : "Copy"}</TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
+};
+
+// ─── MessageFeedback ─────────────────────────────────────────────────────────
+
+import { ThumbsUpIcon, ThumbsDownIcon } from "lucide-react";
+
+export type MessageFeedbackValue = "positive" | "negative" | null;
+
+export type MessageFeedbackProps = ComponentProps<"div"> & {
+  value?: MessageFeedbackValue;
+  onFeedback?: (value: MessageFeedbackValue) => void;
+};
+
+export const MessageFeedback = ({
+  value,
+  onFeedback,
+  className,
+  ...props
+}: MessageFeedbackProps) => {
+  const [local, setLocal] = _useState<MessageFeedbackValue>(value ?? null);
+
+  const handleClick = useCallback(
+    (v: "positive" | "negative") => {
+      const next = local === v ? null : v;
+      setLocal(next);
+      onFeedback?.(next);
+    },
+    [local, onFeedback],
+  );
+
+  return (
+    <div className={cn("flex items-center gap-0.5", className)} {...props}>
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              size="icon"
+              variant="ghost"
+              className={cn(
+                "size-7",
+                local === "positive" && "text-green-500",
+              )}
+              onClick={() => handleClick("positive")}
+              aria-pressed={local === "positive"}
+              aria-label="Good response"
+            >
+              <ThumbsUpIcon className="size-3" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>Good response</TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              size="icon"
+              variant="ghost"
+              className={cn(
+                "size-7",
+                local === "negative" && "text-destructive",
+              )}
+              onClick={() => handleClick("negative")}
+              aria-pressed={local === "negative"}
+              aria-label="Bad response"
+            >
+              <ThumbsDownIcon className="size-3" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>Bad response</TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+    </div>
+  );
+};

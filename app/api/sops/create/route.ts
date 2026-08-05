@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
+import { sanitizePrompt } from "@/lib/security/prompt";
 
 import { generateSop } from "@/lib/sop/generationPipeline";
 
@@ -44,7 +45,7 @@ export async function POST(request: NextRequest) {
     department: body.department,
     category: body.category,
     processDescription: body.processDescription,
-    prompt: body.prompt,
+    prompt: sanitizePrompt(body.prompt ?? ""),
     policyText: body.policyText,
     regulationText: body.regulationText,
     meetingNotes: body.meetingNotes,

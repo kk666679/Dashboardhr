@@ -1,169 +1,128 @@
-import { streamText, tool } from 'ai'
-import { createOpenAI } from '@ai-sdk/openai'
-import { z } from 'zod'
-import { NextRequest } from 'next/server'
-import { payrollAgent } from '@/server/agents/payroll'
-import { leaveAgent } from '@/server/agents/leave'
-import { immigrationAgent } from '@/server/agents/immigration'
-import { fomemaAgent } from '@/server/agents/fomema'
-import { levyAgent } from '@/server/agents/levy'
-import { talentAcquisitionAgent } from '@/server/agents/talent-acquisition'
-import { compensationBenefitsAgent } from '@/server/agents/compensation-benefits'
-import { employeeRelationsAgent } from '@/server/agents/employee-relations'
-import { learningDevelopmentAgent } from '@/server/agents/learning-development'
-import { industrialRelationsAgent } from '@/server/agents/industrial-relations'
-import { hrAnalyticsAgent } from '@/server/agents/hr-analytics'
-import { successionPlanningAgent } from '@/server/agents/succession-planning'
-import { hrComplianceAgent } from '@/server/agents/hr-compliance'
-import { employerBrandingAgent } from '@/server/agents/employer-branding'
-import { AGENT_PROMPTS } from '@/server/agents/prompts'
-import { runHrOrchestrator } from '@/lib/orchestrator/hr-orchestrator'
-import type { ClaudeHooksConfig, ClaudeHookContext } from '@/types/ai'
+/**
+ * POST /api/hr-orchestrator
+ *
+ * Unified multi-agent HR orchestration endpoint.
+ * Routes queries to the correct OpenClaw agent via AGENT_REGISTRY,
+ * with RAG context retrieval and streaming output.
+ *
+ * Auth: required (getCurrentSession)
+ */
 
-export const runtime = 'nodejs'
+import { NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
+import { getCurrentSession } from "@/lib/server/auth";
+import { ragQuery } from "@/lib/rag";
+import { sanitizePrompt } from "@/lib/security/prompt";
 
-const empInput    = z.object({ employeeId: z.string().optional() })
-const tenantInput = z.object({ tenantId: z.string().optional() })
+export const runtime = "nodejs";
 
-function buildTools(employeeId?: string) {
-  return {
-    // ── HR Operations ──────────────────────────────────────────────────────────
-    getPayroll: tool({
-      description: `[HR Operations] ${AGENT_PROMPTS.hrOperations} — Fetch salary, payslip, and payroll records.`,
-      inputSchema: empInput,
-      execute: async ({ employeeId }) => payrollAgent('', employeeId ?? ''),
-    }),
-    getLeave: tool({
-      description: `[HR Operations] ${AGENT_PROMPTS.hrOperations} — Fetch leave balances, annual leave, sick leave, and holiday entitlements.`,
-      inputSchema: empInput,
-      execute: async ({ employeeId }) => leaveAgent('', employeeId ?? ''),
-    }),
+const BodySchema = z.object({
+  message:    z.string().min(1).max(8_000),
+  employeeId: z.string().optional(),
+  tenantId:   z.string().optional(),
+  sessionId:  z.string().optional().default("default"),
+  agentId:    z.string().optional(), // force-route to a specific agent
+});
 
-    // ── Foreign Workers ────────────────────────────────────────────────────────
-    getImmigration: tool({
-      description: `[Foreign Workers] ${AGENT_PROMPTS.foreignWorkers} — Fetch work permit, visa, and PLKS status.`,
-      inputSchema: empInput,
-      execute: async ({ employeeId: eid }) => immigrationAgent('', eid ?? employeeId),
-    }),
-    getFomema: tool({
-      description: `[Foreign Workers] ${AGENT_PROMPTS.foreignWorkers} — Fetch FOMEMA medical examination status and certificate validity.`,
-      inputSchema: empInput,
-      execute: async ({ employeeId: eid }) => fomemaAgent('', eid ?? employeeId),
-    }),
-    getLevy: tool({
-      description: `[Foreign Workers] ${AGENT_PROMPTS.foreignWorkers} — Calculate foreign worker levy by sector and nationality.`,
-      inputSchema: empInput,
-      execute: async ({ employeeId: eid }) => levyAgent('', eid ?? employeeId),
-    }),
+export async function POST(req: NextRequest) {
+  // Auth guard
+  const session = await getCurrentSession();
+  if (!session) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
 
-    // ── Talent Acquisition ─────────────────────────────────────────────────────
-    getTalentAcquisition: tool({
-      description: `[Talent Acquisition] ${AGENT_PROMPTS.talentAcquisition} — Fetch open roles, hiring context, and recruitment data.`,
-      inputSchema: z.object({}),
-      execute: async () => talentAcquisitionAgent(''),
-    }),
+  let body: z.infer<typeof BodySchema>;
+  try {
+    body = BodySchema.parse(await req.json());
+  } catch {
+    return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
+  }
 
-    // ── Compensation & Benefits ────────────────────────────────────────────────
-    getCompensationBenefits: tool({
-      description: `[Compensation & Benefits] ${AGENT_PROMPTS.compensationBenefits} — Fetch salary benchmarks, EPF/SOCSO/EIS rates, and benefits packages.`,
-      inputSchema: empInput,
-      execute: async ({ employeeId: eid }) => compensationBenefitsAgent('', eid ?? employeeId),
-    }),
+  const { message, employeeId, sessionId } = body;
+  const tenantId = body.tenantId ?? session.tenantId;
+  const sanitizedMessage = sanitizePrompt(message);
 
-    // ── Employee Relations ─────────────────────────────────────────────────────
-    getEmployeeRelations: tool({
-      description: `[Employee Relations] ${AGENT_PROMPTS.employeeRelations} — Fetch employee data for HR letters, conflict resolution, and misconduct handling.`,
-      inputSchema: empInput,
-      execute: async ({ employeeId: eid }) => employeeRelationsAgent('', eid ?? employeeId),
-    }),
+  // Lazy-import the agent registry to avoid build-time side effects
+  const { AGENT_REGISTRY, orchestratorAgent } = await import(
+    "@/.openclaw/agents/orchestrator.agent"
+  );
 
-    // ── Learning & Development ─────────────────────────────────────────────────
-    getLearningDevelopment: tool({
-      description: `[Learning & Development] ${AGENT_PROMPTS.learningDevelopment} — Fetch training recommendations, career paths, and HRDC claim guidance.`,
-      inputSchema: empInput,
-      execute: async ({ employeeId: eid }) => learningDevelopmentAgent('', eid ?? employeeId),
-    }),
+  const agentContext = {
+    sessionId,
+    tenantId,
+    userId: session.userId,
+  };
 
-    // ── Industrial Relations ───────────────────────────────────────────────────
-    getIndustrialRelations: tool({
-      description: `[Industrial Relations] ${AGENT_PROMPTS.industrialRelations} — Fetch IR data: domestic inquiry steps, notice periods, legal references, misconduct categories.`,
-      inputSchema: empInput,
-      execute: async ({ employeeId: eid }) => industrialRelationsAgent('', eid ?? employeeId),
-    }),
+  const agentInput = {
+    query:      sanitizedMessage,
+    employeeId: employeeId ?? session.employeeId,
+    tenantId,
+  };
 
-    // ── HR Analytics ───────────────────────────────────────────────────────────
-    getHrAnalytics: tool({
-      description: `[HR Analytics] ${AGENT_PROMPTS.hrAnalytics} — Fetch headcount, attendance rate, absenteeism, compliance metrics, and HR insights.`,
-      inputSchema: tenantInput,
-      execute: async ({ tenantId }) => hrAnalyticsAgent('', tenantId),
-    }),
+  // If caller requests a specific agent, dispatch directly
+  const targetAgent = body.agentId
+    ? AGENT_REGISTRY.get(body.agentId)
+    : orchestratorAgent;
 
-    // ── Succession Planning ────────────────────────────────────────────────────
-    getSuccessionPlanning: tool({
-      description: `[Succession Planning] ${AGENT_PROMPTS.successionPlanning} — Fetch talent map, 9-box grid, high-potential employees, and retention risks.`,
-      inputSchema: tenantInput,
-      execute: async ({ tenantId }) => successionPlanningAgent('', tenantId),
-    }),
+  if (!targetAgent) {
+    return NextResponse.json(
+      { error: `Agent '${body.agentId}' not found in registry` },
+      { status: 404 }
+    );
+  }
 
-    // ── HR Compliance ──────────────────────────────────────────────────────────
-    getHrCompliance: tool({
-      description: `[HR Compliance] ${AGENT_PROMPTS.hrCompliance} — Fetch compliance score, expired documents, policy audit checklist, and risk summary.`,
-      inputSchema: tenantInput,
-      execute: async ({ tenantId }) => hrComplianceAgent('', tenantId),
-    }),
+  try {
+    const result = await targetAgent.process(agentInput, agentContext);
 
-    // ── Employer Branding ──────────────────────────────────────────────────────
-    getEmployerBranding: tool({
-      description: `[Employer Branding] ${AGENT_PROMPTS.employerBranding} — Fetch EVP pillars, campaign KPIs, content calendar, and engagement initiatives.`,
-      inputSchema: tenantInput,
-      execute: async ({ tenantId }) => employerBrandingAgent('', tenantId),
-    }),
+    return NextResponse.json({
+      agent:   targetAgent.id,
+      type:    result.type,
+      summary: result.summary,
+      data:    result.data,
+      actions: result.actions,
+      confidence:          result.confidence,
+      requiresApproval:    result.requiresHumanApproval,
+      complianceScore:     result.complianceScore ?? null,
+      citations:           result.citations ?? [],
+    });
+  } catch (err) {
+    console.error("[hr-orchestrator]", err);
+    // Fallback: plain RAG answer
+    try {
+      const rag = await ragQuery(message, { tenantId });
+      return NextResponse.json({
+        agent:    "rag-fallback",
+        type:     "RAG",
+        summary:  rag.answer,
+        data:     { chunks: rag.chunks.length },
+        actions:  [],
+        confidence: 0.5,
+        requiresApproval: false,
+        citations: rag.chunks.map((c) => c.source),
+      });
+    } catch {
+      return NextResponse.json({ error: "Orchestration failed" }, { status: 500 });
+    }
   }
 }
 
-export async function POST(req: NextRequest) {
-  const body = await req.json()
-  const { messages, employeeId } = body
-
-  // Server-side default hooks for orchestrator (subagents/tools)
-  const defaultHooks: ClaudeHooksConfig = {
-    subAgentStart: async (agentId, ctx) => console.log('[Orchestrator ClaudeHook] Subagent start:', agentId, ctx),
-    subAgentStop: async (agentId) => console.log('[Orchestrator ClaudeHook] Subagent stop:', agentId),
-    notification: async (type, msg) => console.log(`[Orchestrator ClaudeHook ${type.toUpperCase()}] ${msg}`),
-  };
-
-  const ctx: ClaudeHookContext = { employeeId, input: messages };
-  await defaultHooks.subAgentStart('hr-orchestrator', ctx);
-
-
-  if (!process.env.OPENAI_API_KEY) {
-    const lastMessage = messages.at(-1)?.content ?? ''
-    const results = await runHrOrchestrator(lastMessage, employeeId)
-    const text = results
-      .map((r: any) => `**${r.type}**: ${r.data}`)
-      .join('\n\n')
-
-    return new Response(
-      new ReadableStream({
-        start(controller) {
-          controller.enqueue(new TextEncoder().encode(`0:${JSON.stringify(text)}\n`))
-          controller.close()
-        },
-      }),
-      { headers: { 'Content-Type': 'text/event-stream' } }
-    )
+/**
+ * GET /api/hr-orchestrator
+ * Returns the list of available agents and their domains.
+ */
+export async function GET(_req: NextRequest) {
+  const session = await getCurrentSession();
+  if (!session) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const openai = createOpenAI({ apiKey: process.env.OPENAI_API_KEY })
+  const { AGENT_REGISTRY } = await import("@/.openclaw/agents/orchestrator.agent");
 
-  const result = streamText({
-    model: openai('gpt-4o-mini'),
-    system: AGENT_PROMPTS.orchestrator,
-    messages,
-    tools: buildTools(employeeId), // Each tool can be wrapped with hooks
-  })
+  const agents = Array.from(AGENT_REGISTRY.values()).map((a) => ({
+    id:     a.id,
+    name:   a.name,
+    domain: a.domain,
+  }));
 
-  await defaultHooks.subAgentStop('hr-orchestrator', ctx);
-
-  return result.toUIMessageStreamResponse()
+  return NextResponse.json({ agents, total: agents.length });
 }

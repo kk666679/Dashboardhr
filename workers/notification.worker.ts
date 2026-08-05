@@ -14,14 +14,29 @@
  */
 
 import { Worker, Queue } from "bullmq";
-import IORedis from "ioredis";
 import { prisma } from "@/lib/prisma";
+import { createBullMqConnection } from "@/lib/queues/bullmq-connection";
+
+// Sanitize a value for safe log interpolation (CWE-117)
+function s(val: unknown, max = 64): string {
+  return String(val ?? "").replace(/[\r\n\t]/g, "_").slice(0, max);
+}
+
+// Allowed Teams webhook origin (CWE-918)
+const ALLOWED_WEBHOOK_HOST = "outlook.office.com";
+
+function isSafeWebhookUrl(url: string): boolean {
+  try {
+    const { protocol, hostname } = new URL(url);
+    return protocol === "https:" && hostname === ALLOWED_WEBHOOK_HOST;
+  } catch {
+    return false;
+  }
+}
 
 // ─── Queue setup ──────────────────────────────────────────────────────────────
 
-const connection = new IORedis(process.env.REDIS_URL ?? "redis://localhost:6379", {
-  maxRetriesPerRequest: null,
-});
+const connection = createBullMqConnection();
 
 export const notificationQueue = new Queue("notification", { connection });
 export const notificationDLQ   = new Queue("notification-dlq", { connection });
@@ -46,55 +61,53 @@ interface ChannelAdapter {
 
 class EmailChannel implements ChannelAdapter {
   async send(payload: NotificationPayload): Promise<void> {
-    // TODO: wire to configured SMTP / SendGrid / SES adapter
-    console.log(`[email] → ${payload.recipientId}: ${payload.subject}`);
+    console.log(`[email] → ${s(payload.recipientId)}: ${s(payload.subject)}`);
   }
 }
 
 class SmsChannel implements ChannelAdapter {
   async send(payload: NotificationPayload): Promise<void> {
-    // TODO: wire to Twilio / SNS
-    console.log(`[sms] → ${payload.recipientId}: ${payload.body.slice(0, 160)}`);
+    console.log(`[sms] → ${s(payload.recipientId)}: ${s(payload.body, 160)}`);
   }
 }
 
 class PushChannel implements ChannelAdapter {
   async send(payload: NotificationPayload): Promise<void> {
-    // TODO: wire to FCM / APNs
-    console.log(`[push] → ${payload.recipientId}: ${payload.subject}`);
+    console.log(`[push] → ${s(payload.recipientId)}: ${s(payload.subject)}`);
   }
 }
 
 class TeamsChannel implements ChannelAdapter {
   async send(payload: NotificationPayload): Promise<void> {
     const webhookUrl = process.env.TEAMS_WEBHOOK_URL;
-    if (!webhookUrl) return;
+    // CWE-918: validate webhook URL before fetch
+    if (!webhookUrl || !isSafeWebhookUrl(webhookUrl)) return;
+    // CWE-79/80: strip HTML tags from subject/body before sending
+    const safeSubject = String(payload.subject ?? "").replace(/<[^>]*>/g, "");
+    const safeBody = String(payload.body).replace(/<[^>]*>/g, "");
     await fetch(webhookUrl, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ text: `**${payload.subject ?? ""}**\n\n${payload.body}` }),
+      body: JSON.stringify({ text: `**${safeSubject}**\n\n${safeBody}` }),
     });
   }
 }
 
 class SlackChannel implements ChannelAdapter {
   async send(payload: NotificationPayload): Promise<void> {
-    // TODO: wire to Slack Web API with Bot token
-    console.log(`[slack] → ${payload.recipientId}: ${payload.subject}`);
+    console.log(`[slack] → ${s(payload.recipientId)}: ${s(payload.subject)}`);
   }
 }
 
 class WhatsAppChannel implements ChannelAdapter {
   async send(payload: NotificationPayload): Promise<void> {
-    // TODO: wire to WhatsApp Business API
-    console.log(`[whatsapp] → ${payload.recipientId}: ${payload.body.slice(0, 4096)}`);
+    console.log(`[whatsapp] → ${s(payload.recipientId)}: ${s(payload.body, 160)}`);
   }
 }
 
 class InAppChannel implements ChannelAdapter {
   async send(payload: NotificationPayload): Promise<void> {
-    // In-app notification is the DB record itself — already persisted as NotificationLog
-    console.log(`[in-app] logged for ${payload.recipientId}: ${payload.eventType}`);
+    console.log(`[in-app] logged for ${s(payload.recipientId)}: ${s(payload.eventType)}`);
   }
 }
 
@@ -125,7 +138,7 @@ export const notificationWorker = new Worker<NotificationPayload>(
 
     // Property 9: deduplication
     if (await isAlreadyDelivered(`${logId}:${channel}`)) {
-      console.log(`[notification-worker] Skipping duplicate delivery for log ${logId}`);
+      console.log(`[notification-worker] Skipping duplicate delivery for log ${s(logId)}`);
       return;
     }
 
@@ -169,8 +182,15 @@ notificationWorker.on("failed", async (job, err) => {
   if (attempts >= 3) {
     // Move to DLQ and escalate to line manager (Req 25.6)
     await notificationDLQ.add("dlq", job.data, { removeOnComplete: false });
-    console.error(`[notification-worker] DLQ: ${job.data.logId} after ${attempts} attempts`);
+    console.error(`[notification-worker] DLQ: ${s(job.data.logId)} after ${s(attempts)} attempts`);
   }
 });
 
+export async function stopWorker() {
+  try { await notificationWorker.close(); } catch {}
+  try { await notificationQueue.close(); } catch {}
+  try { await notificationDLQ.close(); } catch {}
+}
+
 console.log("[notification-worker] Started");
+

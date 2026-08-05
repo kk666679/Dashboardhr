@@ -2,7 +2,7 @@
 
 import { cn } from "@/lib/utils";
 // import type { MotionProps } from "motion/react";
-import { motion } from "motion/react";
+import { motion } from "framer-motion";
 import type { CSSProperties, ElementType, JSX } from "react";
 import { memo, useMemo } from "react";
 

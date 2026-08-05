@@ -1,4 +1,4 @@
-import { prisma } from "@/lib/prisma";
+﻿import { prisma } from "@/lib/prisma";
 
 // Foreign Worker & Expatriate agent: PLKS/FWCMS/MYEG/EPLKS/FOMEMA/levy/repatriation (Malaysia 2026)
 const PERMIT_TYPES = {
@@ -31,24 +31,32 @@ function getPermitStatus(
   return monthsToExpiry < 2 ? "URGENT_RENEWAL" : "ACTIVE";
 }
 
-function getComplianceRisks(count: number): string[] {
-  if (count > 0.1 * 100)
-    return ["EXCEED_10PCT_CAP: Reduce foreign ratio (13th Malaysia Plan 2026)"];
-  if (count > 0.08 * 100) return ["NEAR_10PCT_CAP: Monitor hiring"];
+function getComplianceRisks(foreignCount: number, totalEmployees?: number): string[] {
+  const total = totalEmployees || foreignCount;
+  const ratio = foreignCount / Math.max(total, 1);
+  if (ratio > 0.1) return ["EXCEED_10PCT_CAP: Reduce foreign ratio (13th Malaysia Plan 2026)"];
+  if (ratio > 0.08) return ["NEAR_10PCT_CAP: Monitor hiring"];
   return ["OK"];
 }
 
 export async function foreignWorkerExpatriateAgent(
   input: string,
+  tenantId: string,
   employeeId?: string,
 ) {
   try {
-    const where = employeeId
-      ? { id: employeeId, isForeign: true }
-      : { isForeign: true };
-    const employees = employeeId
-      ? await prisma.employee.findMany({ where, take: 1 })
-      : await prisma.employee.findMany({ where, take: 20 });
+    const where: any = {
+      tenantId,
+      isForeign: true,
+    };
+    if (employeeId) {
+      where.id = employeeId;
+    }
+
+    const employees = await prisma.employee.findMany({
+      where,
+      take: employeeId ? 1 : 20,
+    });
 
     if (!employees.length) {
       return {
@@ -63,25 +71,26 @@ export async function foreignWorkerExpatriateAgent(
       };
     }
 
-    const breakdown = employees.map((emp: any) => {
+    const breakdown = (employees as any[]).map((emp: any) => {
+      const permit = (emp as any).permit ?? {};
       const status = getPermitStatus(
-        emp.permit?.expiryDate,
-        emp.permit?.levyPaidUntil,
+        permit.expiryDate ?? null,
+        permit.levyPaidUntil ?? null,
       );
       return {
         name: emp.name,
         nationality: emp.nationality || "Unknown",
-        permitType: emp.permit?.type || "Unknown",
-        permitNumber: emp.permit?.permitNumber || "N/A",
+        permitType: permit.type || "Unknown",
+        permitNumber: permit.permitNumber || "N/A",
         status,
         fomemaDue:
-          emp.medicalExpiry &&
-          new Date(emp.medicalExpiry) <
+          (emp as any).medicalExpiry &&
+          new Date((emp as any).medicalExpiry) <
             new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
             ? "URGENT"
             : "OK",
         levyStatus:
-          emp.permit?.levyPaidAmount >= emp.permit?.levyAmount
+          (permit.levyPaidAmount ?? 0) >= (permit.levyAmount ?? 0)
             ? "PAID"
             : "OVERDUE",
         actions:
@@ -93,11 +102,9 @@ export async function foreignWorkerExpatriateAgent(
     });
 
     const risks = getComplianceRisks(employees.length);
-    const urgentCount = breakdown.filter(
-      (b: any) => b.status !== "ACTIVE",
-    ).length;
-    const repatriationPending = breakdown.filter(
-      (b: any) => b.status === "EXPIRED",
+    const urgentCount = (breakdown as Array<{ status: string }>).filter((b) => b.status !== "ACTIVE").length;
+    const repatriationPending = (breakdown as Array<{ status: string }>).filter(
+      (b) => b.status === "EXPIRED",
     ).length;
 
     return {

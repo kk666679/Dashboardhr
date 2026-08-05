@@ -32,6 +32,13 @@ const BodySchema = z.object({
 });
 
 export async function POST(req: NextRequest) {
+  // Auth check — prevents unbounded LLM cost from unauthenticated callers
+  const { getCurrentSession } = await import("@/lib/server/auth");
+  const session = await getCurrentSession();
+  if (!session) {
+    return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401 });
+  }
+
   let body: z.infer<typeof BodySchema>;
   try {
     body = BodySchema.parse(await req.json());
@@ -62,9 +69,14 @@ export async function POST(req: NextRequest) {
     },
   };
 
-  const ctx: ClaudeHookContext = { sessionId, employeeId: body.employeeId, persona, provider };
+  const ctx: ClaudeHookContext = {
+    sessionId,
+    persona,
+    ...(body.employeeId !== undefined && { employeeId: body.employeeId }),
+    ...(provider       !== undefined && { provider }),
+  };
 
-  await defaultHooks.sessionStart(ctx);
+  await defaultHooks.sessionStart?.(ctx);
 
   // Determine provider priority: explicit > Claude > OpenAI > Ollama
   const selectedProvider = provider || (hasClaude ? "claude" : hasOpenAi ? "openai" : "ollama");
@@ -72,13 +84,14 @@ export async function POST(req: NextRequest) {
   // Claude path — streaming
   if (selectedProvider === "claude" && hasClaude) {
     try {
-      const compactMessages = await defaultHooks.preCompact(messages, ctx) || messages;
+      const compactMessages = (await defaultHooks.preCompact?.(messages, ctx)) ?? messages;
+      const safeMessages = Array.isArray(compactMessages) ? compactMessages : messages;
 
-      const claude = createAnthropic({ apiKey: claudeKey });
+      const claude = createAnthropic({ apiKey: claudeKey! });
       const result = streamText({
         model: claude("claude-3-5-sonnet-20241022"),
         system: AGENT_PROMPTS[persona],
-        messages: compactMessages,
+        messages: safeMessages,
         onFinish: async ({ text }) => {
           setChatSession(sessionId, [
             ...history,
@@ -91,7 +104,7 @@ export async function POST(req: NextRequest) {
       return result.toUIMessageStreamResponse();
     } catch (err) {
       console.error("[/api/ai/chat] Claude error:", err);
-      await defaultHooks.notification('error', `Claude error: ${err}`, ctx);
+      await defaultHooks.notification?.('error', `Claude error: ${err}`, ctx);
       if (provider === "claude") {
         return new Response(JSON.stringify({ error: "Claude unavailable" }), {
           status: 503,
@@ -103,7 +116,7 @@ export async function POST(req: NextRequest) {
   // OpenAI path — streaming
   if (selectedProvider === "openai" && hasOpenAi) {
     try {
-      const openai = createOpenAI({ apiKey: openAiKey });
+      const openai = createOpenAI({ apiKey: openAiKey! });
       const result = streamText({
         model: openai("gpt-4o-mini"),
         system: AGENT_PROMPTS[persona],

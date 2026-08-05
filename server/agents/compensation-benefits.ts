@@ -1,10 +1,11 @@
 import { prisma } from "@/lib/prisma";
 
-// Malaysian statutory contribution rates (2024)
+// Malaysian statutory contribution rates (2026)
 const STATUTORY = {
   epf: { employee: 0.11, employer: 0.13 },
   socso: { employee: 0.005, employer: 0.0175 }, // capped at RM4,000/mo
   eis: { employee: 0.002, employer: 0.002 }, // capped at RM4,000/mo
+  skbbk: { employee: 0.001, employer: 0.001 }, // SKBBK (0.1%) – placeholder, actual rate TBC
 };
 
 // PCB/MTD monthly tax estimate (simplified progressive brackets)
@@ -80,16 +81,26 @@ function getIncrementRecommendation(
 
 export async function compensationBenefitsAgent(
   input: string,
+  tenantId: string,
   employeeId?: string,
 ) {
+  if (!tenantId) {
+    throw new Error("compensationBenefitsAgent: tenantId is required");
+  }
+
   try {
-    const employee = employeeId
-      ? await prisma.employee.findUnique({ where: { id: employeeId } })
-      : await prisma.employee.findFirst();
+const employee = employeeId
+      ? await prisma.employee.findUnique({
+          where: { id: employeeId, tenantId },
+        })
+      : await prisma.employee.findFirst({
+          where: { tenantId },
+          orderBy: { createdAt: "desc" },
+        });
 
     const contract = employee
       ? await prisma.contract.findFirst({
-          where: { employeeId: employee.id, status: "ACTIVE" },
+          where: { employeeId: employee.id, tenantId, status: "ACTIVE" },
           orderBy: { startDate: "desc" },
         })
       : null;
@@ -99,21 +110,18 @@ export async function compensationBenefitsAgent(
       ? parseFloat(contract.salary.toString())
       : benchmark.mid;
 
+    const ceiling = 4000;
+    const cappedSalary = Math.min(baseSalary, ceiling);
+
     const statutory = {
       epfEmployee: +(baseSalary * STATUTORY.epf.employee).toFixed(2),
       epfEmployer: +(baseSalary * STATUTORY.epf.employer).toFixed(2),
-      socsoEmployee: +(
-        Math.min(baseSalary, 4000) * STATUTORY.socso.employee
-      ).toFixed(2),
-      socsoEmployer: +(
-        Math.min(baseSalary, 4000) * STATUTORY.socso.employer
-      ).toFixed(2),
-      eisEmployee: +(
-        Math.min(baseSalary, 4000) * STATUTORY.eis.employee
-      ).toFixed(2),
-      eisEmployer: +(
-        Math.min(baseSalary, 4000) * STATUTORY.eis.employer
-      ).toFixed(2),
+      socsoEmployee: +(cappedSalary * STATUTORY.socso.employee).toFixed(2),
+      socsoEmployer: +(cappedSalary * STATUTORY.socso.employer).toFixed(2),
+      eisEmployee: +(cappedSalary * STATUTORY.eis.employee).toFixed(2),
+      eisEmployer: +(cappedSalary * STATUTORY.eis.employer).toFixed(2),
+      skbbkEmployee: +(cappedSalary * STATUTORY.skbbk.employee).toFixed(2),
+      skbbkEmployer: +(cappedSalary * STATUTORY.skbbk.employer).toFixed(2),
       pcbMTD: estimatePCB(baseSalary * 12),
     };
 
@@ -121,7 +129,8 @@ export async function compensationBenefitsAgent(
       baseSalary +
       statutory.epfEmployer +
       statutory.socsoEmployer +
-      statutory.eisEmployer
+      statutory.eisEmployer +
+      statutory.skbbkEmployer
     ).toFixed(2);
 
     const netTakeHome = +(
@@ -129,6 +138,7 @@ export async function compensationBenefitsAgent(
       statutory.epfEmployee -
       statutory.socsoEmployee -
       statutory.eisEmployee -
+      statutory.skbbkEmployee -
       statutory.pcbMTD
     ).toFixed(2);
 
@@ -163,7 +173,7 @@ export async function compensationBenefitsAgent(
         },
         statutory,
         benefits: {
-          statutory: ["EPF", "SOCSO", "EIS", "PCB (MTD)"],
+          statutory: ["EPF", "SOCSO", "EIS", "SKBBK (Skim Kemalangan Bukan Bencana Kerja)", "PCB (MTD)"],
           recommended: [
             "Medical coverage (RM3,000–5,000/yr)",
             "Annual leave 14 days (< 2 yrs) / 16 days (2–5 yrs) / 18 days (> 5 yrs)",
@@ -183,6 +193,7 @@ export async function compensationBenefitsAgent(
           "EPF registration & monthly contribution",
           "SOCSO registration & contribution",
           "EIS registration & contribution",
+          "SKBBK registration & contribution (effective 2026)",
           "PCB/MTD monthly remittance to LHDN",
           "EA Form submission by 28 Feb annually",
         ],
@@ -198,7 +209,7 @@ export async function compensationBenefitsAgent(
         employee: null,
         currentSalary: "Live contract data unavailable",
         netTakeHome:
-          "Estimate after EPF/SOCSO/EIS/PCB depends on actual salary",
+          "Estimate after EPF/SOCSO/EIS/SKBBK/PCB depends on actual salary",
         totalEmployerCost: "Estimate depends on salary and allowances",
         marketBenchmark: {
           min: `RM${benchmark.min.toLocaleString()}`,
@@ -212,10 +223,12 @@ export async function compensationBenefitsAgent(
           socsoEmployer: "1.75% (capped)",
           eisEmployee: "0.2% (capped)",
           eisEmployer: "0.2% (capped)",
+          skbbkEmployee: "0.1% (capped) – placeholder",
+          skbbkEmployer: "0.1% (capped) – placeholder",
           pcbMTD: "Based on chargeable annual income",
         },
         benefits: {
-          statutory: ["EPF", "SOCSO", "EIS", "PCB (MTD)"],
+          statutory: ["EPF", "SOCSO", "EIS", "SKBBK", "PCB (MTD)"],
           recommended: [
             "Medical coverage",
             "Annual leave",
@@ -230,7 +243,7 @@ export async function compensationBenefitsAgent(
         },
         complianceChecklist: [
           "Confirm minimum wage compliance.",
-          "Verify EPF, SOCSO, EIS, and PCB remittances are current.",
+          "Verify EPF, SOCSO, EIS, SKBBK, and PCB remittances are current.",
           "Validate benefits against approved policy and employment contract.",
         ],
       }),

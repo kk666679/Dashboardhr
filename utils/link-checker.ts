@@ -1,4 +1,4 @@
-// Link checker utility for FWMS homepage
+// Link checker utility for AiFWMS homepage
 // Ensures all CTAs and navigation links are functional
 
 export const navigationLinks = [
@@ -10,12 +10,12 @@ export const navigationLinks = [
   { href: "/dashboard/accounting", label: "Payroll", category: "new" },
   { href: "/mobile/worker", label: "Mobile Portal", category: "new" },
   {
-    href: "/integrations/government",
+    href: "/dashboard/integrations/government",
     label: "Government APIs",
     category: "integrations",
   },
   {
-    href: "/integrations",
+    href: "/dashboard/integrations",
     label: "All Integrations",
     category: "integrations",
   },

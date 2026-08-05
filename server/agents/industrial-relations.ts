@@ -85,16 +85,17 @@ const SETTLEMENT_TEMPLATES = {
 
 export async function industrialRelationsAgent(
   input: string,
+  tenantId: string,
   employeeId?: string,
 ) {
   try {
     const employee = employeeId
-      ? await prisma.employee.findUnique({ where: { id: employeeId } })
+      ? await prisma.employee.findUnique({ where: { id: employeeId, tenantId } })
       : null;
 
     const contract = employee
       ? await prisma.contract.findFirst({
-          where: { employeeId: employee.id, status: "ACTIVE" },
+          where: { employeeId: employee.id, tenantId, status: "ACTIVE" },
           orderBy: { startDate: "desc" },
         })
       : null;

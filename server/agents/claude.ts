@@ -1,4 +1,4 @@
-import { createAnthropic } from "@ai-sdk/anthropic";
+﻿import { createAnthropic } from "@ai-sdk/anthropic";
 import { generateText } from "ai";
 import type { ClaudeHooksConfig, ClaudeHookContext } from '@/types/ai';
 import { z } from 'zod';
@@ -11,13 +11,12 @@ export function createClaudeClient(model = CLAUDE_MODEL) {
   if (!ANTHROPIC_API_KEY) {
     throw new Error("ANTHROPIC_API_KEY environment variable is required");
   }
-
   return createAnthropic({ apiKey: ANTHROPIC_API_KEY });
 }
 
 async function safeToolCall(
   toolName: string,
-  parameters: any,
+  parameters: unknown,
   hooks?: ClaudeHooksConfig
 ): Promise<any> {
   const ctx: ClaudeHookContext = { input: parameters };
@@ -25,10 +24,10 @@ async function safeToolCall(
   if (!allow) throw new Error(`Tool ${toolName} blocked by preToolUse hook`);
 
   try {
-    let result: any;
+    let result: unknown;
     if (toolName === 'levyCalculator') {
-      const { sector, workerCount } = parameters;
-      result = { monthlyLevy: await levyCalculator(sector, workerCount) };
+      const params = parameters as { sector: 'construction' | 'plantation' | 'services'; workerCount: number };
+      result = { monthlyLevy: await levyCalculator(params.sector, params.workerCount) };
     } else {
       throw new Error(`Unknown tool: ${toolName}`);
     }
@@ -55,25 +54,26 @@ export async function reasonWithClaude(
 
   const { text } = await generateText({
     model: claude(CLAUDE_MODEL),
-    system: systemPrompt,
-    prompt: submittedPrompt,
+    messages: [
+      { role: 'system', content: systemPrompt },
+      { role: 'user', content: submittedPrompt },
+    ],
     temperature: 0.7,
     tools: {
       levyCalculator: {
         description: "Calculate foreign worker levy",
-        parameters: z.object({
+        inputSchema: z.object({
           sector: z.enum(['construction', 'plantation', 'services']),
           workerCount: z.number(),
         }),
         execute: async (args: { sector: 'construction' | 'plantation' | 'services'; workerCount: number }) =>
           safeToolCall('levyCalculator', args, hooks),
-      } as any,
+      },
     },
   });
 
   return text;
 }
-
 
 export async function ragWithClaude(
   input: string,

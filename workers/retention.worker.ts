@@ -9,12 +9,14 @@
  */
 
 import { Worker, Queue } from "bullmq";
-import IORedis from "ioredis";
 import { prisma } from "@/lib/prisma";
+import { createBullMqConnection } from "@/lib/queues/bullmq-connection";
+import { put, del } from "@vercel/blob";
 
-const connection = new IORedis(process.env.REDIS_URL ?? "redis://localhost:6379", {
-  maxRetriesPerRequest: null,
-});
+// Lazy blob token check
+const BLOB_TOKEN = process.env.BLOB_READ_WRITE_TOKEN ?? "";
+
+const connection = createBullMqConnection();
 
 export const retentionQueue = new Queue("retention", { connection });
 
@@ -57,10 +59,10 @@ async function maskPersonalData(tenantId: string, retentionYears: number): Promi
   });
 
   for (const emp of expiredEmployees) {
-    await prisma.$transaction(async (tx) => {
+    await prisma.$transaction(async (tx: unknown) => {
       const before = { name: emp.name, email: emp.email };
 
-      await tx.employee.update({
+      await (tx as any).employee.update({
         where: { id: emp.id },
         data: {
           name:       `[REDACTED-${emp.id.slice(0, 8)}]`,
@@ -73,9 +75,10 @@ async function maskPersonalData(tenantId: string, retentionYears: number): Promi
         },
       });
 
-      await tx.auditTrail.create({
+      await (tx as any).auditTrail.create({
         data: {
           tenantId,
+          module: "data_governance",
           entityType: "Employee",
           entityId: emp.id,
           action: "UPDATE",
@@ -83,13 +86,15 @@ async function maskPersonalData(tenantId: string, retentionYears: number): Promi
           actorRole: "system",
           previousValue: before as any,
           newValue: { masked: true, reason: "RETENTION_POLICY" },
-          metadata: { type: "pseudonymisation", retentionYears, changedFields: ["name", "email", "phone", "nationalId", "address"] },
+          changedFields: ["name", "email", "phone", "nationalId", "address"],
+          metadata: { type: "pseudonymisation", retentionYears },
         },
       });
     });
   }
 
-  console.log(`[retention-worker] Masked ${expiredEmployees.length} expired employee records in tenant ${tenantId}`);
+  const safeTenantId = String(tenantId).replace(/[\r\n\t]/g, "_").slice(0, 64);
+  console.log(`[retention-worker] Masked ${expiredEmployees.length} expired employee records in tenant ${safeTenantId}`);
 }
 
 /**
@@ -109,35 +114,71 @@ async function archiveDocuments(tenantId: string, retentionYears: number): Promi
   });
 
   for (const doc of expiredDocs) {
-    // TODO: copy doc.fileUrl to cold storage bucket (archive tier)
-    // TODO: delete from primary storage
+    // AUTO-FLAG: Copy document to cold storage archive tier + delete from primary
+    let archiveUrl: string | null = null;
+    try {
+      // Fetch the document content from its current location
+      const response = await fetch(doc.fileUrl);
+      if (response.ok) {
+        const blob = await response.blob();
+        // Upload to cold storage path (archive tier)
+        const archivePath = `archive/${tenantId}/${doc.id}_${Date.now()}`;
+        const result = await put(archivePath, blob, {
+          access: "public",
+          token: BLOB_TOKEN,
+          addRandomSuffix: true,
+        });
+        archiveUrl = result.url;
+      }
+    } catch (archiveErr) {
+      console.warn(`[retention-worker] Failed to archive doc ${doc.id} to cold storage:`, archiveErr);
+    }
 
-    await prisma.$transaction(async (tx) => {
-      await tx.document.update({
+    await prisma.$transaction(async (tx: unknown) => {
+      await (tx as any).document.update({
         where: { id: doc.id },
         data: { status: "EXPIRED" },
       });
 
-      await tx.auditTrail.create({
+      // Delete from primary storage if archive succeeded
+      if (archiveUrl && doc.fileUrl) {
+        try {
+          await del(doc.fileUrl, { token: BLOB_TOKEN });
+        } catch (delErr) {
+          console.warn(`[retention-worker] Failed to delete primary blob for doc ${doc.id}:`, delErr);
+        }
+      }
+
+      await (tx as any).auditTrail.create({
         data: {
           tenantId,
+          module: "data_governance",
           entityType: "Document",
           entityId: doc.id,
           action: "UPDATE",
           actorId: "system",
           actorRole: "system",
-          newValue: { archived: true, originalUrl: doc.fileUrl },
-          metadata: { type: "retention_archive", retentionYears, changedFields: ["status"] },
+          newValue: { archived: true, archiveUrl, originalUrl: doc.fileUrl },
+          changedFields: ["status"],
+          metadata: { type: "retention_archive", retentionYears },
         },
       });
     });
   }
 
-  console.log(`[retention-worker] Archived ${expiredDocs.length} expired documents in tenant ${tenantId}`);
+  const safeTenantId = String(tenantId).replace(/[\r\n\t]/g, "_").slice(0, 64);
+  console.log(`[retention-worker] Archived ${expiredDocs.length} expired documents in tenant ${safeTenantId}`);
 }
 
 retentionWorker.on("failed", (job, err) => {
-  console.error(`[retention-worker] Failed: ${job?.id}`, err.message);
+  const safeJobId = String(job?.id ?? "").replace(/[\r\n\t]/g, "_").slice(0, 64);
+  console.error(`[retention-worker] Failed: ${safeJobId}`, err.message);
 });
 
+export async function stopWorker() {
+  try { await retentionWorker.close(); } catch {}
+  try { await retentionQueue.close(); } catch {}
+}
+
 console.log("[retention-worker] Started");
+

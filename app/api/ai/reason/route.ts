@@ -60,7 +60,7 @@ export async function POST(request: NextRequest) {
   // OpenAI path
   if (selectedProvider === "openai" && hasOpenAi) {
     try {
-      const openai = createOpenAI({ apiKey: openAiKey });
+      const openai = createOpenAI({ apiKey: openAiKey! });
       const { text } = await generateText({
         model: openai("gpt-4o-mini"),
         system: AGENT_PROMPTS[persona as keyof typeof AGENT_PROMPTS],

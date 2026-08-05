@@ -1,8 +1,35 @@
-node_modules
-.next
+# dependencies
+node_modules/
+
+# Next.js
+.next/
+out/
+
+# builds
+dist/
+build/
+
+# env
+.env
+.env.local
+
+# logs
+*.log
+
+# TypeScript
+*.tsbuildinfo
+.vercel
 .env*
-components
-.claude
-lib
-hooks
-docs
+.claude/
+
+# Compiled TypeScript artifacts (lib/ — Next.js/Turbopack compiles .ts directly)
+lib/**/*.js
+lib/**/*.js.map
+lib/**/*.d.ts
+lib/**/*.d.ts.map
+# Allow legitimate JS config files
+!lib/**/*.config.js
+
+
+.openclaw
+WindowDownloader

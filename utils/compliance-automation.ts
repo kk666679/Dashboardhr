@@ -244,7 +244,7 @@ export class ComplianceAutomation {
     };
   }
 
-  static async scheduleFomemaAppointment(data: any) {
+  static async scheduleFomemaAppointment(data: unknown) {
     // Schedule appointment via FOMEMA API
     console.log(
       "FOMEMA appointment scheduled:",
@@ -252,7 +252,7 @@ export class ComplianceAutomation {
     );
   }
 
-  static async createComplianceAlert(alert: any) {
+  static async createComplianceAlert(alert: unknown) {
     // Create compliance alert in system
     console.log(
       "Compliance alert created:",
@@ -271,17 +271,17 @@ export class ComplianceAutomation {
     );
   }
 
-  static async notifyJTK(data: any) {
+  static async notifyJTK(data: unknown) {
     // Send notification to JTK
     console.log("JTK notification sent:", sanitizeLog(JSON.stringify(data)));
   }
 
-  static async reportToImmigration(data: any) {
+  static async reportToImmigration(data: unknown) {
     // Report to Immigration Department
     console.log("Immigration report sent:", sanitizeLog(JSON.stringify(data)));
   }
 
-  static async submitToSocso(data: any) {
+  static async submitToSocso(data: unknown) {
     // Submit to SOCSO
     console.log("SOCSO submission:", sanitizeLog(JSON.stringify(data)));
   }

@@ -129,12 +129,18 @@ export function getRiskLevel(score: number): z.infer<typeof RiskLevelSchema> {
 
 export function getRiskMatrixCell(
   likelihood: z.infer<typeof LikelihoodSchema>,
-  severity: z.infer<typeof SeveritySchema>
+  severity: z.infer<typeof SeveritySchema>,
 ): RiskMatrixCell {
+  // 5x5 matrix: scores are 1..5 → indices 0..4
   const row = getSeverityScore(severity) - 1;
   const col = getLikelihoodScore(likelihood) - 1;
-  return riskMatrix[row][col];
+
+  const safeRow = Math.min(Math.max(row, 0), riskMatrix.length - 1);
+  const safeCol = Math.min(Math.max(col, 0), riskMatrix[safeRow]!.length - 1);
+
+  return riskMatrix[safeRow]![safeCol]!;
 }
+
 
 // Main Risk Engine Class
 export class RiskEngine {

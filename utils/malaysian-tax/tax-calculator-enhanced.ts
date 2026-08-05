@@ -1,4 +1,8 @@
-// Enhanced Malaysian Tax Calculator with 2024 Rates
+// Enhanced Malaysian Tax Calculator with 2026 Rates
+// Includes: EPF, SOCSO, EIS, SKBBK (new)
+// Source: EPF, SOCSO, EIS, LHDN (2026 Budget), SKBBK – placeholder rates
+
+import { BASE_LEVY_SECTOR } from "@/lib/constants/levy-rates";
 
 export interface TaxCalculationResult {
   grossSalary: number;
@@ -8,13 +12,15 @@ export interface TaxCalculationResult {
   socsoEmployer: number;
   eisEmployee: number;
   eisEmployer: number;
+  skbbkEmployee: number;    // new
+  skbbkEmployer: number;    // new
   pcbTax: number;
   netSalary: number;
   totalEmployerCost: number;
 }
 
 export class MalaysianTaxCalculator {
-  // 2024 Tax Rates
+  // 2026 Tax Rates (EPF, SOCSO, EIS unchanged; SKBBK added)
   private static readonly TAX_RATES = {
     EPF: {
       EMPLOYEE_RATE: 0.11,
@@ -53,7 +59,13 @@ export class MalaysianTaxCalculator {
       EMPLOYER_RATE: 0.002,
       CEILING: 4000,
     },
-    PCB: [
+    SKBBK: {
+      // Placeholder rates – update with actual 2026 rates
+      EMPLOYEE_RATE: 0.001,   // 0.1%
+      EMPLOYER_RATE: 0.001,   // 0.1%
+      CEILING: 4000,
+    },
+    PCB: [ // 2026 brackets (unchanged from 2025)
       { min: 0, max: 5000, rate: 0, cumulativeTax: 0 },
       { min: 5000.01, max: 20000, rate: 0.01, cumulativeTax: 0 },
       { min: 20000.01, max: 35000, rate: 0.03, cumulativeTax: 150 },
@@ -63,7 +75,7 @@ export class MalaysianTaxCalculator {
       { min: 100000.01, max: 400000, rate: 0.24, cumulativeTax: 10700 },
       { min: 400000.01, max: 600000, rate: 0.245, cumulativeTax: 82700 },
       { min: 600000.01, max: 2000000, rate: 0.25, cumulativeTax: 131700 },
-      { min: 2000000.01, max: Infinity, rate: 0.3, cumulativeTax: 481700 },
+      { min: 2000000.01, max: Infinity, rate: 0.30, cumulativeTax: 481700 },
     ],
     SST: {
       STANDARD_RATE: 0.06,
@@ -76,7 +88,7 @@ export class MalaysianTaxCalculator {
     grossSalary: number,
     isResident: boolean = true,
   ): TaxCalculationResult {
-    // EPF Calculation
+    // EPF
     const epfEmployee = Math.min(
       grossSalary * this.TAX_RATES.EPF.EMPLOYEE_RATE,
       this.TAX_RATES.EPF.CEILING * this.TAX_RATES.EPF.EMPLOYEE_RATE,
@@ -86,14 +98,14 @@ export class MalaysianTaxCalculator {
       this.TAX_RATES.EPF.CEILING * this.TAX_RATES.EPF.EMPLOYER_RATE,
     );
 
-    // SOCSO Calculation
+    // SOCSO
     const socsoEmployee = this.calculateSOCSO(grossSalary, "employee");
     const socsoEmployer = Math.min(
       grossSalary * this.TAX_RATES.SOCSO.EMPLOYER_RATE,
       this.TAX_RATES.SOCSO.CEILING * this.TAX_RATES.SOCSO.EMPLOYER_RATE,
     );
 
-    // EIS Calculation
+    // EIS
     const eisEmployee = Math.min(
       grossSalary * this.TAX_RATES.EIS.EMPLOYEE_RATE,
       this.TAX_RATES.EIS.CEILING * this.TAX_RATES.EIS.EMPLOYEE_RATE,
@@ -103,20 +115,39 @@ export class MalaysianTaxCalculator {
       this.TAX_RATES.EIS.CEILING * this.TAX_RATES.EIS.EMPLOYER_RATE,
     );
 
-    // PCB Tax Calculation (annual basis)
+    // SKBBK (new)
+    const skbbkEmployee = Math.min(
+      grossSalary * this.TAX_RATES.SKBBK.EMPLOYEE_RATE,
+      this.TAX_RATES.SKBBK.CEILING * this.TAX_RATES.SKBBK.EMPLOYEE_RATE,
+    );
+    const skbbkEmployer = Math.min(
+      grossSalary * this.TAX_RATES.SKBBK.EMPLOYER_RATE,
+      this.TAX_RATES.SKBBK.CEILING * this.TAX_RATES.SKBBK.EMPLOYER_RATE,
+    );
+
+    // PCB
     const annualSalary = grossSalary * 12;
     const annualEPF = epfEmployee * 12;
     const taxableIncome = annualSalary - annualEPF;
     const annualPCB = this.calculatePCB(taxableIncome, isResident);
     const pcbTax = annualPCB / 12;
 
-    // Net Salary
+    // Net Salary (deduct employee contributions)
     const netSalary =
-      grossSalary - epfEmployee - socsoEmployee - eisEmployee - pcbTax;
+      grossSalary -
+      epfEmployee -
+      socsoEmployee -
+      eisEmployee -
+      skbbkEmployee -
+      pcbTax;
 
     // Total Employer Cost
     const totalEmployerCost =
-      grossSalary + epfEmployer + socsoEmployer + eisEmployer;
+      grossSalary +
+      epfEmployer +
+      socsoEmployer +
+      eisEmployer +
+      skbbkEmployer;
 
     return {
       grossSalary: Math.round(grossSalary * 100) / 100,
@@ -126,6 +157,8 @@ export class MalaysianTaxCalculator {
       socsoEmployer: Math.round(socsoEmployer * 100) / 100,
       eisEmployee: Math.round(eisEmployee * 100) / 100,
       eisEmployer: Math.round(eisEmployer * 100) / 100,
+      skbbkEmployee: Math.round(skbbkEmployee * 100) / 100,
+      skbbkEmployer: Math.round(skbbkEmployer * 100) / 100,
       pcbTax: Math.round(pcbTax * 100) / 100,
       netSalary: Math.round(netSalary * 100) / 100,
       totalEmployerCost: Math.round(totalEmployerCost * 100) / 100,
@@ -152,10 +185,7 @@ export class MalaysianTaxCalculator {
     return salary * 0.1; // Maximum rate
   }
 
-  private static calculatePCB(
-    annualIncome: number,
-    isResident: boolean,
-  ): number {
+  private static calculatePCB(annualIncome: number, isResident: boolean): number {
     if (!isResident) {
       return annualIncome * 0.28; // Non-resident flat rate
     }
@@ -185,31 +215,16 @@ export class MalaysianTaxCalculator {
     return amount * rate;
   }
 
-  static calculateForeignWorkerLevy(
-    category: string,
-    duration: number = 12,
-  ): number {
-    const levyRates: Record<string, number> = {
-      manufacturing: 1850, // Annual levy
-      construction: 1850,
-      plantation: 590,
-      agriculture: 590,
-      services: 1850,
-      domestic: 410,
-    };
-
-    const annualLevy = levyRates[category.toLowerCase()] || 1850;
+  static calculateForeignWorkerLevy(category: string, duration: number = 12): number {
+    const annualLevy = BASE_LEVY_SECTOR[category.toLowerCase()] ?? 1850;
     return (annualLevy / 12) * duration;
   }
 
-  static generatePayslip(
-    calculation: TaxCalculationResult,
-    workerInfo: any,
-  ): any {
+  static generatePayslip(calculation: TaxCalculationResult, workerInfo: unknown): any {
     return {
-      workerName: workerInfo.name,
-      workerId: workerInfo.id,
-      payPeriod: new Date().toISOString().slice(0, 7), // YYYY-MM
+      workerName: (workerInfo as any).name,
+      workerId: (workerInfo as any).id,
+      payPeriod: new Date().toISOString().slice(0, 7),
       earnings: {
         basicSalary: calculation.grossSalary,
         overtime: 0,
@@ -220,11 +235,13 @@ export class MalaysianTaxCalculator {
         epf: calculation.epfEmployee,
         socso: calculation.socsoEmployee,
         eis: calculation.eisEmployee,
+        skbbk: calculation.skbbkEmployee,
         pcb: calculation.pcbTax,
         totalDeductions:
           calculation.epfEmployee +
           calculation.socsoEmployee +
           calculation.eisEmployee +
+          calculation.skbbkEmployee +
           calculation.pcbTax,
       },
       netPay: calculation.netSalary,
@@ -232,6 +249,7 @@ export class MalaysianTaxCalculator {
         epf: calculation.epfEmployer,
         socso: calculation.socsoEmployer,
         eis: calculation.eisEmployer,
+        skbbk: calculation.skbbkEmployer,
         totalEmployerCost: calculation.totalEmployerCost,
       },
       generatedAt: new Date().toISOString(),
@@ -244,34 +262,25 @@ export class MalaysianTaxCalculator {
   } {
     const errors: string[] = [];
 
-    // Validate EPF
     if (calculation.epfEmployee < 0 || calculation.epfEmployer < 0) {
       errors.push("EPF contributions cannot be negative");
     }
-
-    // Validate SOCSO
     if (calculation.socsoEmployee < 0 || calculation.socsoEmployer < 0) {
       errors.push("SOCSO contributions cannot be negative");
     }
-
-    // Validate EIS
     if (calculation.eisEmployee < 0 || calculation.eisEmployer < 0) {
       errors.push("EIS contributions cannot be negative");
     }
-
-    // Validate PCB
+    if (calculation.skbbkEmployee < 0 || calculation.skbbkEmployer < 0) {
+      errors.push("SKBBK contributions cannot be negative");
+    }
     if (calculation.pcbTax < 0) {
       errors.push("PCB tax cannot be negative");
     }
-
-    // Validate net salary
     if (calculation.netSalary <= 0) {
       errors.push("Net salary must be positive");
     }
 
-    return {
-      isValid: errors.length === 0,
-      errors,
-    };
+    return { isValid: errors.length === 0, errors };
   }
 }

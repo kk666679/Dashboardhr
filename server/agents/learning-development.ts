@@ -35,12 +35,16 @@ const TRAINING_CATALOG: Record<string, string[]> = {
 
 export async function learningDevelopmentAgent(
   input: string,
+  tenantId: string,
   employeeId?: string,
 ) {
   try {
     const employee = employeeId
-      ? await prisma.employee.findUnique({ where: { id: employeeId } })
-      : await prisma.employee.findFirst();
+      ? await prisma.employee.findUnique({ where: { id: employeeId, tenantId } })
+      : await prisma.employee.findFirst({
+          where: { tenantId },
+          orderBy: { createdAt: "desc" },
+        });
 
     const dept = employee?.department ?? "default";
     const catalog = TRAINING_CATALOG[dept] ?? TRAINING_CATALOG.default;

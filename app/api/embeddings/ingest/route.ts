@@ -13,6 +13,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
+import { getCurrentSession } from "@/lib/server/auth";
 
 const IngestSchema = z.object({
   documentId: z.string().min(1),
@@ -22,8 +23,23 @@ const IngestSchema = z.object({
 export const runtime = "nodejs";
 
 export async function POST(req: NextRequest) {
+  // Auth check — tenant ownership verified before overwriting document text
+  const session = await getCurrentSession();
+  if (!session) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   try {
     const body = IngestSchema.parse(await req.json());
+
+    // Verify document belongs to this tenant before updating
+    const existing = await prisma.document.findFirst({
+      where: { id: body.documentId, tenantId: session.tenantId },
+      select: { id: true },
+    });
+    if (!existing) {
+      return NextResponse.json({ error: "Document not found" }, { status: 404 });
+    }
 
     const doc = await prisma.document.update({
       where: { id: body.documentId },
