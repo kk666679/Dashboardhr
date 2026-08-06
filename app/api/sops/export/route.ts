@@ -1,7 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { getCurrentSession } from '@/lib/server/auth';
 import { exportSopToMarkdown, exportSopToHtml } from '@/lib/sop/export';
 
 export async function GET(request: NextRequest) {
+  const session = await getCurrentSession();
+  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
   const searchParams = request.nextUrl.searchParams;
   const sopId = searchParams.get('sopId');
   const version = parseInt(searchParams.get('version') || '1');
@@ -14,16 +18,11 @@ export async function GET(request: NextRequest) {
   try {
     if (format === 'html') {
       const html = await exportSopToHtml(sopId, version);
-      return new NextResponse(html, {
-        headers: { 'Content-Type': 'text/html' },
-      });
-    } else {
-      const markdown = await exportSopToMarkdown(sopId, version);
-      return new NextResponse(markdown, {
-        headers: { 'Content-Type': 'text/markdown' },
-      });
+      return new NextResponse(html, { headers: { 'Content-Type': 'text/html' } });
     }
-  } catch (error) {
+    const markdown = await exportSopToMarkdown(sopId, version);
+    return new NextResponse(markdown, { headers: { 'Content-Type': 'text/markdown' } });
+  } catch {
     return NextResponse.json({ error: 'Export failed' }, { status: 500 });
   }
 }

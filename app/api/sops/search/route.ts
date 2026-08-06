@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-
+import { getCurrentSession } from "@/lib/server/auth";
 import { searchSops, findRelatedSops } from "@/lib/sop/search";
 
 const SearchQuerySchema = z.object({
@@ -9,6 +9,9 @@ const SearchQuerySchema = z.object({
 });
 
 export async function POST(request: NextRequest) {
+  const session = await getCurrentSession();
+  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
   let body: z.infer<typeof SearchQuerySchema>;
   try {
     body = SearchQuerySchema.parse(await request.json());
@@ -20,8 +23,10 @@ export async function POST(request: NextRequest) {
   return NextResponse.json({ results });
 }
 
-// Convenience GET: /api/sops/search?q=...&limit=...
 export async function GET(request: NextRequest) {
+  const session = await getCurrentSession();
+  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
   const url = new URL(request.url);
   const q = url.searchParams.get("q") ?? "";
   const limitRaw = url.searchParams.get("limit");
@@ -32,7 +37,9 @@ export async function GET(request: NextRequest) {
 }
 
 export async function PUT(request: NextRequest) {
-  // Convenience related: body { sopId, limit }
+  const session = await getCurrentSession();
+  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
   const body = z
     .object({
       sopId: z.string().min(1),
@@ -43,4 +50,3 @@ export async function PUT(request: NextRequest) {
   const results = await findRelatedSops(body.sopId, body.limit);
   return NextResponse.json({ results });
 }
-

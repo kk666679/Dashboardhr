@@ -41,8 +41,7 @@ async function retrieveVectorChunks(query: string, tenantId?: string): Promise<R
       id: row.id,
       source: row.metadata?.source || `embedding:${row.id.slice(0, 8)}`,
       text: row.metadata?.content || '[No content stored]',
-      score: 1 - row.distance, // convert distance to similarity
-      score: 1 - row.distance,
+score: 1 - row.distance, // convert distance to similarity
       metadata: row.metadata,
     }));
   } catch (error) {
