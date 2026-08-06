@@ -1,13 +1,9 @@
-﻿"use client";
-/**
- * MSS Dashboard
- * Team summary: headcount, attendance, pending approvals, attrition risks.
- */
+"use client";
 import { trpc } from "@/lib/trpc";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Users, Calendar, AlertTriangle, CheckSquare, TrendingDown, TrendingUp, Loader2 } from "lucide-react";
+import { Users, Calendar, CheckSquare, TrendingDown, TrendingUp, Loader2, Zap, Brain, Lightbulb, Heart, GraduationCap, Target } from "lucide-react";
 import Link from "next/link";
 
 export default function MssDashboardPage() {
@@ -37,9 +33,16 @@ export default function MssDashboardPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-slate-900">Manager Dashboard</h1>
-        <p className="text-sm text-muted-foreground">Your team overview for today</p>
+      <div className="flex items-start justify-between">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">Manager Self-Service</h1>
+          <p className="text-sm text-muted-foreground mt-0.5">2026 Workforce Command Center · {new Date().toLocaleDateString("en-MY", { weekday: "long", day: "numeric", month: "long" })}</p>
+        </div>
+        <Link href="/mss/command-center">
+          <Button size="sm" className="bg-violet-600 hover:bg-violet-700 text-xs">
+            <Zap className="h-3.5 w-3.5 mr-1.5" /> Command Center
+          </Button>
+        </Link>
       </div>
 
       {/* KPI cards */}
@@ -131,21 +134,31 @@ export default function MssDashboardPage() {
         </CardContent>
       </Card>
 
-      {/* Quick links */}
-      <div className="grid grid-cols-2 gap-3">
-        {[
-          { href: "/mss/team", label: "View Team", icon: Users },
-          { href: "/mss/performance", label: "Performance", icon: TrendingUp },
-          { href: "/mss/approvals", label: "Approvals", icon: CheckSquare },
-          { href: "/mss/attendance", label: "Attendance", icon: Calendar },
-        ].map(({ href, label, icon: Icon }) => (
-          <Link key={href} href={href}>
-            <Card className="hover:shadow-md transition-shadow cursor-pointer h-full p-3 flex items-center gap-3">
-              <Icon className="h-5 w-5 text-primary flex-shrink-0" />
-              <span className="text-sm font-medium">{label}</span>
-            </Card>
-          </Link>
-        ))}
+      {/* Quick links — 2026 expanded */}
+      <div>
+        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Quick Access</p>
+        <div className="grid grid-cols-2 gap-2">
+          {[
+            { href: "/mss/command-center", label: "Command Center", icon: Zap, color: "text-violet-600", badge: "AI" },
+            { href: "/mss/ai-assistant", label: "AI Assistant", icon: Brain, color: "text-indigo-600", badge: "New" },
+            { href: "/mss/team", label: "My Team", icon: Users, color: "text-blue-600" },
+            { href: "/mss/approvals", label: "Approvals", icon: CheckSquare, color: "text-orange-600" },
+            { href: "/mss/workforce-planning", label: "Workforce Planning", icon: Lightbulb, color: "text-amber-600" },
+            { href: "/mss/analytics", label: "Analytics", icon: TrendingUp, color: "text-emerald-600" },
+            { href: "/mss/experience", label: "Experience", icon: Heart, color: "text-rose-600" },
+            { href: "/mss/talent", label: "Talent & Growth", icon: GraduationCap, color: "text-teal-600" },
+            { href: "/mss/feedback", label: "Feedback", icon: Target, color: "text-cyan-600" },
+            { href: "/mss/attendance", label: "Attendance", icon: Calendar, color: "text-green-600" },
+          ].map(({ href, label, icon: Icon, color, badge }) => (
+            <Link key={href} href={href}>
+              <Card className="hover:shadow-md transition-shadow cursor-pointer h-full p-3 flex items-center gap-2.5">
+                <Icon className={`h-4 w-4 flex-shrink-0 ${color}`} />
+                <span className="text-sm font-medium flex-1">{label}</span>
+                {badge && <Badge className="text-[9px] h-4 px-1 bg-violet-100 text-violet-700 dark:bg-violet-900/40 dark:text-violet-300 border-0">{badge}</Badge>}
+              </Card>
+            </Link>
+          ))}
+        </div>
       </div>
     </div>
   );

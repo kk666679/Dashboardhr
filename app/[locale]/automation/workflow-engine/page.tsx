@@ -3,11 +3,12 @@
 /**
  * Workflow Engine Page
  *
- * Replaced standalone ReactFlow with the shared FlowDesigner component.
+ * Replaced standalone ReactFlow with the shared FlowStudio component.
  * This integrates with the unified automation state management and
- * provides all canvas tools, palette, properties panel, and keyboard shortcuts.
+ * provides all canvas tools, palette, properties panel, AI copilot,
+ * execution panel, version history, and responsive mobile sheets.
  *
- * @see FlowDesigner (shared base)
+ * @see FlowStudio (shared base)
  */
 
 import { useCallback } from "react";
@@ -35,7 +36,7 @@ export default function WorkflowEnginePage() {
     [toast]
   );
 
-return (
+  return (
     <div className="h-[calc(100vh-4rem)] flex flex-col">
       <FlowStudio
         onWorkflowExecute={handleExecute}
@@ -45,4 +46,3 @@ return (
     </div>
   );
 }
-

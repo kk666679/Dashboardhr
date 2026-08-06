@@ -10,7 +10,7 @@ export default function KbChatPage() {
   return (
     <div className="p-6">
       <h1 className="text-2xl font-bold mb-6">Knowledge Base Chat</h1>
-      <KbAssistantWidget />
+<KbAssistantWidget variant="alwaysOpen" />
     </div>
   );
 }

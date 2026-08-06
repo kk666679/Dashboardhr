@@ -1,4 +1,3 @@
-
 "use client";
 
 /**
@@ -25,7 +24,7 @@ function FlowStudioPageInner() {
     setHasMounted(true);
     const template = searchParams.get("template") ?? undefined;
     const standard = searchParams.get("standard") ?? undefined;
-setParams({ template, standard });
+    setParams({ template, standard });
   }, []); // run once on mount
 
   if (!hasMounted) {
