@@ -1,16 +1,4 @@
 import * as L from 'leaflet';
-<<<<<<< HEAD
-import type { GeoJsonObject, Feature, Geometry, GeoJsonProperties } from 'geojson';
-import type { HrGeoJsonProperties } from '@/types/geolocation';
-
-export function addGeoJsonToMap(
-  geoJsonData: GeoJsonObject, 
-  map: L.Map
-): L.GeoJSON {
-  const geoJsonLayer = L.geoJSON(geoJsonData, {
-    onEachFeature: (feature: Feature<Geometry, GeoJsonProperties>, layer: L.Layer) => {
-      const props = feature.properties;
-=======
 import type { GeoJsonObject, Feature, Geometry } from 'geojson';
 
 // HR-specific GeoJSON properties — standalone interface (not extending nullable GeoJsonProperties)
@@ -30,18 +18,12 @@ export function addGeoJsonToMap(
   const geoJsonLayer = L.geoJSON(geoJsonData, {
     onEachFeature: (feature: Feature<Geometry, HrGeoJsonProperties | null | undefined>, layer: L.Layer) => {
       const props = feature.properties as HrGeoJsonProperties | null | undefined;
->>>>>>> 237f310 (Add libraries, services and application logic)
       if (!props) return;
       if (props.popupContent) {
         layer.bindPopup(props.popupContent);
       }
-<<<<<<< HEAD
-      if ((props as HrGeoJsonProperties).name) {
-        layer.bindTooltip((props as HrGeoJsonProperties).name, { permanent: false, direction: 'top' });
-=======
       if (props.name) {
         layer.bindTooltip(props.name, { permanent: false, direction: 'top' });
->>>>>>> 237f310 (Add libraries, services and application logic)
       }
     },
     style: (feature?: { properties?: { type?: string } }) => {
@@ -62,32 +44,16 @@ export function addGeoJsonToMap(
   return geoJsonLayer;
 }
 
-<<<<<<< HEAD
-// Example HR office point feature (NYC -> KL)
-export const exampleOfficeLocation: Feature<any> = {
-  type: 'Feature' as const,
-  geometry: {
-    type: 'Point' as const,
-    coordinates: [101.6869, 3.1390] // KL coordinates
-=======
 // Example HR office point feature (KL)
 export const exampleOfficeLocation: Feature<{ type: 'Point'; coordinates: number[] }, HrGeoJsonProperties> = {
   type: 'Feature' as const,
   geometry: {
     type: 'Point' as const,
     coordinates: [101.6869, 3.1390]
->>>>>>> 237f310 (Add libraries, services and application logic)
   },
   properties: {
     name: 'KL Head Office',
     popupContent: '<b>Kuala Lumpur Office</b><br>Foreign Worker Management HQ (PDPA Compliant)'
-<<<<<<< HEAD
-  } as HrGeoJsonProperties
-};
-
-// Malaysian worksite geofences example
-export const malaysiaWorksiteGeofences: GeoJSON.FeatureCollection<any, HrGeoJsonProperties> = {
-=======
   }
 };
 
@@ -96,7 +62,6 @@ export const malaysiaWorksiteGeofences: {
   type: 'FeatureCollection';
   features: Array<Feature<{ type: 'Polygon'; coordinates: number[][][] }, HrGeoJsonProperties>>;
 } = {
->>>>>>> 237f310 (Add libraries, services and application logic)
   type: 'FeatureCollection' as const,
   features: [
     {
@@ -113,13 +78,8 @@ export const malaysiaWorksiteGeofences: {
       },
       properties: {
         name: 'Selangor Worksite A (JTK Approved)',
-<<<<<<< HEAD
-        type: 'worksite' as const,
-        status: 'active' as const,
-=======
         type: 'worksite',
         status: 'active',
->>>>>>> 237f310 (Add libraries, services and application logic)
         workerCount: 45
       }
     },
@@ -137,19 +97,10 @@ export const malaysiaWorksiteGeofences: {
       },
       properties: {
         name: 'KL Accommodation Zone',
-<<<<<<< HEAD
-        type: 'accommodation' as const,
-        status: 'active' as const,
-=======
         type: 'accommodation',
         status: 'active',
->>>>>>> 237f310 (Add libraries, services and application logic)
         workerCount: 120
       }
     }
   ]
 };
-<<<<<<< HEAD
-
-=======
->>>>>>> 237f310 (Add libraries, services and application logic)

@@ -79,11 +79,7 @@ export function getAllKbDocs(limit = 100, tenantId?: TenantId): KbDocument[] {
 export function kbStats() {
   return {
     totalDocs: kbStore.size,
-<<<<<<< HEAD
-    avgEmbeddingDim: kbStore.size > 0 ? kbStore.values().next().value.embedding.length : 0,
-=======
     avgEmbeddingDim: kbStore.size > 0 ? (kbStore.values().next().value?.embedding?.length ?? 0) : 0,
->>>>>>> 237f310 (Add libraries, services and application logic)
   };
 }
 
@@ -92,4 +88,3 @@ export async function preloadKb() {
   // Loader will populate; this ensures store init
   return kbStats();
 }
-

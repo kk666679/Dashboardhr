@@ -268,9 +268,6 @@ async function detectIntents(
 
 // ── Dispatcher ─────────────────────────────────────────────────────────────────
 
-<<<<<<< HEAD
-function dispatch(intent: AgentKey, input: string, employeeId?: string) {
-=======
 /**
  * Dispatch to the correct agent.
  *
@@ -287,7 +284,6 @@ function dispatch(
   employeeId?: string,
 ) {
   const eid = employeeId ?? "";
->>>>>>> 237f310 (Add libraries, services and application logic)
   switch (intent) {
     case "PAYROLL":
       return payrollAgent(input, employeeId);
@@ -296,37 +292,6 @@ function dispatch(
     case "IMMIGRATION":
       return immigrationAgent(input, employeeId);
     case "FOMEMA":
-<<<<<<< HEAD
-      return fomemaAgent(input, employeeId);
-    case "LEVY":
-      return levyAgent(input, employeeId);
-    case "TALENT_ACQUISITION":
-      return talentAcquisitionAgent(input);
-    case "COMPENSATION_BENEFITS":
-      return compensationBenefitsAgent(input, employeeId);
-    case "EMPLOYEE_RELATIONS":
-      return employeeRelationsAgent(input, employeeId);
-    case "LEARNING_DEVELOPMENT":
-      return learningDevelopmentAgent(input, employeeId);
-    case "INDUSTRIAL_RELATIONS":
-      return industrialRelationsAgent(input, employeeId);
-    case "HR_ANALYTICS":
-      return hrAnalyticsAgent(input);
-    case "SUCCESSION_PLANNING":
-      return successionPlanningAgent(input);
-    case "HR_COMPLIANCE":
-      return hrComplianceAgent(input);
-    case "HR_QUALITY_MANAGEMENT":
-      return hrQualityManagementAgent(input);
-    case "EMPLOYER_BRANDING":
-      return employerBrandingAgent(input);
-    case "FOREIGN_WORKER_EXPATRIATE":
-      return foreignWorkerExpatriateAgent(input, employeeId);
-  }
-}
-
-export async function runHrOrchestrator(input: string, employeeId?: string) {
-=======
       return fomemaAgent(input, tenantId, eid);
     case "LEVY":
       return levyAgent(input, employeeId, tenantId);
@@ -360,7 +325,6 @@ export async function runHrOrchestrator(
   tenantId: string,
   employeeId?: string,
 ) {
->>>>>>> 237f310 (Add libraries, services and application logic)
   const intents = await detectIntents(input);
 
   if (!intents.length) {
@@ -373,11 +337,7 @@ export async function runHrOrchestrator(
   }
 
   const results = await Promise.all(
-<<<<<<< HEAD
-    intents.map((intent) => dispatch(intent, input, employeeId)),
-=======
     intents.map((intent) => dispatch(intent, input, tenantId, employeeId)),
->>>>>>> 237f310 (Add libraries, services and application logic)
   );
   return results.filter(Boolean);
 }

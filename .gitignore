@@ -9,7 +9,6 @@ out/
 dist/
 build/
 
-# env
 .env
 .env.local
 
@@ -18,14 +17,8 @@ build/
 
 # TypeScript
 *.tsbuildinfo
-.vercel
 .env*
-<<<<<<< HEAD
-components
-lib
-hooks
-=======
-.claude/
+
 
 # Compiled TypeScript artifacts (lib/ — Next.js/Turbopack compiles .ts directly)
 lib/**/*.js
@@ -38,4 +31,4 @@ lib/**/*.d.ts.map
 
 .openclaw
 WindowDownloader
->>>>>>> 2cd618c (refactor: update existing files)
+.vercel
