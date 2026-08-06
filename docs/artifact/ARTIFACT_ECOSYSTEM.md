@@ -155,29 +155,52 @@ To achieve enterprise scalability, the artifact storage is tiered based on acces
 
 ```mermaid
 flowchart TD
-    subgraph Tier1["🔥 Hot Tier (Redis / Elasticsearch)"]
-        Active["Active Workflows / Plans"]
-        Cache["Recent Executions (30d)"]
-        Index["Search Index"]
+    subgraph Tier1["🔥 Hot Tier (LD Live Traversal) - Redis / Elasticsearch"]
+        ActiveNodes["Active DAG Nodes (Workflows / Plans)"]
+        ExecCheck["Executing Checkpoints (Writable LD leaves)"]
+        Cache["Recent Executions (30d - Hot DAG cache)"]
+        SearchIdx["LD Search Index (DAG-aware full-text)"]
     end
-    subgraph Tier2["💧 Warm Tier (PostgreSQL / MongoDB)"]
-        Historical["Completed Executions (2yrs)"]
-        SOPs["Published SOPs"]
-        Audit_Full["Audit Logs (Online)"]
+
+    subgraph Tier2["💧 Warm Tier (LD Traversable History) - PostgreSQL / MongoDB"]
+        Historical["Completed DAG Branches (2yrs)"]
+        DeprecatedSOPs["Deprecated SOPs (Still traversable)"]
+        Audit_Full["Audit Logs (LD Terminal Leaves - Immutable)"]
     end
-    subgraph Tier3["❄️ Cold Tier (S3 / Glacier / Parquet)"]
-        Archived["Archived Artifacts"]
-        Legal["Legal Hold Data"]
-        Large_Blobs["Conversation Transcripts"]
+
+    subgraph Tier3["❄️ Cold Tier (LD Pruned Nodes) - S3 / Glacier / Parquet"]
+        Archived["Archived DAG Leaves (Excluded from live walks)"]
+        Legal["Legal Hold (Frozen DAG snapshot)"]
+        Large_Blobs["Conversation Transcripts (DAG Root origins)"]
     end
-    subgraph Special["🧠 Vector Tier (Pinecone / Weaviate)"]
-        Embeddings["Knowledge Embeddings"]
-        RAG_Context["Semantic Retrieval Corpus"]
+
+    subgraph Special["🧠 Vector Tier (LD Semantic Context) - Pinecone / Weaviate"]
+        Embeddings["Knowledge Embeddings (DAG-aware RAG)"]
+        RAG_Context["Semantic Retrieval Corpus (LD enriched)"]
     end
-    API["Artifact API / SDK"] --> Tier1
-    Tier1 -->|Auto-archive after 30d| Tier2
-    Tier2 -->|Scheduled job (cron)| Tier3
-    Special -->|Retrieved by| AI["AI Reasoning Engine"]
+
+    API["Artifact API / SDK (LD-aware)"] -->|"Writes/Reads"| Tier1
+
+    %% LD Lifecycle State Transitions (The "L" in LD)
+    Tier1 -->|"State: Active → Completed (Auto-archive after 30d)"| Tier2
+    Tier2 -->|"State: Deprecated/Completed → Archived (Scheduled purge)"| Tier3
+
+    %% LD DAG Traversal Rules (The "D" in LD)
+    Tier1 -.->|"Primary DAG Traversal (Live nodes only)"| DAG_Engine["⚙️ LD Sync Engine (DAG Walker)"]
+    Tier2 -.->|"Secondary DAG Traversal (Historical branches)"| DAG_Engine
+    Tier3 -.-|"❌ Excluded from live DAG walks"| DAG_Engine
+
+    %% Vector / AI Feedback Loop
+    Special -->|"Retrieved by (semantic RAG queries)"| AI["🧠 AI Reasoning Engine"]
+    AI -->|"Generates new LD DAG branches"| Tier1
+
+    %% Styling for clarity
+    style Tier1 fill:#ff6b6b,color:#000
+    style Tier2 fill:#4dabf7,color:#000
+    style Tier3 fill:#adb5bd,color:#000
+    style Special fill:#9775fa,color:#000
+    style DAG_Engine fill:#ffe066,color:#000
+    style AI fill:#20c997,color:#000
 ```
 
 ---

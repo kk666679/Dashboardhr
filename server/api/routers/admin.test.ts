@@ -73,12 +73,12 @@ async function callQuery(mockFn: ReturnType<typeof vi.fn>, returnVal: unknown, f
 // ─── user.getAll ──────────────────────────────────────────────────────────────
 
 describe("adminRouter.user.getAll", () => {
-  const findMany = prisma.user.findMany as ReturnType<typeof vi.fn>;
+  const findMany = prisma.user.findMany;
   beforeEach(() => vi.clearAllMocks());
 
   it("queries with tenantId scope", async () => {
     findMany.mockResolvedValue([]);
-    await (prisma.user.findMany as ReturnType<typeof vi.fn>)({
+    await prisma.user.findMany({
       where: { tenantId },
       select: { id: true },
       orderBy: { createdAt: "desc" },
@@ -99,7 +99,7 @@ describe("adminRouter.user.getAll", () => {
 // ─── user.getById ─────────────────────────────────────────────────────────────
 
 describe("adminRouter.user.getById", () => {
-  const findFirst = prisma.user.findFirst as ReturnType<typeof vi.fn>;
+  const findFirst = prisma.user.findFirst;
   beforeEach(() => vi.clearAllMocks());
 
   it("scopes query to tenantId + id", async () => {
@@ -121,8 +121,8 @@ describe("adminRouter.user.getById", () => {
 // ─── user.create — CONFLICT guard ────────────────────────────────────────────
 
 describe("adminRouter.user.create — conflict detection", () => {
-  const findUnique = prisma.user.findUnique as ReturnType<typeof vi.fn>;
-  const create = prisma.user.create as ReturnType<typeof vi.fn>;
+  const findUnique = prisma.user.findUnique;
+  const create = prisma.user.create;
   beforeEach(() => vi.clearAllMocks());
 
   it("proceeds when email is unique", async () => {
@@ -148,8 +148,8 @@ describe("adminRouter.user.create — conflict detection", () => {
 // ─── user.delete — soft delete ────────────────────────────────────────────────
 
 describe("adminRouter.user.delete — soft delete", () => {
-  const findFirst = prisma.user.findFirst as ReturnType<typeof vi.fn>;
-  const update = prisma.user.update as ReturnType<typeof vi.fn>;
+  const findFirst = prisma.user.findFirst;
+  const update = prisma.user.update;
   beforeEach(() => vi.clearAllMocks());
 
   it("soft-deletes by setting deletedAt and isActive=false", async () => {
@@ -172,7 +172,7 @@ describe("adminRouter.user.delete — soft delete", () => {
 // ─── permission.getAll ────────────────────────────────────────────────────────
 
 describe("adminRouter.permission.getAll", () => {
-  const findMany = prisma.featureFlag.findMany as ReturnType<typeof vi.fn>;
+  const findMany = prisma.featureFlag.findMany;
   beforeEach(() => vi.clearAllMocks());
 
   it("returns feature flags scoped to tenant", async () => {
@@ -186,8 +186,8 @@ describe("adminRouter.permission.getAll", () => {
 // ─── permission.toggle ────────────────────────────────────────────────────────
 
 describe("adminRouter.permission.toggle", () => {
-  const findFirst = prisma.featureFlag.findFirst as ReturnType<typeof vi.fn>;
-  const update = prisma.featureFlag.update as ReturnType<typeof vi.fn>;
+  const findFirst = prisma.featureFlag.findFirst;
+  const update = prisma.featureFlag.update;
   beforeEach(() => vi.clearAllMocks());
 
   it("toggles enabled flag from true to false", async () => {
@@ -215,9 +215,9 @@ describe("adminRouter.system.getStatus", () => {
   beforeEach(() => vi.clearAllMocks());
 
   it("aggregates counts across user, employee, and auditTrail", async () => {
-    (prisma.user.count as ReturnType<typeof vi.fn>).mockResolvedValue(10);
-    (prisma.employee.count as ReturnType<typeof vi.fn>).mockResolvedValue(8);
-    (prisma.auditTrail.count as ReturnType<typeof vi.fn>)
+    prisma.user.count.mockResolvedValue(10);
+    prisma.employee.count.mockResolvedValue(8);
+    prisma.auditTrail.count
       .mockResolvedValueOnce(200)   // total
       .mockResolvedValueOnce(5);    // last 24h
 
@@ -238,7 +238,7 @@ describe("adminRouter.system.getStatus", () => {
 // ─── audit.getAll — tenant scope ──────────────────────────────────────────────
 
 describe("adminRouter.audit.getAll", () => {
-  const findMany = prisma.auditTrail.findMany as ReturnType<typeof vi.fn>;
+  const findMany = prisma.auditTrail.findMany;
   beforeEach(() => vi.clearAllMocks());
 
   it("fetches audit trail scoped to tenant, ordered desc, limited to 100", async () => {
