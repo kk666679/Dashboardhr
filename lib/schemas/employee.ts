@@ -161,30 +161,7 @@ export type TerminationFilters = z.infer<typeof TerminationFiltersSchema>;
 
 // ── Payroll (employee perspective) ────────────────────────────────────────────
 
-export const CreatePayrollSchema = z.object({
-  workerId: z.string(),
-  payPeriod: z.string().regex(/^\d{4}-\d{2}$/),
-  basicSalary: z.number().positive(),
-  overtimeHours: z.number().nonnegative(),
-  overtimeRate: z.number().positive(),
-  overtimePay: z.number().nonnegative(),
-  allowances: z.array(PayrollAllowanceSchema),
-  deductions: z.array(PayrollDeductionSchema),
-  grossPay: z.number().positive(),
-  netPay: z.number().nonnegative(),
-  epfEmployee: z.number().nonnegative(),
-  epfEmployer: z.number().nonnegative(),
-  socsoEmployee: z.number().nonnegative(),
-  socsoEmployer: z.number().nonnegative(),
-  eisEmployee: z.number().nonnegative(),
-  eisEmployer: z.number().nonnegative(),
-  pcbTax: z.number().nonnegative(),
-  levyAmount: z.number().nonnegative(),
-  paymentDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
-  status: z.enum(["draft", "approved", "paid"]),
-  bankAccount: z.string().optional(),
-  paymentReference: z.string().optional(),
-});
+export { CreatePayrollSchema } from "./payroll";
 
 // ── Emergency Contact & Documents ─────────────────────────────────────────────
 

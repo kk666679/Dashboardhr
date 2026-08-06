@@ -8,7 +8,7 @@
  * Requirements: 3.10
  */
 
-import { createHmac } from "crypto";
+import { createHmac, timingSafeEqual } from "crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
@@ -28,8 +28,12 @@ interface BackgroundCheckResult {
 }
 
 function verifySignature(body: string, signature: string): boolean {
-  const expected = createHmac("sha256", WEBHOOK_SECRET).update(body).digest("hex");
-  return `sha256=${expected}` === signature;
+  const expected = `sha256=${createHmac("sha256", WEBHOOK_SECRET).update(body).digest("hex")}`;
+  try {
+    return timingSafeEqual(Buffer.from(expected), Buffer.from(signature));
+  } catch {
+    return false;
+  }
 }
 
 export async function POST(request: NextRequest) {

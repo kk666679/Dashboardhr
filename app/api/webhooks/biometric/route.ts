@@ -9,7 +9,7 @@
  * Requirements: 7.1, 7.8
  */
 
-import { createHmac } from "crypto";
+import { createHmac, timingSafeEqual } from "crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { attendanceQueue } from "@/lib/queues";
 
@@ -30,10 +30,12 @@ interface BiometricEvent {
 }
 
 function verifySignature(body: string, signature: string): boolean {
-  const expected = createHmac("sha256", WEBHOOK_SECRET)
-    .update(body)
-    .digest("hex");
-  return `sha256=${expected}` === signature;
+  const expected = `sha256=${createHmac("sha256", WEBHOOK_SECRET).update(body).digest("hex")}`;
+  try {
+    return timingSafeEqual(Buffer.from(expected), Buffer.from(signature));
+  } catch {
+    return false;
+  }
 }
 
 export async function POST(request: NextRequest) {

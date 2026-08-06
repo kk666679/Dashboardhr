@@ -80,7 +80,7 @@ export async function checkComplianceStatus(
   }> = [];
 
   // Check visas
-  employee.visas.forEach((visa) => {
+  employee.visas.forEach((visa: { type: string; expiryDate: Date }) => {
     const daysLeft = Math.ceil(
       (visa.expiryDate.getTime() - now.getTime()) / (24 * 60 * 60 * 1000),
     );
@@ -109,7 +109,7 @@ export async function checkComplianceStatus(
   });
 
   // Check documents
-  employee.documents.forEach((doc) => {
+  employee.documents.forEach((doc: { type: string; expiryDate: Date | null }) => {
     if (doc.expiryDate) {
       const daysLeft = Math.ceil(
         (doc.expiryDate.getTime() - now.getTime()) / (24 * 60 * 60 * 1000),

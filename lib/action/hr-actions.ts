@@ -51,7 +51,7 @@ export async function getLeaveInfo(employeeId?: string) {
 
     // Import here to avoid client-side issues
     const { getLeaveBalance } =
-      await import("@/components/features/employee/ess/ess-service");
+      await import("@/components/features/ess/ess-service");
 
     const leaveBalances = await getLeaveBalance(empId);
 
@@ -96,7 +96,7 @@ export async function getImmigrationInfo(employeeId?: string) {
     }
 
     const visaInfo = visas
-      .map((visa) => {
+      .map((visa: any) => {
         const expiryDate = visa.expiryDate.toLocaleDateString();
         const daysUntilExpiry = Math.ceil(
           (visa.expiryDate.getTime() - new Date().getTime()) /
