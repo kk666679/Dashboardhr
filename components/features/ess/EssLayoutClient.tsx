@@ -33,7 +33,7 @@ export function EssLayoutClient({ children }: { children: React.ReactNode }) {
           <div className="flex-1" />
           <ThemeToggle />
           <Avatar className="size-7">
-            <AvatarImage src="/women.png" alt="User avatar" />
+            <AvatarImage src="/Avatar-woman.png" alt="User avatar" />
             <AvatarFallback className="text-xs bg-[var(--brand-muted)] text-[var(--brand)]">E</AvatarFallback>
           </Avatar>
         </header>
