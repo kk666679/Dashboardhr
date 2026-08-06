@@ -13,9 +13,8 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, AlertCircle } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { FlowDesigner } from "@/components/features/automation/FlowDesigner";
+import { FlowStudio } from "@/components/features/automation/flow-studio";
 import type { Edge, Node } from "@xyflow/react";
 import { getComplianceWorkflowTemplate, type ComplianceWorkflowType } from "@/lib/iso-workflow-integration";
 
@@ -161,17 +160,12 @@ function FlowDesignerInner() {
         </Alert>
       )}
 
-      {/* Designer Container */}
+{/* Designer Container */}
       <div className="flex-1 overflow-hidden">
-        <FlowDesigner
+        <FlowStudio
           initialNodes={workflowData.nodes}
           initialEdges={workflowData.edges}
           enableAI={true}
-          leftSidebarCollapsible={true}
-          rightSidebarCollapsible={true}
-          defaultEdgeType="smoothstep"
-          defaultShowMinimap={true}
-          defaultShowControls={true}
           workflowName={workflowName}
           onWorkflowExecute={handleWorkflowExecute}
           onWorkflowSave={(nodes, edges) => {

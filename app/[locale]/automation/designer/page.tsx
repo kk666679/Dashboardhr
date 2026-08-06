@@ -1,77 +1,65 @@
+
 "use client";
 
-import { Suspense } from "react";
-import Link from "next/link";
+/**
+ * Flow Studio Page
+ *
+ * The next-generation workflow designer. Renders the full Flow Studio
+ * orchestrator (canvas, palette, properties, AI copilot, execution panel,
+ * version history, command menu, responsive mobile sheets).
+ *
+ * Supports launching with a template via `/automation/designer?template=<id>`
+ * and an ISO standard via `&standard=<iso>`.
+ */
+
+import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, BookOpen, Workflow } from "lucide-react";
-import { FlowDesigner } from "@/components/features/automation/FlowDesigner";
-import { ROUTE } from "@/components/dashboard-sidebar/route-mapping";
+import { FlowStudio } from "@/components/features/automation/flow-studio";
 
-function DesignerInner() {
+function FlowStudioPageInner() {
   const searchParams = useSearchParams();
-  const flowId     = searchParams.get("flowId")   ?? undefined;
-  const templateId = searchParams.get("template") ?? undefined;
-  const standard   = searchParams.get("standard") ?? undefined;
+  const [params, setParams] = useState<{ template?: string; standard?: string }>({});
+  const [hasMounted, setHasMounted] = useState(false);
 
-  const templateLabel = templateId
-    ? templateId.replaceAll("-", " ").replace(/\b\w/g, (c) => c.toUpperCase())
-    : null;
+  useEffect(() => {
+    setHasMounted(true);
+    const template = searchParams.get("template") ?? undefined;
+    const standard = searchParams.get("standard") ?? undefined;
+setParams({ template, standard });
+  }, []); // run once on mount
+
+  if (!hasMounted) {
+    // Avoid next/navigation hooks during prerender/SSG inspection.
+    return (
+      <div className="flex h-screen items-center justify-center bg-background">
+        <div className="flex flex-col items-center gap-3">
+          <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+          <p className="text-sm text-muted-foreground">Loading Flow Studio…</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="flex h-[calc(100vh-4rem)] flex-col -m-4 md:-m-6 overflow-hidden">
-      {/* Top bar */}
-      <div className="flex items-center justify-between gap-3 border-b bg-background px-4 py-2 shrink-0">
-        <div className="flex items-center gap-2">
-          <Button variant="ghost" size="sm" asChild className="gap-1">
-            <Link href={ROUTE.dashboard.automation.root}>
-              <ArrowLeft className="h-3.5 w-3.5" />
-              Hub
-            </Link>
-          </Button>
-          <Workflow className="h-4 w-4 text-muted-foreground" />
-          <span className="font-medium text-sm">Flow Studio</span>
-          {templateLabel && (
-            <>
-              <span className="text-muted-foreground text-sm">/</span>
-              <Badge variant="secondary" className="text-xs">{templateLabel}</Badge>
-            </>
-          )}
-          {standard && (
-            <Badge variant="outline" className="text-xs">{standard}</Badge>
-          )}
-        </div>
-        {templateId && (
-          <Button variant="outline" size="sm" asChild>
-            <Link href={ROUTE.dashboard.automation.templates}>
-              <BookOpen className="mr-1 h-3.5 w-3.5" />
-              Templates
-            </Link>
-          </Button>
-        )}
-      </div>
-
-      {/* Canvas — FlowDesigner owns palette, properties, toolbar */}
-      <div className="flex-1 overflow-hidden">
-        <FlowDesigner
-          flowId={flowId}
-          template={templateId}
-          standard={standard}
-          leftSidebarCollapsible
-          rightSidebarCollapsible
-          defaultShowMinimap
-          defaultShowControls
-        />
-      </div>
+    <div className="h-screen overflow-hidden">
+      <FlowStudio template={params.template} standard={params.standard} enableAI />
     </div>
   );
 }
 
-export default function AutomationDesignerPage() {
+export default function FlowStudioPage() {
   return (
-    <Suspense fallback={<div className="flex h-screen items-center justify-center text-muted-foreground text-sm">Loading designer…</div>}>
-      <DesignerInner />
+    <Suspense
+      fallback={
+        <div className="flex h-screen items-center justify-center bg-background">
+          <div className="flex flex-col items-center gap-3">
+            <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+            <p className="text-sm text-muted-foreground">Loading Flow Studio…</p>
+          </div>
+        </div>
+      }
+    >
+      <FlowStudioPageInner />
     </Suspense>
   );
 }

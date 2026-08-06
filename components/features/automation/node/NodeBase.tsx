@@ -15,6 +15,8 @@ export interface NodeBaseProps {
   children?: ReactNode;
   badge?: string;
   variant?: "default" | "start" | "end" | "decision" | "action" | "workflow" | "communication" | "integration" | "custom";
+  /** Touch-friendly mode: larger hit targets + handles */
+  touchOptimized?: boolean;
 }
 
 const variantStyles: Record<NonNullable<NodeBaseProps["variant"]>, string> = {
@@ -52,19 +54,31 @@ export function NodeBase({
   children,
   badge,
   variant = "default",
+  touchOptimized = false,
 }: NodeBaseProps) {
   return (
     <Card
+      data-touch-optimized={touchOptimized || undefined}
       className={cn(
-        "min-w-[160px] shadow-md hover:shadow-lg transition-all border-2",
+        // Responsive sizing: 160px+ desktop, 120px+ mobile (via touch-optimized)
+        "min-w-[120px] sm:min-w-[160px] shadow-md hover:shadow-lg transition-all border-2",
+        // Touch-friendly: larger hit area for dragging/selection
+        touchOptimized && "min-w-[120px] sm:min-w-[150px] touch-action-none",
         variantStyles[variant],
         selected && "ring-2 ring-primary ring-offset-2",
         className
       )}
     >
-      <CardHeader className="pb-1 flex flex-row items-center gap-2">
-        <span className="text-lg">{icon}</span>
-        <CardTitle className="text-sm flex-1">{label}</CardTitle>
+      <CardHeader
+        className={cn(
+          "pb-1 flex flex-row items-center gap-2",
+          touchOptimized && "min-h-[44px]"
+        )}
+      >
+        <span className={cn("text-lg", touchOptimized && "min-h-[44px] min-w-[44px] flex items-center justify-center")}>
+          {icon}
+        </span>
+        <CardTitle className={cn("text-sm flex-1", touchOptimized && "text-[13px]")}>{label}</CardTitle>
         {badge && <Badge variant="secondary" className="text-xs">{badge}</Badge>}
         {status && (
           <span className={cn("h-2 w-2 rounded-full", statusColors[status] ?? "bg-gray-400")} />
@@ -77,3 +91,23 @@ export function NodeBase({
     </Card>
   );
 }
+
+/**
+ * CSS helper for touch-friendly connection handles.
+ * Apply via a style tag or global CSS to ensure minimum 44px hit targets.
+ */
+export const NODE_TOUCH_HANDLE_CSS = `
+  .react-flow__handle {
+    min-width: 12px;
+    min-height: 12px;
+  }
+  [data-touch-optimized] .react-flow__handle {
+    min-width: 20px;
+    min-height: 20px;
+  }
+  [data-touch-optimized="true"] .react-flow__handle {
+    min-width: 44px;
+    min-height: 44px;
+    opacity: 0.6;
+  }
+`;

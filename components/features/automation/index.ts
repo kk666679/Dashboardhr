@@ -4,6 +4,9 @@
 export { FlowDesigner, FlowDesignerWithProvider } from "./FlowDesigner";
 export type { FlowDesignerProps } from "./FlowDesigner";
 
+// ── Flow Studio (Next-Generation Designer) ─────────────────────────────────
+export * from "./flow-studio";
+
 // ── Providers ──────────────────────────────────────────────────────────────
 export { AutomationProvider } from "./AutomationProvider";
 

@@ -12,7 +12,7 @@ import React from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
-import { FlowDesigner } from "@/components/features/automation/FlowDesigner";
+import { FlowStudio } from "@/components/features/automation/flow-studio";
 
 // Default workflow nodes for enhanced page
 const initialNodes = [
@@ -89,17 +89,12 @@ export default function EnhancedFlowPage() {
         </Link>
       </div>
 
-      {/* Designer Container */}
+{/* Designer Container */}
       <div className="flex-1 overflow-hidden">
-        <FlowDesigner
+        <FlowStudio
           initialNodes={initialNodes}
           initialEdges={initialEdges}
           enableAI={false}
-          leftSidebarCollapsible={false}
-          rightSidebarCollapsible={false}
-          defaultEdgeType="smoothstep"
-          defaultShowMinimap={true}
-          defaultShowControls={true}
           workflowName="Enhanced Flow Designer"
           onWorkflowExecute={handleWorkflowExecute}
           onWorkflowSave={(nodes, edges) => {

@@ -11,7 +11,7 @@
  */
 
 import { useCallback } from "react";
-import { FlowDesigner } from "@/components/features/automation/FlowDesigner";
+import { FlowStudio } from "@/components/features/automation/flow-studio";
 import { useToast } from "@/components/ui/use-toast";
 import type { Node, Edge } from "@xyflow/react";
 
@@ -35,15 +35,12 @@ export default function WorkflowEnginePage() {
     [toast]
   );
 
-  return (
+return (
     <div className="h-[calc(100vh-4rem)] flex flex-col">
-      <FlowDesigner
+      <FlowStudio
         onWorkflowExecute={handleExecute}
         onWorkflowSave={handleSave}
-        leftSidebarCollapsible={true}
-        rightSidebarCollapsible={true}
-        defaultShowMinimap={true}
-        defaultShowControls={true}
+        enableAI
       />
     </div>
   );

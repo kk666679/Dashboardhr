@@ -5,9 +5,12 @@ import { Node, Edge } from "@xyflow/react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { PropertyEditor } from "./PropertyEditor";
 import { useProperties } from "./useProperties";
 import { cn } from "@/lib/utils";
+import { MousePointerClick, Keyboard, MousePointer2, Workflow } from "lucide-react";
 
 interface PropertiesPanelProps {
   selectedNode: Node | null;
