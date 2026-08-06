@@ -10,6 +10,7 @@ import {
   Tooltip,
   CartesianGrid,
 } from "recharts";
+import { useQueries } from "@tanstack/react-query";
 import { trpc } from "@/lib/trpc";
 
 type ActivityDatum = {
@@ -25,37 +26,31 @@ function formatDayShort(d: Date) {
 export function ActivityChart() {
   const days = React.useMemo(() => {
     const now = new Date();
-    const list: Date[] = [];
-    for (let i = 6; i >= 0; i--) {
+    return Array.from({ length: 7 }, (_, i) => {
       const d = new Date(now);
-      d.setDate(now.getDate() - i);
+      d.setDate(now.getDate() - (6 - i));
       d.setHours(0, 0, 0, 0);
-      list.push(d);
-    }
-    return list;
+      return d;
+    });
   }, []);
 
-  const q0 = trpc.attendance.getDailySummary.useQuery({ date: days[0] });
-  const q1 = trpc.attendance.getDailySummary.useQuery({ date: days[1] });
-  const q2 = trpc.attendance.getDailySummary.useQuery({ date: days[2] });
-  const q3 = trpc.attendance.getDailySummary.useQuery({ date: days[3] });
-  const q4 = trpc.attendance.getDailySummary.useQuery({ date: days[4] });
-  const q5 = trpc.attendance.getDailySummary.useQuery({ date: days[5] });
-  const q6 = trpc.attendance.getDailySummary.useQuery({ date: days[6] });
+  const utils = trpc.useUtils();
 
-  const queries = [q0, q1, q2, q3, q4, q5, q6];
+  const queries = useQueries({
+    queries: days.map((date) => ({
+      queryKey: ["attendance", "getDailySummary", date.toISOString()],
+      queryFn: () => utils.attendance.getDailySummary.fetch({ date }),
+      staleTime: 60_000,
+    })),
+  });
 
   const isLoading = queries.some((q) => q.isLoading);
 
-  const data: ActivityDatum[] = queries.map((q, idx) => {
-    const date = days[idx];
-    const summary = q.data;
-    return {
-      name: formatDayShort(date),
-      users: summary?.present ?? 0,
-      sessions: summary ? Math.round(Number(summary.overtime) * 10) / 10 : 0,
-    };
-  });
+  const data: ActivityDatum[] = queries.map((q, idx) => ({
+    name: formatDayShort(days[idx]),
+    users: q.data?.present ?? 0,
+    sessions: q.data ? Math.round(Number(q.data.overtime) * 10) / 10 : 0,
+  }));
 
   return (
     <ResponsiveContainer width="100%" height="100%">

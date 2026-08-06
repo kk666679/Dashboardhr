@@ -1,16 +1,16 @@
 "use client"
 
+import Link from 'next/link'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Input } from '@/components/ui/input'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Progress } from '@/components/ui/progress'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import {
-  Plus, Search, Download, BookOpen, Users,
-  Calendar, Clock, Award, Star, TrendingUp,
-  Filter, Eye, Edit, Trash2, MessageCircle,
+  Plus, Download, BookOpen, Users,
+  Clock, Award, TrendingUp,
+  Eye, MessageCircle, ArrowRight,
   GraduationCap, Target, Sparkles, Zap, Brain,
   Layers, ClipboardList,
 } from 'lucide-react'
@@ -133,6 +133,19 @@ export function LearningDevelopmentModule() {
     trainings.reduce((sum, t) => sum + t.score, 0) / (trainings.length || 1),
   )
 
+  const priorityCourse = courses.find((course) => course.category === 'Leadership') ?? courses[0]
+  const activeTraining = trainings.find((training) => training.status === 'In Progress') ?? trainings[0]
+  const expiringCertification = certifications.find((certification) => certification.status === 'Expiring')
+
+  const connectedFrameworks = [
+    { title: 'Lean', description: 'Reduce waste and improve flow', href: '/opex/lean' },
+    { title: 'Six Sigma', description: 'Drive process excellence with DMAIC', href: '/opex/six-sigma' },
+    { title: 'Kanban', description: 'Visualize work and improve throughput', href: '/opex/kanban' },
+    { title: 'Kaizen', description: 'Support continuous improvement events and culture', href: '/opex/kaizen' },
+    { title: 'ISO', description: 'Align training to compliance and audits', href: '/iso' },
+    { title: 'QMS', description: 'Connect learning to quality actions', href: '/automation/qms' },
+  ]
+
   const kpiItems = [
     {
       label: 'Active Courses',
@@ -197,22 +210,6 @@ export function LearningDevelopmentModule() {
     { dept: 'HR', enrolled: 10, completed: 9 },
   ]
 
-  const getStatusColor = (status: string) => {
-    const colors: Record<string, any> = {
-      'Active': 'success',
-      'Upcoming': 'default',
-      'Completed': 'success',
-      'Cancelled': 'destructive',
-      'Enrolled': 'default',
-      'In Progress': 'warning',
-      'Dropped': 'secondary',
-      'Expiring': 'warning',
-      'Expired': 'destructive',
-      'Pending': 'warning',
-    }
-    return colors[status] || 'secondary'
-  }
-
   const courseFilters = [
     {
       key: 'category',
@@ -235,9 +232,13 @@ export function LearningDevelopmentModule() {
       {/* Header */}
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Learning & Development</h1>
-          <p className="text-sm text-gray-500 dark:text-gray-400">
-            Manage training programs, courses, and employee development
+          <div className="inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-sm font-medium text-blue-700 dark:border-blue-900/50 dark:bg-blue-950/40 dark:text-blue-300">
+            <GraduationCap className="h-4 w-4" />
+            LMS • Talent growth hub
+          </div>
+          <h1 className="mt-3 text-3xl font-bold tracking-tight">Learning & Development</h1>
+          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+            Run a modern learning experience with clear progress, stronger recommendations, and role-ready skill pathways.
           </p>
         </div>
         <ActionButtonGroup
@@ -259,8 +260,142 @@ export function LearningDevelopmentModule() {
         />
       </div>
 
+      {/* LMS Hero Overview */}
+      <Card className="overflow-hidden border-0 bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950 text-white shadow-xl">
+        <CardContent className="p-6 md:p-8">
+          <div className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
+            <div className="max-w-2xl">
+              <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-sm text-slate-200 backdrop-blur">
+                <Sparkles className="h-4 w-4" />
+                AI-guided learning experience
+              </div>
+              <h2 className="mt-4 text-2xl font-semibold sm:text-3xl">
+                Keep every employee progressing with one clear learning journey.
+              </h2>
+              <p className="mt-3 max-w-xl text-sm leading-6 text-slate-300 sm:text-base">
+                From onboarding to leadership readiness, this LMS view helps HR and managers focus on the right trainings, certifications, and next actions.
+              </p>
+            </div>
+            <div className="rounded-2xl border border-white/15 bg-white/10 p-4 backdrop-blur-sm">
+              <p className="text-sm text-slate-300">Average learner score</p>
+              <div className="mt-2 flex items-end gap-2">
+                <span className="text-3xl font-semibold">{avgScore}%</span>
+                <span className="mb-1 text-sm text-emerald-300">+8% this quarter</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-6 grid gap-3 md:grid-cols-3">
+            <div className="rounded-xl border border-white/10 bg-white/10 p-4">
+              <div className="flex items-center gap-2 text-sm text-slate-200">
+                <Target className="h-4 w-4 text-amber-300" />
+                Priority focus
+              </div>
+              <p className="mt-2 font-semibold">{priorityCourse?.title}</p>
+              <p className="mt-1 text-sm text-slate-300">Recommended for leadership readiness</p>
+            </div>
+            <div className="rounded-xl border border-white/10 bg-white/10 p-4">
+              <div className="flex items-center gap-2 text-sm text-slate-200">
+                <Clock className="h-4 w-4 text-sky-300" />
+                Next live session
+              </div>
+              <p className="mt-2 font-semibold">{activeTraining?.name}</p>
+              <p className="mt-1 text-sm text-slate-300">{activeTraining?.employee} • {activeTraining?.department}</p>
+            </div>
+            <div className="rounded-xl border border-white/10 bg-white/10 p-4">
+              <div className="flex items-center gap-2 text-sm text-slate-200">
+                <Award className="h-4 w-4 text-emerald-300" />
+                Certification watchlist
+              </div>
+              <p className="mt-2 font-semibold">{expiringCertification?.name}</p>
+              <p className="mt-1 text-sm text-slate-300">Expires {expiringCertification?.expiryDate}</p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Connected operating framework links */}
+      <Card className="border-slate-200/80 bg-gradient-to-br from-slate-50 to-white dark:border-slate-800 dark:from-slate-950/50 dark:to-background">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Layers className="h-5 w-5 text-indigo-600" />
+            Connect learning to operational excellence
+          </CardTitle>
+          <CardDescription>Link capability-building initiatives directly with Lean, Six Sigma, Kanban, ISO, and QMS workflows.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+            {connectedFrameworks.map((framework) => (
+              <Link
+                key={framework.title}
+                href={framework.href}
+                className="group rounded-xl border border-slate-200 bg-white p-4 transition-all hover:-translate-y-0.5 hover:border-indigo-300 hover:shadow-md dark:border-slate-800 dark:bg-slate-950/60"
+              >
+                <div className="flex items-center justify-between">
+                  <p className="font-semibold text-slate-900 dark:text-slate-100">{framework.title}</p>
+                  <ArrowRight className="h-4 w-4 text-slate-400 transition group-hover:text-indigo-600" />
+                </div>
+                <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">{framework.description}</p>
+              </Link>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
       {/* KPI Grid */}
       <KpiCardGrid items={kpiItems} columns={4} />
+
+      {/* Recommended learning paths */}
+      <div className="grid gap-4 xl:grid-cols-[1.2fr_0.8fr]">
+        <Card className="border-blue-100 bg-gradient-to-br from-blue-50 to-white dark:border-blue-900/40 dark:from-blue-950/30 dark:to-background">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <BookOpen className="h-5 w-5 text-blue-600" />
+              Recommended learning paths
+            </CardTitle>
+            <CardDescription>Curated routes to strengthen critical skills and close capability gaps.</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {courses.slice(0, 3).map((course) => (
+              <div key={course.id} className="flex items-start justify-between rounded-xl border border-slate-200 bg-white/80 p-4 dark:border-slate-800 dark:bg-slate-950/40">
+                <div>
+                  <p className="font-medium">{course.title}</p>
+                  <p className="mt-1 text-sm text-gray-500">{course.provider} • {course.duration}</p>
+                </div>
+                <Button variant="ghost" size="sm" className="text-blue-600 hover:text-blue-700">
+                  Enroll <ArrowRight className="ml-1 h-4 w-4" />
+                </Button>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <TrendingUp className="h-5 w-5 text-emerald-600" />
+              This week’s momentum
+            </CardTitle>
+            <CardDescription>Progress snapshot for your learning operations.</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="rounded-xl bg-emerald-50 p-4 dark:bg-emerald-950/20">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium text-emerald-700 dark:text-emerald-300">Completion pace</span>
+                <span className="text-lg font-semibold text-emerald-700 dark:text-emerald-300">+18%</span>
+              </div>
+              <p className="mt-1 text-sm text-emerald-700/80 dark:text-emerald-300/80">Learners are finishing modules faster than last week.</p>
+            </div>
+            <div className="rounded-xl bg-amber-50 p-4 dark:bg-amber-950/20">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium text-amber-700 dark:text-amber-300">Upcoming cohort</span>
+                <span className="text-lg font-semibold text-amber-700 dark:text-amber-300">12</span>
+              </div>
+              <p className="mt-1 text-sm text-amber-700/80 dark:text-amber-300/80">Leadership and compliance workshops are filling quickly.</p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
 
       {/* Analytics Charts */}
       <div className="grid gap-4 lg:grid-cols-2">

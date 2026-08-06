@@ -255,7 +255,7 @@ export function AppSidebar({ isCollapsed = false, onToggle }: AppSidebarProps) {
           <>
             <div className="flex items-center gap-2.5 px-1 py-1">
               <Avatar className="size-7 shrink-0">
-                <AvatarImage src="/women.png" alt="User avatar" />
+                <AvatarImage src="/Avatar-woman.png" alt="User avatar" />
                 <AvatarFallback className="text-xs bg-[var(--brand-muted)] text-[var(--brand)]">U</AvatarFallback>
               </Avatar>
               <div className="flex-1 min-w-0">
@@ -277,7 +277,7 @@ export function AppSidebar({ isCollapsed = false, onToggle }: AppSidebarProps) {
         ) : (
           <>
             <Avatar className="size-7">
-              <AvatarImage src="/women.png" alt="User avatar" />
+              <AvatarImage src="/Avatar-woman.png" alt="User avatar" />
               <AvatarFallback className="text-xs bg-[var(--brand-muted)] text-[var(--brand)]">U</AvatarFallback>
             </Avatar>
             <ThemeToggle />

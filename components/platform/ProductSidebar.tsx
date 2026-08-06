@@ -308,7 +308,7 @@ export function ProductSidebar({ productId, isCollapsed = false, onToggle }: Pro
           <>
             <div className="flex items-center gap-2.5 px-1 py-1">
               <Avatar className="size-7 shrink-0">
-                <AvatarImage src="/women.png" alt="User avatar" />
+                <AvatarImage src="/Avatar-woman.png" alt="User avatar" />
                 <AvatarFallback className="text-xs bg-[var(--brand-muted)] text-[var(--brand)]">
                   U
                 </AvatarFallback>
@@ -331,7 +331,7 @@ export function ProductSidebar({ productId, isCollapsed = false, onToggle }: Pro
         {isCollapsed && (
           <>
             <Avatar className="size-7">
-              <AvatarImage src="/women.png" alt="User avatar" />
+              <AvatarImage src="/Avatar-woman.png" alt="User avatar" />
               <AvatarFallback className="text-xs bg-[var(--brand-muted)] text-[var(--brand)]">
                 U
               </AvatarFallback>

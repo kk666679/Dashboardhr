@@ -181,7 +181,7 @@ export function MobileMenu({ open, onClose, productId }: MobileMenuProps) {
             <div className="shrink-0 border-t border-[var(--sidebar-border)] p-3 space-y-3">
               <div className="flex items-center gap-2.5">
                 <Avatar className="size-8 shrink-0">
-                  <AvatarImage src="/women.png" alt="User avatar" />
+                  <AvatarImage src="/Avatar-woman.png" alt="User avatar" />
                   <AvatarFallback className="text-xs bg-[var(--brand-muted)] text-[var(--brand)]">
                     U
                   </AvatarFallback>
