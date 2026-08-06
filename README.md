@@ -1,20 +1,3 @@
-<<<<<<< HEAD
-
-<!--
-  AiFWMS — AI Foreign Worker Management System
-  Enterprise-grade README generated from repository analysis.
-  Note: No features were invented; uncertain items are marked with > **TODO:** Verify implementation.
--->
-<div align="center">
-
-  <!-- Logo placeholder -->
-  <img src="./public/logo.svg" alt="AiFWMS logo" width="96" height="96" style="border-radius:24px;" />
-
-  # AiFWMS — AI Foreign Worker Management System
-
-  <p>
-    Enterprise <b>Malaysian HR platform</b> for <b>foreign worker compliance</b>, <b>permit & visa lifecycle</b>, <b>payroll</b>, <b>geolocation attendance</b>, <b>AI-powered HR orchestration</b>, and <b>ISO/QMS management</b>.
-=======
 <div align="center">
 
   <img src="./public/logo.svg" alt="AiFWMS logo" width="96" height="96" style="border-radius:24px;" />
@@ -24,7 +7,6 @@
   <p>
     Enterprise <b>Malaysian HR platform</b> for <b>foreign worker compliance</b>, <b>permit & visa lifecycle</b>,
     <b>payroll</b>, <b>geolocation attendance</b>, <b>autonomous HR orchestration</b>, and <b>ISO/QMS management</b>.
->>>>>>> 2cd618c (refactor: update existing files)
   </p>
 
   <p>
@@ -40,11 +22,6 @@
 
 ## Badges
 
-<<<<<<< HEAD
-### Framework & Quality
-
-=======
->>>>>>> 2cd618c (refactor: update existing files)
 ![Next.js](https://img.shields.io/badge/Next.js-16-000000?style=for-the-badge&logo=next.js)
 ![React](https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react)
 ![TypeScript](https://img.shields.io/badge/TypeScript-6-3178C6?style=for-the-badge&logo=typescript)
@@ -55,28 +32,14 @@
 ![Redis](https://img.shields.io/badge/Redis-7-FF4438?style=for-the-badge&logo=redis)
 ![Docker](https://img.shields.io/badge/Docker-Enabled-2496ED?style=for-the-badge&logo=docker)
 ![Vercel](https://img.shields.io/badge/Vercel-Ready-000000?style=for-the-badge&logo=vercel)
-<<<<<<< HEAD
-![Status](https://img.shields.io/badge/Status-Development-yellow?style=for-the-badge)
-=======
 ![Status](https://img.shields.io/badge/Status-Active-brightgreen?style=for-the-badge)
 ![Agents](https://img.shields.io/badge/OpenClaw_Agents-50-blueviolet?style=for-the-badge)
 ![Models](https://img.shields.io/badge/Prisma_Models-291-blue?style=for-the-badge)
->>>>>>> 2cd618c (refactor: update existing files)
 
 ---
 
 ## Quick Links
 
-<<<<<<< HEAD
-- **Documentation**: `docs/` directory
-- **Quick Start**: [docs/QUICK_START.md](./docs/QUICK_START.md)
-- **Architecture**: [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md)
-- **API Overview**: [docs/API_OVERVIEW.md](./docs/API_OVERVIEW.md)
-- **Development Guide**: [docs/DEVELOPMENT.md](./docs/DEVELOPMENT.md)
-- **Security**: [docs/SECURITY.md](./docs/SECURITY.md)
-- **FAQ**: [docs/FAQ.md](./docs/FAQ.md)
-- **Changelog**: [CHANGELOG.md](./CHANGELOG.md)
-=======
 - **Quick Start**: [QUICK_START.md](./QUICK_START.md)
 - **Architecture**: [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md)
 - **API Analysis**: [docs/api-analysis/README.md](./docs/api-analysis/README.md)
@@ -88,76 +51,11 @@
 - **Changelog**: [CHANGELOG.md](./CHANGELOG.md)
 - **OpenClaw AI Framework**: [.openclaw/README_AI.md](./.openclaw/README_AI.md)
 - **Tech Debt Roadmap**: [docs/tech-debt/PATH_TO_100.md](./docs/tech-debt/PATH_TO_100.md)
->>>>>>> 2cd618c (refactor: update existing files)
 
 ---
 
 ## Table of Contents
 
-<<<<<<< HEAD
-- [AiFWMS — AI Foreign Worker Management System](#aifwms--ai-foreign-worker-management-system)
-  - [Badges](#badges)
-  - [Quick Links](#quick-links)
-  - [Screenshots](#screenshots)
-  - [Features](#features)
-  - [Products](#products)
-  - [Tech Stack](#tech-stack)
-  - [Architecture](#architecture)
-    - [System Overview](#system-overview)
-    - [AI Orchestration](#ai-orchestration)
-    - [Background Workers](#background-workers)
-    - [Deployment Architecture](#deployment-architecture)
-  - [Folder Structure](#folder-structure)
-  - [Getting Started](#getting-started)
-  - [Environment Variables](#environment-variables)
-  - [Scripts](#scripts)
-  - [Development Workflow](#development-workflow)
-  - [Code Style](#code-style)
-  - [Internationalization](#internationalization)
-  - [Performance](#performance)
-  - [Security](#security)
-  - [Testing](#testing)
-  - [Deployment](#deployment)
-  - [Roadmap](#roadmap)
-  - [Contributing](#contributing)
-  - [Changelog](#changelog)
-  - [FAQ](#faq)
-  - [License](#license)
-  - [Acknowledgements](#acknowledgements)
-
----
-
-## Screenshots
-
-> Screenshot paths reference images in `./public/images/`. Replace with actual images once available.
-
-| Page | Screenshot |
-|---|---|
-| Landing Page | ![Landing](./docs/landing.png) |
-| Dashboard Live Location | ![Live Location](./docs/live-location.png) |
-| Permit & Immigration | ![Permit & Immigration](./docs/Screenshot_2026-3.png) |
-| Desktop CMD Installation | ![Landing](./docs/cmd.png) |
-| Flow Design | ![Flow Design](./docs/flow-design.png) |
-| MSS Dashboard | ![MSS Dashboard](./docs/mss.png) |
-| Compliance Management | ![Compliance](./docs/docs/Screenshot_2026-2.png) |
-| Accounting | ![Accounting](./public/accounting.png) |
-| Data Governance | ![Data Governance](./public/data-governance.png) |
-| Learning & Development | ![Learning & Development](./public/images/lnd.png) |
-
----
-
-## Features
-
-<details>
-<summary><h3>Core Platform 🧱</h3></summary>
-
-- **Multi-tenant architecture** driven by tenant ID scoping
-- **API-first design** — Next.js App Router + tRPC layer (30+ routers) + domain services
-- **AI orchestration** — Multi-agent HR orchestrator with domain-specific agents
-- **Prisma-based PostgreSQL persistence** with pgvector support for semantic search
-- **Internationalization** — 9 locales with RTL support
-- **Theme system** — Dark/light mode with next-themes
-=======
 - [Features](#features)
 - [Implementation Status](#implementation-status)
 - [Products](#products)
@@ -189,21 +87,10 @@
 - **Human-in-the-Loop gates** via `ai_approvals` table for critical decisions (dismissals, permits, compliance)
 - **10-step regulatory change pipeline** — gazette monitoring → diff → affected workflows → policy update → notify → recommend → deadlines → migration tasks → impact assessment → KB index refresh
 - See [`.openclaw/README_AI.md`](./.openclaw/README_AI.md) for the full framework guide
->>>>>>> 2cd618c (refactor: update existing files)
 
 </details>
 
 <details>
-<<<<<<< HEAD
-<summary><h3>Foreign Worker Compliance & Permits 🇲🇾</h3></summary>
-
-- Foreign worker permit & visa lifecycle management
-- FOMEMA medical screening scheduling and expiration alerts
-- Levy calculator and payment tracking
-- Immigration compliance tracking
-- Accommodation inspection and compliance
-- Geolocation-based attendance verification
-=======
 <summary><h3>Core Platform 🧱</h3></summary>
 
 - **Multi-tenant architecture** — tenant ID scoped at every query
@@ -212,23 +99,10 @@
 - **pgvector semantic search** — embeddings-backed knowledge retrieval for all AI agents
 - **Internationalization** — 11 locales with RTL (Arabic) support
 - **Dark/light theme** — CSS-first Tailwind v4 design tokens
->>>>>>> 2cd618c (refactor: update existing files)
 
 </details>
 
 <details>
-<<<<<<< HEAD
-<summary><h3>Payroll & Accounting 💼</h3></summary>
-
-- Payroll processing with EPF, SOCSO, EIS, PCB statutory calculations
-- Payroll calculator with real-time projections
-- Tax calculator
-- E-invoice (LHDN-compliant)
-- Invoice management (create, track, export)
-- Delivery orders, credit/debit notes
-- Financial reports and analytics
-- Government submissions portal
-=======
 <summary><h3>Foreign Worker Compliance & Permits 🇲🇾</h3></summary>
 
 - Full 10-stage foreign worker lifecycle: quota → recruitment → pre-departure medical → visa → arrival → FOMEMA → permit registration → deployment → renewal → repatriation
@@ -239,69 +113,22 @@
 - eKad/iKad biometric management (2026 mandatory re-enrolment)
 - MAPO/ATIPSOM forced-labour compliance checks
 - Geolocation-based attendance with geofence verification
->>>>>>> 2cd618c (refactor: update existing files)
 
 </details>
 
 <details>
 <summary><h3>Payroll & Accounting 💼</h3></summary>
 
-<<<<<<< HEAD
-- **Multi-agent HR orchestrator** — Routes queries to 15+ domain-specific agents
-- **Provider-agnostic AI** — OpenAI, Anthropic Claude, and Ollama support
-- **RAG pipeline** — Knowledge retrieval + context assembly with pgvector embeddings
-- **Streaming chat endpoints** for live assistant experience
-- **Document generator** — AI-powered document creation
-- **Semantic search** across knowledge base
-=======
 - Full-cycle payroll with EPF, SOCSO, EIS, PCB/MTD, SKBBK statutory calculations
 - Payroll batch run, period locking, payslip PDF generation
 - EA Form, CP39, CP8D government submission workflows
 - e-Invoice (LHDN MyInvois-compliant, mandatory from Aug 2024)
 - Invoice management, delivery orders, credit/debit notes
 - Tax calculator, financial reports, government submissions portal
->>>>>>> 2cd618c (refactor: update existing files)
 
 </details>
 
 <details>
-<<<<<<< HEAD
-<summary><h3>Automation & Workflow ⏱️</h3></summary>
-
-- **React Flow-based workflow designer** (`@xyflow/react`)
-- **Workflow engine** — Execute and monitor automated workflows
-- **BullMQ job queues** — 6 background workers for async processing
-- **QMS integration** — Link workflows to ISO 9001 / ISO 27001 compliance
-- **SOP management** — Create, approve, and publish standard operating procedures
-- **Flow templates** — Reusable workflow templates
-
-</details>
-
-<details>
-<summary><h3>ISO & Quality Management 📋</h3></summary>
-
-- ISO 9001 and ISO 27001 compliance frameworks
-- Audit checklist creation and management
-- CAPA (Corrective and Preventive Actions) workflow
-- 5 Whys root cause analysis
-- Fishbone (Ishikawa) diagrams
-- Gap analysis and compliance scoring
-- Risk assessment matrix
-- Climate risk assessment
-
-</details>
-
-<details>
-<summary><h3>CAPEX & OPEX 💰</h3></summary>
-
-- **CAPEX**: Asset tracking, project management, budget planning, ROI analysis
-- **OPEX (Operational Excellence)**:
-  - **Lean** — Waste reduction and process optimization
-  - **Six Sigma** — DMAIC methodology and statistical process control
-  - **Kaizen** — Continuous improvement tracking
-  - **Kanban** — Visual workflow management
-  - Analytics and performance dashboards
-=======
 <summary><h3>Regulatory Intelligence 🏛️</h3></summary>
 
 - **14 specialized regulatory intelligence agents** (Labour Law, Immigration, Payroll Compliance, Tax, HRD Corp, ESG, Foreign Worker Compliance, Expatriate Compliance, Circular Monitoring, Legal Knowledge, Audit Readiness, Policy Change Detection, Risk Prediction, AI Compliance Copilot)
@@ -309,45 +136,21 @@
 - **Versioned legal knowledge graph** — `legal_authorities` + `knowledge_graph_edges` with effective dates and superseded-by tracking
 - **Explainable AI** — citation-backed compliance answers with source attribution
 - **Regulatory risk scoring** — weighted model from violations, pending changes, and open alerts
->>>>>>> 2cd618c (refactor: update existing files)
 
 </details>
 
 <details>
 <summary><h3>Automation & Workflow ⏱️</h3></summary>
 
-<<<<<<< HEAD
-- Attendance tracking with geolocation verification
-- Real-time worker location monitoring
-- Geofence-based compliance checking
-- Attendance history and reporting
-- API endpoint: `/api/geolocation/*`
-=======
 - React Flow-based workflow designer (`@xyflow/react`)
 - BullMQ job queues — **7 background workers**: leave, notification, payroll, retention, statutory, workflow, **regulatory monitoring**
 - QMS integration — ISO 9001 / ISO 27001 compliance workflows
 - SOP management — create, approve, publish
 - Automation rules engine with trigger/condition/action model
->>>>>>> 2cd618c (refactor: update existing files)
 
 </details>
 
 <details>
-<<<<<<< HEAD
-<summary><h3>HR Operations 👥</h3></summary>
-
-- Employee lifecycle management (onboarding to offboarding)
-- Leave management with balance tracking
-- Recruitment pipeline
-- Performance management and reviews
-- Learning & development with LMS integration
-- Succession planning
-- Employee relations and industrial relations case management
-- Health & safety incident tracking
-- Travel management
-- Workforce planning and forecasting
-- Document management with PDF generation
-=======
 <summary><h3>ISO & Quality Management 📋</h3></summary>
 
 - ISO 9001:2015 and ISO 27001:2022 compliance frameworks
@@ -367,30 +170,19 @@
 - Performance cycles, reviews, and goal tracking
 - Industrial relations: union management, collective bargaining, retrenchment (VSS/MSS)
 - Health & safety, travel management, workforce planning
->>>>>>> 2cd618c (refactor: update existing files)
 
 </details>
 
 <details>
 <summary><h3>Self-Service Portals 🔑</h3></summary>
 
-<<<<<<< HEAD
-- **ESS (Employee Self-Service)**: Payslips, leave requests, claims, training, profile
-- **MSS (Manager Self-Service)**: Team management, approvals, attendance, performance
-=======
 - **ESS**: Payslips, leave requests, claims, training enrolment, profile management
 - **MSS**: Team management, approvals, attendance monitoring, performance reviews
->>>>>>> 2cd618c (refactor: update existing files)
 
 </details>
 
 ---
 
-<<<<<<< HEAD
-## Products
-
-The application is organized into **9 distinct products**, each with its own routes and navigation:
-=======
 ## Implementation Status
 
 Current verified state of the codebase (August 2026):
@@ -416,7 +208,6 @@ Current verified state of the codebase (August 2026):
 ---
 
 ## Products
->>>>>>> 2cd618c (refactor: update existing files)
 
 | Product | Route | Description |
 |---|---|---|
@@ -436,23 +227,6 @@ Current verified state of the codebase (August 2026):
 
 | Layer | Technology | Version |
 |---|---|---|
-<<<<<<< HEAD
-| **Frontend** | Next.js 16 (App Router), React 19 | UI + routing |
-| **Language** | TypeScript 6 | Type-safe enterprise codebase |
-| **Styling** | Tailwind CSS 4 + shadcn/ui + Radix UI | Design system and responsive UI |
-| **Backend/API** | Next.js Route Handlers + tRPC 11 | API layer and type-safe contracts |
-| **Runtime** | Node.js 22 | Server/runtime execution |
-| **Database** | PostgreSQL 16 + Prisma 7 | Persistence and relational model |
-| **Vector/AI Search** | pgvector + embeddings libs | Semantic retrieval for RAG |
-| **Auth** | NextAuth.js + MFA (TOTP) | Authentication and session management |
-| **AI Orchestration** | Vercel AI SDK + @ai-sdk/* + LangChain | Streaming LLM + provider abstraction |
-| **AI Providers** | OpenAI, Anthropic Claude, Ollama | Multi-provider AI support |
-| **Async Jobs** | BullMQ 5 + Redis 7 | Background processing and workflows |
-| **Charts/UX** | Recharts, React Flow, Framer Motion | Enterprise dashboards and visual workflows |
-| **Virtualization** | @dnd-kit | Drag-and-drop interactions |
-| **Containers** | Docker / Docker Compose | Reproducible deployments |
-| **Desktop App** | Electron (WindowDownloader/) | Offline desktop client |
-=======
 | **Frontend** | Next.js App Router, React | 16, 19 |
 | **Language** | TypeScript | 6 |
 | **Styling** | Tailwind CSS + shadcn/ui + Radix UI | 4 |
@@ -467,51 +241,12 @@ Current verified state of the codebase (August 2026):
 | **Charts/UX** | Recharts, React Flow, Framer Motion | — |
 | **Desktop App** | Electron | WindowDownloader/ |
 | **Containers** | Docker / Docker Compose | — |
->>>>>>> 2cd618c (refactor: update existing files)
 
 ---
 
 ## Architecture
 
 ### System Overview
-<<<<<<< HEAD
-
-The following diagram illustrates the high-level architecture of AiFWMS, showing the separation between frontend, API transport, business services, and data access layers. The system is designed with clear boundaries to ensure maintainability, testability, and security.
-
-```mermaid
-flowchart TD
-    App["Full-Stack Application"]
-
-    App --> FE["Frontend Layer (UI)"]
-    App --> API["API Transport Layer"]
-    App --> Services["Business Services Layer"]
-    App --> Data["Data Access Layer"]
-
-    FE --> Pages["Pages (App Router)"]
-    FE --> Components["Components"]
-    FE --> Hooks["Custom Hooks"]
-    FE --> States["Client State (Zustand/Context)"]
-
-    API --> REST["REST Endpoints"]
-    API --> TRPC["tRPC Routers (30+)"]
-    API --> Validate["Input Validation (Zod)"]
-
-    Services --> AuthSvc["Authentication Service"]
-    Services --> NotificationSvc["Notification Service"]
-    Services --> AISvc["AI Orchestration Service"]
-    Services --> WorkflowSvc["Workflow Engine (BullMQ)"]
-
-    Data --> ORM["Prisma ORM"]
-    ORM --> DB[("PostgreSQL + pgvector")]
-
-    App --> Agents["AI Domain Agents (15+)"]
-    Agents --> Services
-```
-
-### AI Orchestration
-
-The AI orchestration engine is a core component of AiFWMS. It uses a multi‑agent architecture to handle a wide variety of HR‑related queries. The sequence diagram below shows how a user query flows through the system: from the frontend, through the orchestrator API, to the agent router, and finally to a domain‑specific agent that interacts with large language models (LLMs), retrieval‑augmented generation (RAG), and external tools.
-=======
 
 ```mermaid
 flowchart TD
@@ -548,73 +283,11 @@ flowchart TD
 ```
 
 ### OpenClaw Agent Routing
->>>>>>> 2cd618c (refactor: update existing files)
 
 ```mermaid
 sequenceDiagram
     participant User
     participant Frontend
-<<<<<<< HEAD
-    participant OrchestratorAPI
-    participant Orchestrator
-    participant AgentRouter
-    participant DomainAgent
-    participant LLM
-    participant RAG
-    participant Tools
-
-    User->>Frontend: Sends query
-    Frontend->>OrchestratorAPI: POST /api/ai/orchestrate
-    OrchestratorAPI->>Orchestrator: routeQuery(query)
-    Orchestrator->>Orchestrator: Identify intent
-    Orchestrator->>AgentRouter: selectAgent(intent)
-    AgentRouter-->>Orchestrator: DomainAgent instance
-    Orchestrator->>DomainAgent: process(query)
-    DomainAgent->>RAG: retrieveContext(query)
-    RAG-->>DomainAgent: relevant documents
-    DomainAgent->>LLM: prompt + context
-    LLM-->>DomainAgent: generated response
-    DomainAgent->>Tools: (if needed) call tools
-    Tools-->>DomainAgent: tool results
-    DomainAgent-->>Orchestrator: final response
-    Orchestrator-->>OrchestratorAPI: response
-    OrchestratorAPI-->>Frontend: streaming/response
-    Frontend-->>User: display answer
-```
-
-### Background Workers
-
-Time‑consuming or recurring tasks are offloaded to background workers managed by BullMQ and Redis. Six dedicated workers handle leave processing, notifications, payroll, retention analytics, statutory contributions, and workflow execution. The diagram below illustrates how jobs are enqueued, processed, and how results are persisted and notifications are triggered.
-
-```mermaid
-graph TD
-    A[API Trigger] --> B[Queue Job]
-    B --> C{BullMQ Queue}
-    C --> D[Worker: Leave]
-    C --> E[Worker: Notification]
-    C --> F[Worker: Payroll]
-    C --> G[Worker: Retention]
-    C --> H[Worker: Statutory]
-    C --> I[Worker: Workflow]
-    D --> J[Process Leave Request]
-    E --> K[Send Email/SMS]
-    F --> L[Calculate Payroll]
-    G --> M[Analytics Update]
-    H --> N[Statutory Contributions]
-    I --> O[Execute Workflow Steps]
-    J --> P[Update DB]
-    K --> P
-    L --> P
-    M --> P
-    N --> P
-    O --> P
-    P --> Q[Trigger Notifications]
-```
-
-### Deployment Architecture
-
-The application is containerized using Docker and orchestrated with Docker Compose. The deployment stack includes the Next.js app, a PostgreSQL database with pgvector extension, Redis for caching and queue management, and BullMQ workers. The diagram also shows optional integration with Neon serverless PostgreSQL and external AI APIs.
-=======
     participant OrchestratorAPI as POST /api/hr-orchestrator
     participant OrchestratorAgent
     participant AGENT_REGISTRY
@@ -671,24 +344,10 @@ graph TD
 ```
 
 ### Deployment
->>>>>>> 2cd618c (refactor: update existing files)
 
 ```mermaid
 graph TD
     subgraph "Docker Compose"
-<<<<<<< HEAD
-        A[Next.js App] --> B[(PostgreSQL + pgvector)]
-        A --> C[(Redis)]
-        A --> D[BullMQ Workers]
-        D --> C
-        B --> E[Neon Serverless]
-    end
-    F[External AI APIs] --> A
-    G[Vercel] --> A
-```
-
-For additional diagrams covering security, i18n, and more detailed component interactions, see [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md).
-=======
         App[Next.js App :3000] --> PG[(PostgreSQL 16 + pgvector)]
         App --> Redis[(Redis 7)]
         App --> Workers[BullMQ Workers x7]
@@ -785,109 +444,12 @@ For additional diagrams covering security, i18n, and more detailed component int
 | Risk Prediction | `risk-prediction` | Regulatory risk scoring (0–100) |
 | AI Compliance Copilot | `compliance-copilot` | Fan-out to all regulatory agents, unified answer |
 | Orchestrator | `orchestrator` | Intent routing, AGENT_REGISTRY dispatch |
->>>>>>> 2cd618c (refactor: update existing files)
 
 ---
 
 ## Folder Structure
 
 ```text
-<<<<<<< HEAD
-app/                          # Next.js App Router
-  [locale]/                   # Locale-first routes (9 languages)
-    accounting/               # Accounting product
-    ai/                       # AI hub product
-    automation/               # Automation product
-    capex/                    # CAPEX product
-    dashboard/                # HR dashboard product
-    employees/                # Employee management
-    ess/                      # Employee self-service
-    hr/                       # HR operations
-    integrations/             # Third-party integrations
-    iso/                      # ISO/QMS management
-    login/                    # Authentication pages
-    mss/                      # Manager self-service
-    opex/                     # Operational excellence
-  api/                        # API route handlers
-    ai/                       # AI endpoints (chat, rag, reason, documents)
-    auth/                     # Authentication endpoints
-    geolocation/              # Attendance tracking endpoints
-    hr-orchestrator/          # Multi-agent AI orchestrator
-    iso/                      # ISO/QMS endpoints
-    kb/                       # Knowledge base endpoints
-    sops/                     # SOP management endpoints
-    trpc/                     # tRPC HTTP handler
-    webhooks/                 # External webhook receivers
-components/                   # React components
-  ui/                         # shadcn/ui primitives
-  ai-elements/                # AI chat UI components
-  charts/                     # Chart components (Recharts)
-  dashboard-sidebar/          # Sidebar navigation
-  features/                   # Domain-specific feature components
-  i18n/                       # Internationalization components
-  landing/                    # Landing page components
-  layout/                     # Layout components
-  platform/                   # Product platform components
-config/                       # Application configuration
-  navigation.ts               # Product navigation definitions
-  products.ts                 # Product registry
-  sidebar.ts                  # Sidebar configuration
-  server-env.ts               # Server environment validation
-docs/                         # Documentation
-hooks/                        # Custom React hooks
-  useAI.ts                    # AI interaction hooks
-  useAuth.ts                  # Authentication hooks
-  useTranslation.ts           # i18n hooks
-  useDashboard.ts             # Dashboard data hooks
-  usePayroll.ts               # Payroll hooks
-  # ... 40+ domain-specific hooks
-i18n/                         # Internationalization
-  config.ts                   # Locale configuration (9 locales)
-  locales/                    # Translation files
-  I18nProvider.tsx            # i18n provider
-lib/                          # Core libraries
-  ai/                         # AI agents and tools
-  orchestrator/               # HR orchestrator logic
-  security/                   # ABAC, RLS, rate-limit, SSRF, XSS
-  queues/                     # BullMQ queue configuration
-  secrets/                    # Secrets management (env/AWS/Azure)
-  prisma.ts                   # Database client
-  trpc.ts                     # tRPC client
-  # ... domain services
-prisma/                       # Database schema and migrations
-  schema.prisma               # Prisma schema
-  migrations/                 # Database migrations
-scripts/                      # Utility scripts
-  check-automation-routes.mjs # Route verification
-  locale-report.mjs           # Locale coverage report
-  validate-locales.mjs        # Locale validation
-server/                       # Server-side code
-  api/routers/                # tRPC API routers
-  routers/                    # Additional tRPC routers
-  middleware/                 # ABAC, RLS middleware
-  agents/                     # AI domain agents
-services/                     # Domain services
-  audit-engine.ts             # Audit trail engine
-  compliance-scoring-engine.ts# Compliance scoring
-  risk-engine.ts              # Risk assessment
-  climate-risk-engine.ts      # Climate risk
-  corrective-action-engine.ts # CAPA engine
-styles/                       # CSS files
-  globals.css                 # Tailwind v4 imports
-  theme.css                   # Design tokens
-types/                        # TypeScript type definitions
-utils/                        # Utility functions
-workers/                      # BullMQ background workers
-  leave.worker.ts             # Leave processing
-  notification.worker.ts      # Notification dispatch
-  payroll.worker.ts           # Payroll execution
-  retention.worker.ts         # Retention analytics
-  statutory.worker.ts         # Statutory contributions
-  workflow.worker.ts          # Workflow execution
-WindowDownloader/             # Electron desktop app
-  electron/                   # Electron main process
-  src/                        # React renderer
-=======
 app/                            # Next.js App Router
   [locale]/                     # 11-locale routes
     accounting/ ai/ automation/ capex/ dashboard/
@@ -952,7 +514,6 @@ services/                       # Domain engines
   audit-engine.ts compliance-scoring-engine.ts
   risk-engine.ts climate-risk-engine.ts corrective-action-engine.ts
 WindowDownloader/               # Electron desktop app
->>>>>>> 2cd618c (refactor: update existing files)
 ```
 
 ---
@@ -962,11 +523,7 @@ WindowDownloader/               # Electron desktop app
 ### Prerequisites
 
 - Node.js 22+
-<<<<<<< HEAD
-- PostgreSQL 16+ with pgvector
-=======
 - PostgreSQL 16+ with pgvector extension
->>>>>>> 2cd618c (refactor: update existing files)
 - Redis 7+
 - Docker & Docker Compose (recommended)
 
@@ -975,11 +532,7 @@ WindowDownloader/               # Electron desktop app
 ```bash
 # Clone and install
 git clone <repo-url>
-<<<<<<< HEAD
-cd fwms
-=======
 cd aifwms
->>>>>>> 2cd618c (refactor: update existing files)
 npm install
 
 # Database setup
@@ -996,11 +549,6 @@ npm run dev
 docker-compose up
 ```
 
-<<<<<<< HEAD
-Starts: PostgreSQL (pgvector), Redis, Next.js app, BullMQ workers.
-
-See [docs/QUICK_START.md](./docs/QUICK_START.md) for detailed setup instructions including individual worker startup, WindowDownloader, and environment configuration.
-=======
 Starts: PostgreSQL (pgvector), Redis, Next.js app, BullMQ workers (all 7).
 
 ### Index the Knowledge Base
@@ -1016,7 +564,6 @@ npm run embed-docs         # generates embeddings for all documents
 Or call `POST /api/kb/ingest?preload=true` from the UI after startup.
 
 See [QUICK_START.md](./QUICK_START.md) for full setup including WindowDownloader and environment configuration.
->>>>>>> 2cd618c (refactor: update existing files)
 
 ---
 
@@ -1026,15 +573,6 @@ See [QUICK_START.md](./QUICK_START.md) for full setup including WindowDownloader
 |---|---|---|
 | `DATABASE_URL` | PostgreSQL connection string | ✅ |
 | `NEON_DATABASE_URL` | Neon serverless PostgreSQL (overrides DATABASE_URL) | ⛳ |
-<<<<<<< HEAD
-| `OPENAI_API_KEY` | OpenAI API key for LLM features | ⛳ |
-| `ANTHROPIC_API_KEY` | Anthropic Claude API key | ⛳ |
-| `REDIS_URL` | Redis connection string | ⛳ |
-| `SECRETS_PROVIDER` | Secrets provider (`env`, `aws`, `azure`) | ⛳ |
-| `NEXT_PUBLIC_TENANT_ID` | Tenant identifier | ⛳ |
-
-✅ Required · ⛳ Optional (see [docs/QUICK_START.md](./docs/QUICK_START.md) for full list)
-=======
 | `REDIS_URL` | Redis connection string | ⛳ |
 | `OPENAI_API_KEY` | OpenAI API key (`sk-...`) | ⛳ |
 | `ANTHROPIC_API_KEY` | Anthropic Claude API key (`sk-ant-...`) | ⛳ |
@@ -1052,7 +590,6 @@ See [QUICK_START.md](./QUICK_START.md) for full setup including WindowDownloader
 ✅ Required · ⛳ Optional
 
 Copy `.env.example` (project root) to `.env.local` for the full reference with comments.
->>>>>>> 2cd618c (refactor: update existing files)
 
 ---
 
@@ -1060,58 +597,6 @@ Copy `.env.example` (project root) to `.env.local` for the full reference with c
 
 | Script | Command | Description |
 |---|---|---|
-<<<<<<< HEAD
-| Dev Server | `npm run dev` | Start Next.js dev server (Turbopack) |
-| Production Build | `npm run build` | Build production artifacts (standalone) |
-| Production Start | `npm run start` | Run production server |
-| Type Check | `npm run typecheck` | Run `tsc --noEmit` |
-| Verify Routes | `npm run verify:automation-routes` | Validate automation routes |
-
----
-
-## Development Workflow
-
-1. Create a feature branch
-2. Implement changes with TypeScript + existing domain conventions
-3. Ensure tenant scoping and security checks remain intact
-4. Run `npm run typecheck` to verify type safety
-5. Open a Pull Request
-6. See [docs/DEVELOPMENT.md](./docs/DEVELOPMENT.md) for detailed guidance
-
----
-
-## Code Style
-
-- **Domain services** in `lib/` — keep business logic separate from UI
-- **Zod schemas** for validation — defined in `lib/schemas.ts`
-- **tRPC** for client-server communication — avoid raw `fetch()`
-- **Server-only logic** out of client components — use `'use client'` boundary
-- **Tailwind CSS v4** — CSS-first configuration with `@theme` tokens
-- **ES2023 target** with `bundler` module resolution
-
----
-
-## Internationalization
-
-| Feature | Details |
-|---|---|
-| **Locales** | 11 languages (en, ms, zh, es, id, th, ph, vt, bn, ne, ar) |
-| **RTL Support** | Arabic (`ar`) with full bidirectional layout |
-| **Translation Namespaces** | common, validation, errors, notifications, email |
-| **Formatting** | Locale-specific date, number, and currency formatting |
-| **Implementation** | `i18next` + `react-i18next` with file-based translation loading |
-
----
-
-## Performance
-
-- **Streaming responses** for AI endpoints to reduce perceived latency
-- **Tenant-scoped queries** to minimize result sets
-- **Standalone output** for optimal production Docker images
-- **Turbopack** for fast development builds
-- **Redis caching** for queue and session management
-- **Memoization** in React components (Framer Motion, useMemo)
-=======
 | Dev server | `npm run dev` | Next.js dev (Turbopack) |
 | Production build | `npm run build` | Standalone output |
 | Production start | `npm run start` | Run production server |
@@ -1121,34 +606,11 @@ Copy `.env.example` (project root) to `.env.local` for the full reference with c
 | Workers | `npx tsx workers/index.ts` | Start all 7 BullMQ workers |
 | Index knowledge | `cd .openclaw && npm run index-knowledge` | Load docs into pgvector |
 | Verify routes | `npm run verify:automation-routes` | Validate automation routes |
->>>>>>> 2cd618c (refactor: update existing files)
 
 ---
 
 ## Security
 
-<<<<<<< HEAD
-| Layer | Implementation |
-|---|---|
-| **Authentication** | NextAuth.js + MFA (TOTP via otplib) |
-| **Authorization** | ABAC (`lib/security/abac.ts`) + RLS middleware (`server/middleware/rls.ts`) |
-| **Rate Limiting** | Configurable rate limiter (`lib/security/rate-limit.ts`) |
-| **XSS Protection** | Input sanitization with dompurify (`lib/security/xss.ts`) |
-| **SSRF Protection** | Outbound request validation (`lib/security/ssrf.ts`) |
-| **Secrets Management** | AWS Secrets Manager / Azure Key Vault / Environment variables |
-| **Audit Trail** | Event logging and querying (`/dashboard/audit-trail`) |
-
-See [docs/SECURITY.md](./docs/SECURITY.md) for detailed security documentation.
-
----
-
-## Testing
-
-- **Unit tests**: Co-located with source files (*.test.ts)
-- **Integration tests**: Located in `tests/` directory
-- **tRPC router tests**: Available for key routers
-- **Testing libraries**: Vitest configured for WindowDownloader
-=======
 | Layer | Implementation | Status |
 |---|---|---|
 | **Password hashing** | bcryptjs (cost factor 12) via `lib/server/password.ts` | ✅ |
@@ -1178,7 +640,6 @@ See [docs/SECURITY.md](./docs/SECURITY.md) for full security documentation.
 | **Namespaces** | common, validation, errors, notifications, email |
 | **Formatting** | Locale-specific date, number, currency |
 | **Engine** | `i18next` + `react-i18next`, file-based loading |
->>>>>>> 2cd618c (refactor: update existing files)
 
 ---
 
@@ -1190,53 +651,23 @@ See [docs/SECURITY.md](./docs/SECURITY.md) for full security documentation.
 # Production build
 docker build --target production -t aifwms:latest .
 
-<<<<<<< HEAD
-# Run with Docker Compose
-=======
 # Full stack (app + postgres + redis + workers)
->>>>>>> 2cd618c (refactor: update existing files)
 docker-compose up
 ```
 
 ### Vercel
 
-<<<<<<< HEAD
-- Compatible with Vercel deployment for Next.js
-- Configure environment variables in Vercel dashboard
-- AI runtime compatible with Node.js runtime
-=======
 Deploy the Next.js app to Vercel. Set all environment variables in the Vercel dashboard. Workers must run separately (e.g., a dedicated Node.js container or Railway).
->>>>>>> 2cd618c (refactor: update existing files)
 
 ### Neon (Serverless PostgreSQL)
 
 ```bash
-<<<<<<< HEAD
-# Set Neon connection string
 export NEON_DATABASE_URL="postgresql://..."
-
-# Start stack
-=======
-export NEON_DATABASE_URL="postgresql://..."
->>>>>>> 2cd618c (refactor: update existing files)
 docker-compose up
 ```
 
 ---
 
-<<<<<<< HEAD
-## Roadmap
-
-The project follows a milestone-based sprint model. See:
-- [CHANGELOG.md](./CHANGELOG.md) for detailed progress
-
-### Current Status
-
-- **Sprint 1** — Build Recovery & Technical Stabilization (IN PROGRESS)
-- **Sprint 2** — AiFWMS Core Completion
-- **Sprint 3** — Compliance & Automation Enhancements
-- **Sprint 4** — ISO/QMS Integration
-=======
 ## Development Workflow
 
 1. Create a feature branch from `main`
@@ -1252,7 +683,6 @@ The project follows a milestone-based sprint model. See:
 - **tRPC** for client↔server communication — avoid raw `fetch()` for internal calls
 - **`'use client'` boundary** — server-only logic stays in server paths
 - **Tailwind CSS v4** — CSS-first with `@theme` tokens
->>>>>>> 2cd618c (refactor: update existing files)
 
 ---
 
@@ -1260,24 +690,10 @@ The project follows a milestone-based sprint model. See:
 
 1. Fork the repository
 2. Create a feature branch
-<<<<<<< HEAD
-3. Follow existing patterns in `docs/`
-4. Submit a PR
-5. Ensure typecheck and build pass
-
-### Contribution Principles
-
-- Preserve tenant isolation and RBAC safety
-- Never bypass tRPC contracts
-- Keep server-only logic in server paths
-- Maintain audit/compliance alignment
-- Add i18n translations for new UI strings
-=======
 3. Follow patterns in `docs/DEVELOPMENT.md`
 4. Preserve tenant isolation, RBAC safety, and audit compliance
 5. Add i18n translations for any new UI strings
 6. Submit a PR with typecheck and build passing
->>>>>>> 2cd618c (refactor: update existing files)
 
 ---
 
@@ -1289,50 +705,16 @@ See [CHANGELOG.md](./CHANGELOG.md) for sprint progress, fixes, and versioning.
 
 ## FAQ
 
-<<<<<<< HEAD
-See [docs/FAQ.md](./docs/FAQ.md) for answers to common questions about:
-- Multi-tenancy, AI providers, i18n, workers, ISO/QMS, CAPEX/OPEX
-- Local development, troubleshooting, and security
-=======
 See [docs/FAQ.md](./docs/FAQ.md) for answers on multi-tenancy, AI providers, i18n, workers, ISO/QMS, CAPEX/OPEX, local development, and security.
->>>>>>> 2cd618c (refactor: update existing files)
 
 ---
 
 ## License
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 PROPRIETARY — see [LICENSE](./LICENSE).
-=======
-PROPRIETARY — see `LICENSE`.
->>>>>>> 7b8345c (docs: updated)
-=======
-PROPRIETARY — see [LICENSE](./LICENSE).
->>>>>>> 2cd618c (refactor: update existing files)
 
 ---
 
 ## Acknowledgements
 
-<<<<<<< HEAD
-- **Next.js** & **React** — Web framework and UI library
-- **TypeScript** — Type-safe development
-- **Tailwind CSS** + **shadcn/ui** + **Radix UI** — Design system
-- **Prisma** — Database ORM
-- **tRPC** — Type-safe API layer
-- **Vercel AI SDK** — AI integration framework
-- **BullMQ** — Queue and job processing
-- **Redis** — In-memory data store
-- **PostgreSQL** + **pgvector** — Database and vector search
-- **Framer Motion** — Animation library
-- **Recharts** — Charting library
-- **React Flow** — Workflow visualization
-- **i18next** — Internationalization framework
-- **Zustand** — State management
-- **Zod** — Schema validation
-- **Electron** — Desktop application framework
-- **Open Source Community** — All contributors and dependency maintainers
-=======
 **Next.js** · **React** · **TypeScript** · **Tailwind CSS** · **shadcn/ui** · **Radix UI** · **Prisma** · **tRPC** · **Vercel AI SDK** · **Anthropic Claude** · **OpenAI** · **Ollama** · **BullMQ** · **Redis** · **PostgreSQL** · **pgvector** · **Framer Motion** · **Recharts** · **React Flow** · **i18next** · **Zustand** · **Zod** · **Electron** · **bcryptjs** · **jose**
->>>>>>> 2cd618c (refactor: update existing files)
