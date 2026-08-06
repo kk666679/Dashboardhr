@@ -96,10 +96,8 @@ let initialised = false;
 
 export function initClientI18n(locale: Locale = DEFAULT_LOCALE) {
   if (initialised) {
-    // Already running — just switch language if needed
-    if (i18next.language !== locale) {
-      void i18next.changeLanguage(locale);
-    }
+    // Already running. Avoid changing language during render; the provider effect
+    // will synchronise the active locale after mount.
     return i18next;
   }
 
@@ -147,5 +145,7 @@ export async function loadNamespace(ns: Namespace, locale: Locale = DEFAULT_LOCA
     }
   }
 }
+
+export const clientI18n = initClientI18n(DEFAULT_LOCALE);
 
 export default i18next;

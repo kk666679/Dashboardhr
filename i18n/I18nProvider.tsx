@@ -2,7 +2,7 @@
 
 import { type ReactNode, useEffect, useRef } from "react";
 import { I18nextProvider } from "react-i18next";
-import { initClientI18n } from "./client";
+import { clientI18n } from "./client";
 import { isValidLocale, DEFAULT_LOCALE } from "./config";
 import type { Locale } from "./config";
 
@@ -13,8 +13,7 @@ interface I18nProviderProps {
 
 export function I18nProvider({ locale, children }: I18nProviderProps) {
   const resolvedLocale: Locale = isValidLocale(locale) ? locale : DEFAULT_LOCALE;
-  // Initialise once synchronously so the first render already has translations
-  const i18n = useRef(initClientI18n(resolvedLocale)).current;
+  const i18n = useRef(clientI18n).current;
 
   useEffect(() => {
     if (i18n.language !== resolvedLocale) {

@@ -11,8 +11,8 @@
 
 import Redis from "ioredis";
 import { SignJWT, jwtVerify } from "jose";
-import type { HCMRole } from "@/src/shared-kernel/security/permission-types";
-import { MFA_REQUIRED_ROLES } from "@/src/shared-kernel/security/permission-types";
+import type { HCMRole } from "@/lib/shared-kernel/security/permission-types";
+import { MFA_REQUIRED_ROLES } from "@/lib/shared-kernel/security/permission-types";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 

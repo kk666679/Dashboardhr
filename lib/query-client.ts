@@ -49,6 +49,14 @@ function retryDelay(failureCount: number): number {
   return Math.min(RETRY_DELAY_BASE * 2 ** failureCount, 10_000);
 }
 
+/** Never retry auth or client errors — only transient server/network failures. */
+function shouldRetry(failureCount: number, error: unknown): boolean {
+  if (failureCount >= MAX_RETRIES) return false;
+  const status = (error as any)?.data?.httpStatus ?? (error as any)?.status;
+  if (status === 401 || status === 403 || status === 404 || (status >= 400 && status < 500)) return false;
+  return true;
+}
+
 // ─── Query client factory ─────────────────────────────────────────────────────
 
 let globalQueryClient: QueryClient | null = null;
@@ -70,11 +78,11 @@ function buildQueryClient(): QueryClient {
     defaultOptions: {
       queries: {
         staleTime: STALE_TIMES.default,
-        retry: MAX_RETRIES,
+        retry: shouldRetry,
         retryDelay,
         refetchOnWindowFocus: true,
         refetchOnReconnect: true,
-        gcTime: 5 * 60_000, // garbage collection after 5 min
+        gcTime: 5 * 60_000,
       },
       mutations: {
         retry: 0, // never retry mutations
