@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Zap } from "lucide-react";
+import { Zap, CalendarDays } from "lucide-react";
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import gsap from "gsap";
@@ -309,77 +309,112 @@ export default function CosmicLanding() {
     <div
       className="relative w-full h-screen overflow-hidden"
       style={{
-        background: "#010103",
+        background: "linear-gradient(135deg, #071827 0%, #10233b 45%, #0a1627 100%)",
       }}
     >
       {/* Three.js container - full background */}
       <div ref={containerRef} className="absolute inset-0 z-0" />
 
-      {/* Overlay content - same as before, but without the old canvas and nebula blobs */}
-      <div className="absolute inset-0 z-10 flex flex-col items-center justify-center text-center px-6 pointer-events-none">
-        <div className="float-glow-title pointer-events-auto">
-          <h1
-            className="font-black tracking-[0.06em] sm:tracking-[0.2em] text-center"
+      {/* Hero overlay — value prop first, canvas as background */}
+      <div className="absolute inset-0 z-10 flex flex-col items-center justify-center text-center px-6 pointer-events-none bg-[radial-gradient(circle_at_top,rgba(52,152,219,0.16),transparent_42%),linear-gradient(180deg,rgba(7,24,39,0.3),rgba(7,24,39,0.7))]" />
+      <div className="absolute inset-0 z-20 flex flex-col items-center justify-center text-center px-6 pointer-events-none">
+
+        {/* Logo + brand */}
+        <div className="float-glow-title pointer-events-auto flex flex-col items-center gap-3 mb-6">
+          <Image
+            src="/logo.svg"
+            alt="AiFWMS logo"
+            priority
+            width={72}
+            height={72}
             style={{
-              fontFamily: "'Orbitron', monospace",
-              fontSize: "clamp(24px, 7vw, 58px)",
-              background:
-                "linear-gradient(135deg, #eef2ff, #7dd3fc, #a78bfa, #c084fc)",
-              backgroundSize: "300% 300%",
-              WebkitBackgroundClip: "text",
-              backgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              animation: "shimmerText 5s ease infinite",
+              width: "clamp(44px, 8vw, 72px)",
+              height: "auto",
+              filter: "drop-shadow(0 0 18px rgba(125,211,252,0.4))",
+            }}
+          />
+          <span
+            style={{
+              fontFamily: "'Exo 2', sans-serif",
+              fontSize: "clamp(10px, 1.4vw, 13px)",
+              letterSpacing: "0.28em",
+              color: "rgba(125,211,252,0.7)",
+              textTransform: "uppercase",
             }}
           >
-            <span className="flex flex-col items-center gap-y-3 sm:gap-y-4 justify-center">
-              <img
-                src="/logo.svg"
-                alt="Chemara Enterprise logo"
-                loading="eager"
-                style={{
-                  width: "clamp(48px, 10vw, 90px)",
-                  height: "auto",
-                  filter: "drop-shadow(0 0 18px rgba(125,211,252,0.35))",
-                  WebkitTextFillColor: "initial",
-                }}
-              />
-              <span className="flex flex-wrap items-center gap-x-[0.4em] gap-y-2 sm:gap-[0.85em] justify-center">
-                <span>CHEMMARA</span>
-                <span>ENTERPRISE</span>
-              </span>
-            </span>
-          </h1>
+            AiFWMS by Chemmara Enterprise
+          </span>
         </div>
 
-        <p
-          className="font-light tracking-[0.35em] uppercase mt-4 pointer-events-auto"
+        {/* Primary headline */}
+        <h1
+          className="font-black text-center pointer-events-auto"
           style={{
-            fontFamily: "'Exo 2', sans-serif",
-            fontSize: "clamp(10px, 2vw, 18px)",
-            color: "rgba(167,139,250,0.85)",
-            textShadow: "0 0 12px rgba(125,211,252,0.3)",
+            fontFamily: "'Orbitron', monospace",
+            fontSize: "clamp(20px, 5vw, 48px)",
+            lineHeight: 1.15,
+            color: "#f8fafc",
+            textShadow: "0 10px 30px rgba(2, 10, 22, 0.45)",
+            maxWidth: "860px",
           }}
         >
-          Smart Human Resources, Expatriate &amp; Foreign Workers Management
+          <span className="text-white">Unify work. Empower people.</span>{" "}
+          <span style={{ color: "#f5b041" }}>Reduce costs.</span>{" "}
+          <span className="text-white">Move faster.</span>
+        </h1>
+
+        {/* Subheadline */}
+        <p
+          className="mt-5 pointer-events-auto"
+          style={{
+            fontFamily: "'Exo 2', sans-serif",
+            fontSize: "clamp(13px, 1.8vw, 18px)",
+            color: "#ecf0f1",
+            maxWidth: "560px",
+            lineHeight: 1.6,
+          }}
+        >
+          Malaysia&apos;s enterprise HR &amp; foreign worker & expatriate platform.
         </p>
 
-        <div className="w-full max-w-md mx-auto mt-12 float-glow-button fade-in-up pointer-events-auto">
-          <Card className="bg-gradient-to-br from-purple-500/30 to-blue-500/30 backdrop-blur-md border-white/30 shadow-2xl hover:shadow-[0_0_32px_rgba(167,139,250,0.4)] transition-all duration-500 hover:scale-[1.02]">
-            <CardContent className="p-8">
-              <Button
-                asChild
-                size="lg"
-                className="w-full bg-gradient-to-r from-white via-blue-50 to-indigo-100 text-gray-900 font-bold tracking-wide text-lg shadow-2xl hover:shadow-[0_0_24px_rgba(99,102,241,0.4)] hover:scale-105 transition-all duration-300 px-10 py-8 font-black border-0"
-              >
-                <Link href="/dashboard">
-                  <Zap className="w-7 h-7 mr-3" />
-                  🚀 Start Here
-                </Link>
-              </Button>
-            </CardContent>
-          </Card>
+        {/* Dual CTA */}
+        <div className="flex flex-col sm:flex-row items-center gap-3 mt-10 fade-in-up pointer-events-auto">
+          <Button
+            asChild
+            size="lg"
+            className="bg-[#e67e22] text-white font-bold text-base shadow-[0_16px_40px_rgba(230,126,34,0.28)] hover:bg-[#cf6413] hover:scale-105 transition-all duration-300 px-8 py-6 border-0 min-w-[180px]"
+          >
+            <Link href="/dashboard">
+              <Zap className="w-5 h-5 mr-2" />
+              Request a demo
+            </Link>
+          </Button>
+
+          <Button
+            asChild
+            size="lg"
+            variant="outline"
+            className="border-[#3498db]/45 text-[#ecf0f1] bg-[#3498db]/12 backdrop-blur-sm hover:bg-[#3498db]/20 hover:scale-105 transition-all duration-300 px-8 py-6 text-base min-w-[180px]"
+          >
+            <Link href="/employees/onboarding">
+              <CalendarDays className="w-5 h-5 mr-2" />
+              See onboarding workflow
+            </Link>
+          </Button>
         </div>
+
+        {/* Social proof */}
+        <p
+          className="mt-6 pointer-events-auto"
+          style={{
+            fontFamily: "'Exo 2', sans-serif",
+            fontSize: "clamp(10px, 1.2vw, 12px)",
+            color: "rgba(236,240,241,0.8)",
+            letterSpacing: "0.05em",
+          }}
+        >
+          Trusted by manufacturers, plantations &amp; construction firms across Malaysia
+        </p>
       </div>
 
       {/* Hint badge - keep as before */}

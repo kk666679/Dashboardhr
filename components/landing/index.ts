@@ -15,7 +15,9 @@ export { SecurityModule } from '../landing/SecurityModule';
 export { PricingPreviewModule } from '../landing/PricingPreviewModule';
 export { FAQModule } from '../landing/FAQModule';
 
-// Shared components
+export { PersonaRoutingSection } from '../landing/PersonaRoutingSection';
+export { OutcomesBar } from '../landing/OutcomesBar';
+export { ConnectedWorkflowSection } from '../landing/ConnectedWorkflowSection';
 export { default as Marquee } from '../landing/marquee';
 export { default as CosmicLanding } from '../landing/cosmic-landing';
 export { default as TechStackMarquee } from '../landing/TechStackMarquee';

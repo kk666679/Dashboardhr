@@ -1,23 +1,18 @@
 "use client";
 
-// Landing section components
 import { EnterpriseHeader } from "../landing/EnterpriseHeader";
 import { WorkforceModule } from "../landing/WorkforceModule";
 import { AutomationModule } from "../landing/AutomationModule";
 import { SecurityModule } from "../landing/SecurityModule";
 import { FAQModule } from "../landing/FAQModule";
-
-// Shared / decorative components
+import { PersonaRoutingSection } from "../landing/PersonaRoutingSection";
+import { OutcomesBar } from "../landing/OutcomesBar";
+import { ConnectedWorkflowSection } from "../landing/ConnectedWorkflowSection";
 import CosmicLanding from "@/components/landing/cosmic-landing";
-import TechStackMarquee from "@/components/landing/TechStackMarquee";
-
-// Module-landing sub-components
 import { GovernmentIntegration } from "@/components/modules/landing/GovernmentIntegration";
 import { CtaSection } from "@/components/modules/landing/CtaSection";
 import type { CtaAction } from "@/components/modules/landing/CtaSection";
 import { FooterSection } from "@/components/modules/landing/FooterSection";
-
-// AI
 import { AIChatbot } from "@/components/features/ai/ai-chatbot";
 
 /* ------------------------------------------------------------------ */
@@ -26,23 +21,21 @@ import { AIChatbot } from "@/components/features/ai/ai-chatbot";
 
 const translations = {
   en: {
-    subtitle: "Complete compliance solution for Malaysian businesses",
+    subtitle: "Unify workforce operations to improve employee experience, control cost, and move work faster.",
     cta: {
-      title: "Ready to Get Started?",
-      subtitle:
-        "Join 2,500+ Malaysian businesses using our enhanced FWMS",
-      demo: "Try Live Demo",
-      contact: "Contact Sales",
+      title: "Ready to see it in action?",
+      subtitle: "Join 2,500+ Malaysian businesses running a more productive, compliant, and cost-efficient workforce.",
+      demo: "Request a tailored demo",
+      contact: "Calculate your ROI",
     },
   },
   ms: {
-    subtitle: "Penyelesaian pematuhan lengkap untuk perniagaan Malaysia",
+    subtitle: "Satukan operasi tenaga kerja untuk meningkatkan pengalaman pekerja, mengawal kos, dan mempercepatkan kerja.",
     cta: {
-      title: "Bersedia untuk Memulakan?",
-      subtitle:
-        "Sertai 2,500+ perniagaan Malaysia menggunakan FWMS kami",
-      demo: "Cuba Demo Langsung",
-      contact: "Hubungi Jualan",
+      title: "Bersedia untuk melihatnya?",
+      subtitle: "Sertai 2,500+ perniagaan Malaysia yang menjalankan tenaga kerja yang lebih produktif dan patuh.",
+      demo: "Minta demo yang disesuaikan",
+      contact: "Kira ROI anda",
     },
   },
 } as const;
@@ -54,36 +47,21 @@ const translations = {
 export function LandingLayout() {
   const t = translations["en"];
 
-  const handleWindowExeDownload = () => {
-    const link = document.createElement("a");
-    link.href = "/api/window-exe";
-    link.download = "Window.exe";
-    link.click();
-  };
-
-  /* ---- Government integrations ---- */
   const governmentApis = [
-    { name: "JTK", status: "Active", icon: "⚖️", color: "bg-green-500" },
-    { name: "Immigration", status: "Active", icon: "🛂", color: "bg-green-500" },
+    { name: "JTK / JTKSM", status: "Active", icon: "⚖️", color: "bg-green-500" },
+    { name: "Immigration (JIM)", status: "Active", icon: "🛂", color: "bg-green-500" },
     { name: "LHDN", status: "Active", icon: "📊", color: "bg-green-500" },
-    { name: "EPF", status: "Active", icon: "🏛️", color: "bg-green-500" },
-    { name: "SOCSO", status: "Active", icon: "🛡️", color: "bg-green-500" },
+    { name: "EPF (KWSP)", status: "Active", icon: "🏛️", color: "bg-green-500" },
+    { name: "SOCSO (PERKESO)", status: "Active", icon: "🛡️", color: "bg-green-500" },
     { name: "FOMEMA", status: "Active", icon: "🏥", color: "bg-green-500" },
   ];
 
-  /* ---- CTA actions ---- */
   const ctaActions: CtaAction[] = [
     {
       label: t.cta.demo,
       href: "/dashboard",
       icon: "zap",
       variant: "primary",
-    },
-    {
-      label: "WindowDownloader.exe Download",
-      onClick: handleWindowExeDownload,
-      icon: "download",
-      variant: "outline",
     },
     {
       label: t.cta.contact,
@@ -95,25 +73,31 @@ export function LandingLayout() {
 
   return (
     <div className="min-h-screen">
-      {/* ---- Enterprise Navbar ---- */}
+      {/* 1. Persistent outcome-first navbar with "Request a demo" primary CTA */}
       <EnterpriseHeader />
 
-{/* ---- Hero: full-screen Cosmic canvas ---- */}
+      {/* 2. Hero — outcome promise + dual CTA over cosmic canvas */}
       <section className="relative">
         <CosmicLanding />
       </section>
 
-      {/* ---- Tech Stack Marquee hero section ---- */}
-      <TechStackMarquee />
+      {/* 3. Six executive outcomes — immediately below the hero */}
+      <OutcomesBar />
 
-      {/* ---- Main content: all LandingLayout section modules ---- */}
+      {/* 4. Five role-based paths — executives see outcomes, technical evaluators reach depth */}
+      <PersonaRoutingSection />
+
+      {/* 5. Connected workflow visual — one hire flowing across HR, Finance, IT, Facilities, Employee */}
+      <ConnectedWorkflowSection />
+
+      {/* 6. Platform capability modules */}
       <main>
         <WorkforceModule />
 
-        {/* ---- Government Integration ---- */}
+        {/* 7. Government integration trust section */}
         <GovernmentIntegration
-          title="Government API Status"
-          subtitle="Real-time integration with Malaysian authorities"
+          title="Connected to Malaysian statutory authorities"
+          subtitle="Real-time integrations with every government body your workforce depends on"
           apis={governmentApis}
         />
 
@@ -122,55 +106,52 @@ export function LandingLayout() {
         <FAQModule />
       </main>
 
-      {/* ---- CTA Section ---- */}
+      {/* 8. Progressive conversion CTA — demo + ROI calculator */}
       <CtaSection
         title={t.cta.title}
         subtitle={t.cta.subtitle}
         actions={ctaActions}
       />
 
-      {/* ---- Footer ---- */}
+      {/* 9. Footer — outcome language, not acronyms */}
       <FooterSection
         brand={{
           name: "AiFWMS",
           version: "v2.1",
           subtitle: t.subtitle,
-          tagline: "Malaysian Compliant Real-Time Enabled",
+          tagline: "Malaysian Compliant · Real-Time · AI-Powered",
           copyright:
             "© 2026 AiFWMS. All rights reserved. CHEMMARA ENTERPRISE 003149776-P",
         }}
         columns={[
           {
-            title: "Enterprise Products",
+            title: "Solutions",
             links: [
-              { href: "/dashboard", label: "HR Administration" },
-              { href: "/accounting", label: "Accounting" },
-              { href: "/automation", label: "Automation" },
-              { href: "/ai", label: "AI Hub" },
-              { href: "/employees", label: "Employees" },
-              { href: "/capex", label: "CAPEX" },
+              { href: "/ess", label: "Improve employee experience" },
+              { href: "/accounting/payroll", label: "Reduce workforce cost and risk" },
+              { href: "/employees", label: "Streamline HR operations" },
+              { href: "/dashboard/geolocation", label: "Run efficient workplace operations" },
+              { href: "/employees/foreign-workers", label: "Foreign worker compliance" },
             ],
           },
           {
-            title: "Portals & Integrations",
+            title: "Platform",
             links: [
-              { href: "/ess", label: "Employee Portal (ESS)" },
-              { href: "/mss", label: "Manager Portal (MSS)" },
-              { href: "/integrations", label: "Integrations Hub" },
-              { href: "/dashboard/geolocation", label: "Live Tracking" },
-              { href: "/dashboard/compliance", label: "Compliance" },
+              { href: "/automation", label: "Workflow automation" },
+              { href: "/dashboard/analytics", label: "Analytics and intelligence" },
+              { href: "/integrations", label: "Integrations" },
+              { href: "/dashboard/security", label: "Security and governance" },
+              { href: "/api/openapi", label: "Developer platform" },
             ],
           },
         ]}
         aiAssistant={{
           title: "AI Assistant",
-          description:
-            "Get instant answers about Malaysian labor laws and regulations",
+          description: "Get instant answers about Malaysian labor laws and regulations",
           buttonLabel: "Start Chat",
         }}
       />
 
-      {/* ---- Floating AI Chatbot ---- */}
       <AIChatbot />
     </div>
   );

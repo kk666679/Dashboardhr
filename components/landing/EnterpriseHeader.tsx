@@ -20,132 +20,67 @@ interface ProductFamily {
 
 const PRODUCT_FAMILIES: ProductFamily[] = [
   {
-    id: "ai",
-    label: "AI",
-    href: "/ai",
-    pages: [
-      { label: "AI Hub", href: "/ai" },
-      { label: "Chat Hub", href: "/ai/chat-hub" },
-      { label: "Knowledge Base", href: "/ai/kb-chat" },
-      { label: "Semantic Search", href: "/ai/semantic-search" },
-      { label: "HR Orchestrator", href: "/ai/hr-orchestrator" },
-      { label: "Document Generator", href: "/ai/doc-generator" },
-      { label: "Compliance AI", href: "/ai/compliance" },
-      { label: "Recruitment AI", href: "/ai/recruitment" },
-    ],
-  },
-  {
-    id: "hr",
-    label: "HR",
-    href: "/employees",
-    pages: [
-      { label: "Employees", href: "/employees" },
-      { label: "Onboarding", href: "/employees/onboarding" },
-      { label: "Offboarding", href: "/employees/offboarding" },
-      { label: "Foreign Workers", href: "/employees/foreign-workers" },
-      { label: "Expatriates", href: "/employees/expatriates" },
-      { label: "Compensation", href: "/dashboard/compensation" },
-      { label: "Recruitment", href: "/dashboard/recruitment" },
-      { label: "Performance", href: "/dashboard/performance" },
-    ],
-  },
-  {
-    id: "workforce",
-    label: "Workforce",
+    id: "solutions",
+    label: "Solutions",
     href: "/employees/foreign-workers",
     pages: [
-      { label: "Worker Dashboard", href: "/dashboard" },
-      { label: "Permits & Visas", href: "/employees/permits" },
-      { label: "Medical / FOMEMA", href: "/employees/medical" },
-      { label: "Accommodation", href: "/dashboard/accommodation" },
-      { label: "Geolocation", href: "/dashboard/geolocation" },
-      { label: "Scheduling", href: "/dashboard/scheduling" },
-      { label: "ESS Portal", href: "/ess" },
-      { label: "MSS Portal", href: "/mss" },
+      { label: "Improve employee experience", href: "/ess" },
+      { label: "Reduce workforce cost and risk", href: "/accounting/payroll" },
+      { label: "Streamline HR operations", href: "/employees" },
+      { label: "Run efficient workplace operations", href: "/dashboard/geolocation" },
+      { label: "Ensure foreign worker compliance", href: "/employees/foreign-workers" },
     ],
   },
   {
-    id: "accounting",
-    label: "Accounting",
-    href: "/accounting",
-    pages: [
-      { label: "Dashboard", href: "/accounting" },
-      { label: "Invoices", href: "/accounting/invoices" },
-      { label: "E-Invoice", href: "/accounting/e-invoice" },
-      { label: "Payroll", href: "/accounting/payroll" },
-      { label: "Payroll Calculator", href: "/accounting/payroll-calculator" },
-      { label: "Tax Calculator", href: "/accounting/tax-calculator" },
-      { label: "Financial Reports", href: "/accounting/reports" },
-      { label: "Government Submissions", href: "/accounting/government-submissions" },
-    ],
-  },
-  {
-    id: "automation",
-    label: "Automation",
+    id: "platform",
+    label: "Platform",
     href: "/automation",
     pages: [
-      { label: "Overview", href: "/automation" },
-      { label: "Flow Designer", href: "/automation/designer" },
-      { label: "Workflow Engine", href: "/automation/workflow-engine" },
-      { label: "QMS / Quality", href: "/automation/qms" },
-      { label: "SOP Workflows", href: "/automation/sops" },
-      { label: "Templates", href: "/automation/templates" },
-      { label: "Analytics", href: "/automation/analytics" },
+      { label: "Workflow automation", href: "/automation" },
+      { label: "Analytics and decision intelligence", href: "/dashboard/analytics" },
+      { label: "Integrations", href: "/integrations" },
+      { label: "Security, privacy, and governance", href: "/dashboard/security" },
+      { label: "Developer platform", href: "/api/openapi" },
     ],
   },
   {
-    id: "iso",
-    label: "ISO",
-    href: "/iso",
+    id: "by-role",
+    label: "By role",
+    href: "/employees",
     pages: [
-      { label: "ISO Dashboard", href: "/iso" },
-      { label: "Audit Checklist", href: "/iso/audit-checklist" },
-      { label: "Create Audit Plan", href: "/iso/audit-create-plan" },
-      { label: "Generate Audit", href: "/iso/audit-generate" },
-      { label: "CAPA", href: "/iso/capa-create" },
-      { label: "Compliance Check", href: "/iso/compliance-check" },
-      { label: "Gap Analysis", href: "/iso/gap-analysis" },
-      { label: "Fishbone", href: "/iso/fishbone" },
+      { label: "HR leaders", href: "/employees" },
+      { label: "Finance leaders", href: "/accounting" },
+      { label: "Operations leaders", href: "/dashboard/geolocation" },
+      { label: "IT leaders", href: "/integrations" },
+      { label: "Developers", href: "/api/openapi" },
     ],
   },
   {
-    id: "analytics",
-    label: "Analytics",
-    href: "/dashboard/analytics",
+    id: "customers",
+    label: "Customers",
+    href: "/dashboard",
     pages: [
-      { label: "Analytics Dashboard", href: "/dashboard/analytics" },
-      { label: "Financial Reports", href: "/accounting/reports" },
-      { label: "Automation Analytics", href: "/automation/analytics" },
-      { label: "Compliance Dashboard", href: "/iso/compliance-dashboard" },
-      { label: "Compliance Score", href: "/iso/compliance-score" },
-      { label: "OPEX Analytics", href: "/opex/analytics" },
+      { label: "Customer stories", href: "/dashboard" },
+      { label: "Industries", href: "/dashboard" },
+      { label: "ROI and outcomes", href: "/dashboard" },
     ],
   },
   {
-    id: "integrations",
-    label: "Integrations",
-    href: "/integrations",
+    id: "resources",
+    label: "Resources",
+    href: "/ai/kb-chat",
     pages: [
-      { label: "Overview", href: "/integrations" },
-      { label: "Government APIs", href: "/integrations/government" },
-      { label: "OpenAPI", href: "/api/openapi" },
-      { label: "HR Integration", href: "/api/hr-integration" },
-    ],
-  },
-  {
-    id: "api",
-    label: "API",
-    href: "/integrations",
-    pages: [
-      { label: "Integrations Hub", href: "/integrations" },
-      { label: "Government APIs", href: "/integrations/government" },
-      { label: "Agencies Integration", href: "/integrations/government/agencies-integration" },
+      { label: "Guides and reports", href: "/ai/kb-chat" },
+      { label: "Implementation resources", href: "/automation/templates" },
+      { label: "Help center / documentation", href: "/ai/semantic-search" },
+      { label: "Malaysian labor law guide", href: "/ai/hr-orchestrator" },
+      { label: "API reference", href: "/api/openapi" },
     ],
   },
 ];
 
 export function EnterpriseHeader() {
-  const { href: localizedHref, locale } = useLocalizedHref();
+  const { href: localizedHref } = useLocalizedHref();
   const [scrolled, setScrolled] = useState(false);
 
   // Localize all product family + page hrefs
@@ -164,11 +99,9 @@ export function EnterpriseHeader() {
 
   const [mobileOpen, setMobileOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
-  const [mounted, setMounted] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    setMounted(true);
     const onScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener("scroll", onScroll, { passive: true });
 
@@ -200,8 +133,8 @@ export function EnterpriseHeader() {
       className={cn(
         "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
         scrolled
-          ? "bg-background/80 backdrop-blur-xl border-b shadow-sm"
-          : "bg-transparent",
+          ? "bg-[#071827]/95 backdrop-blur-xl border-b border-[#23415c]/60 shadow-[0_12px_40px_rgba(2,10,22,0.35)]"
+          : "bg-[#071827]/90 backdrop-blur-xl border-b border-[#23415c]/40",
       )}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
@@ -209,7 +142,7 @@ export function EnterpriseHeader() {
           {/* Logo */}
           <Link href={localizedHref("/")} className="flex items-center gap-2 flex-shrink-0">
             <Logo width={36} height={36} className="rounded-lg" />
-            <span className="font-bold text-lg hidden sm:block bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
+            <span className="font-bold text-lg hidden sm:block text-white">
               AiFWMS
             </span>
           </Link>
@@ -227,8 +160,8 @@ export function EnterpriseHeader() {
                   href={family.href}
                   className={cn(
                     "px-3 py-2 text-sm font-medium rounded-md transition-colors",
-                    "hover:bg-accent hover:text-accent-foreground",
-                    "text-muted-foreground",
+                    "hover:bg-[#17324f] hover:text-white",
+                    "text-slate-100/90",
                   )}
                 >
                   <span className="flex items-center gap-1">
@@ -244,14 +177,14 @@ export function EnterpriseHeader() {
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       exit={{ opacity: 0, y: 8, scale: 0.96 }}
                       transition={{ duration: 0.15, ease: "easeOut" }}
-                      className="absolute top-full left-0 mt-1 w-56 rounded-xl border bg-popover shadow-2xl overflow-hidden"
+                      className="absolute top-full left-0 mt-1 w-56 rounded-xl border border-[#23415c] bg-[#10263f] shadow-2xl overflow-hidden"
                     >
                       <div className="p-2">
-                        {family.pages.map((page) => (
+                        {family.pages.map((page, idx) => (
                           <Link
-                            key={page.href}
+                            key={`${page.href}-${idx}`}
                             href={page.href}
-                            className="block px-3 py-2 rounded-lg text-sm hover:bg-accent hover:text-accent-foreground transition-colors text-muted-foreground"
+                            className="block px-3 py-2 rounded-lg text-sm hover:bg-[#17324f] hover:text-white transition-colors text-slate-200/90"
                             onClick={() => setActiveDropdown(null)}
                           >
                             {page.label}
@@ -260,7 +193,7 @@ export function EnterpriseHeader() {
                         <div className="border-t mt-2 pt-2">
                           <Link
                             href={family.href}
-                            className="block px-3 py-2 rounded-lg text-sm font-medium text-primary hover:bg-accent transition-colors"
+                            className="block px-3 py-2 rounded-lg text-sm font-medium text-[#7dd3fc] hover:bg-[#17324f] hover:text-white transition-colors"
                             onClick={() => setActiveDropdown(null)}
                           >
                             View all {family.label} →
@@ -279,20 +212,38 @@ export function EnterpriseHeader() {
             <LanguageSwitcher />
             <ThemeToggle />
 
-            <Button variant="default" size="sm" className="hidden sm:inline-flex gap-2" asChild>
-              <Link href={localizedHref("/login")}>
-                <LogIn className="h-4 w-4" />
-                Sign In
+            <Link
+              href={localizedHref("/dashboard/settings/pricing")}
+              className="hidden md:inline-flex px-3 py-2 text-sm font-medium text-[#7dd3fc] hover:text-[#f5b041] transition-colors"
+            >
+              Pricing
+            </Link>
+
+            <Button
+              variant="default"
+              size="sm"
+              className="hidden sm:inline-flex gap-2 bg-[#e67e22] text-white hover:bg-[#cf6413] shadow-[0_12px_30px_rgba(230,126,34,0.25)]"
+              asChild
+            >
+              <Link href={localizedHref("/dashboard")}>
+                Request a demo
               </Link>
             </Button>
 
-            <Button variant="default" size="sm" className="sm:hidden" asChild>
-              <Link href={localizedHref("/login")}>Login</Link>
+            <Button variant="ghost" size="sm" className="hidden sm:inline-flex gap-1 text-[#7dd3fc] hover:text-white hover:bg-[#17324f]" asChild>
+              <Link href={localizedHref("/login")}>
+                <LogIn className="h-4 w-4" />
+                Log in
+              </Link>
+            </Button>
+
+            <Button variant="default" size="sm" className="sm:hidden bg-[#e67e22] text-white hover:bg-[#cf6413]" asChild>
+              <Link href={localizedHref("/login")}>Log in</Link>
             </Button>
 
             {/* Mobile menu trigger */}
             <button
-              className="lg:hidden p-2 rounded-md hover:bg-accent"
+              className="lg:hidden p-2 rounded-md text-white hover:bg-[#17324f]"
               onClick={() => setMobileOpen(!mobileOpen)}
               aria-label="Toggle menu"
             >
@@ -316,7 +267,7 @@ export function EnterpriseHeader() {
                 <div key={family.id}>
                   <Link
                     href={family.href}
-                    className="flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium hover:bg-accent transition-colors"
+                    className="flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium text-white hover:bg-[#17324f] transition-colors"
                     onClick={() => {
                       setMobileOpen(false);
                       setActiveDropdown(null);
@@ -326,11 +277,11 @@ export function EnterpriseHeader() {
                     <ChevronDown className="h-4 w-4 opacity-50" />
                   </Link>
                   <div className="ml-4 space-y-0.5 mb-2">
-                    {family.pages.map((page) => (
+                    {family.pages.map((page, idx) => (
                       <Link
-                        key={page.href}
+                        key={`${page.href}-${idx}`}
                         href={page.href}
-                        className="block px-3 py-2 rounded-lg text-sm text-muted-foreground hover:bg-accent transition-colors"
+                        className="block px-3 py-2 rounded-lg text-sm text-slate-200/90 hover:bg-[#17324f] transition-colors"
                         onClick={() => setMobileOpen(false)}
                       >
                         {page.label}
@@ -340,7 +291,7 @@ export function EnterpriseHeader() {
                 </div>
               ))}
               <div className="border-t pt-4 mt-4">
-                <Button className="w-full gap-2" asChild>
+                <Button className="w-full gap-2 bg-[#3498db] text-white hover:bg-[#267db8]" asChild>
                   <Link href="/login" onClick={() => setMobileOpen(false)}>
                     <LogIn className="h-4 w-4" />
                     Sign In
