@@ -144,7 +144,7 @@ Each bounded context owns its **ubiquitous language** (e.g., *Levy*, *FOMEMA*, *
 A **hybrid structure** — feature-first for the presentation/application layers,
 bounded-context-first for the domain layer. This mirrors the actual repository layout.
 
-```text
+```
 ├── app/                                # Next.js App Router — composition root (Presentation)
 │   ├── [locale]/                       #   localized route segment (en, ms, zh, ar, …)
 │   │   ├── (auth)/login/               #   auth route group
@@ -264,6 +264,7 @@ bounded-context-first for the domain layer. This mirrors the actual repository l
 │
 ├── workers/                            # BullMQ workers (async jobs)
 ### `utils/` — Pure Utilities
+```
 
 - **Purpose**: Framework-agnostic helper functions with no business rules.
 - **Responsibilities**: Currency formatting, compliance helpers, tax calculators, PDF generators (see `utils/currency.ts`, `utils/geolocation/`, `utils/malaysian-tax/`, `utils/pdf/`).
@@ -305,3 +306,4 @@ sequenceDiagram
   Srv->>S: call use-case → domain service
   S->>D: enforce invariants, build aggregate
   S->>DB: repository persists via Prisma
+```
