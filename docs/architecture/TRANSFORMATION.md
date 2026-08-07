@@ -557,25 +557,64 @@ Documents | Analytics | Administration | AI Copilot
 **Route Hierarchy:**
 ```mermaid
 flowchart TD
-    Root[/] --> Dashboard[/dashboard<br>Command Center]
-    Root --> Workspace[/workspace<br>Workspace Sessions]
-    Workspace --> Session[/workspace/{sessionId}<br>Active Workspace]
+    Root(/) --> Dashboard["/dashboard<br>Command Center"]
+    Root --> Workspace["/workspace<br>Workspace Sessions"]
+    Workspace --> Session["/workspace/{sessionId}<br>Active Workspace"]
     
-    Root --> Domains[Business Domains]
-    Domains --> People[/people]
-    Domains --> Recruitment[/recruitment]
-    Domains --> Payroll[/payroll]
-    Domains --> Attendance[/attendance]
-    Domains --> Leave[/leave]
-    Domains --> FW[/foreign-workers]
+    Root --> Domains{Business Domains}
+    Domains --> People["/people"]
+    Domains --> Recruitment["/recruitment"]
+    Domains --> Payroll["/payroll"]
+    Domains --> Attendance["/attendance"]
+    Domains --> Leave["/leave"]
+    Domains --> FW["/foreign-workers"]
     
-    Root --> Platforms[Cross-Cutting Platforms]
-    Platforms --> Compliance[/compliance]
-    Platforms --> Automation[/automation]
-    Platforms --> Knowledge[/knowledge]
+    Root --> Platforms{Cross-Cutting Platforms}
+    Platforms --> Compliance["/compliance"]
+    Platforms --> Automation["/automation"]
+    Platforms --> Knowledge["/knowledge"]
     
-    Root --> Copilot[/ai/copilot<br>AI Assistant]
+    Root --> Copilot["/ai/copilot<br>AI Assistant"]
+
+    classDef root fill:#2d3748,stroke:#1a202c,stroke-width:3px,color:#fff,font-weight:bold,font-size:16px
+    classDef domain fill:#fed7d7,stroke:#e53e3e,stroke-width:3px,color:#742a2a,font-weight:bold,font-size:14px
+    classDef platform fill:#bee3f8,stroke:#2b6cb0,stroke-width:3px,color:#2a4365,font-weight:bold,font-size:14px
+    classDef path fill:#c6f6d5,stroke:#276749,stroke-width:2px,color:#22543d,font-size:12px
+    classDef copilot fill:#e9d8fd,stroke:#6b46c1,stroke-width:3px,color:#44337a,font-weight:bold
+    classDef workspace fill:#fefcbf,stroke:#d69e2e,stroke-width:2px,color:#744210
+    classDef session fill:#fbd38d,stroke:#c05621,stroke-width:2px,color:#7b341e
+    
+    class Root root
+    class Domains domain
+    class Platforms platform
+    class People,Recruitment,Payroll,Attendance,Leave,FW path
+    class Compliance,Automation,Knowledge path
+    class Copilot copilot
+    class Dashboard,Workspace workspace
+    class Session session
 ```
+
+# 🎨 Color Hierarchy Legend:
+- Level	Node Type	Color	Purpose
+- Level 1	Root /	Dark gray	Entry point
+- Level 2	Business Domains	Red/Pink	Domain category
+- Level 2	Cross-Cutting Platforms	Blue	Platform category
+- Level 3	Path nodes (/people, etc.)	Green	Individual endpoints
+- Level 3	Workspace	Yellow	Session container
+- Level 4	Session {sessionId}	Orange	Dynamic session
+- Special	Copilot AI	Purple	AI assistant feature
+
+# 📊 Visual Hierarchy Features:
+1. Color coding - Each level has distinct colors for quick recognition
+
+2. Stroke width - Higher-level nodes have thicker borders (3px vs 2px)
+
+3. Font weight - Categories and root are bold, endpoints are normal
+
+4. Font size - Root (16px) > Categories (14px) > Endpoints (12px)
+
+5. Shape distinction - Diamonds for categories, rectangles for endpoints
+
 
 ### 5C — Artifact Synchronization Model
 Every workspace automatically synchronizes artifacts through the event bus. The following chain ensures **no duplication**:
@@ -717,24 +756,34 @@ flowchart LR
 **Observability Architecture:**
 ```mermaid
 flowchart TD
-    subgraph Signals[📡 Telemetry Signals]
-        Logs[📝 pino Structured Logs]
-        Errors[🚨 Sentry Errors]
-        Metrics[📊 Agent Metrics<br>Latency / Success / Tokens]
-        Health[💓 Health Checks]
-        Perf[⚡ Vercel Analytics]
+    subgraph Signals["📡 Telemetry Signals"]
+        Logs["📝 pino Structured Logs"]
+        Errors["🚨 Sentry Errors"]
+        Metrics["📊 Agent Metrics<br>Latency / Success / Tokens"]
+        Health["💓 Health Checks"]
+        Perf["⚡ Vercel Analytics"]
     end
     
-    subgraph Storage[🗄️ Storage & Visualization]
-        LogStore[(Log Aggregator)]
-        ErrorDashboard[Sentry Dashboard]
-        CostDashboard[💰 LLM Cost Dashboard]
-        HealthEndpoint[/api/health]
-        PerfDashboard[Vercel Analytics]
+    subgraph Storage["🗄️ Storage & Visualization"]
+        LogStore[("Log Aggregator")]
+        ErrorDashboard["Sentry Dashboard"]
+        CostDashboard["💰 LLM Cost Dashboard"]
+        HealthEndpoint[/"api/health"/]
+        PerfDashboard["Vercel Analytics"]
     end
     
     Signals --> Storage
-    Storage --> Alert[🔔 Alerting / SRE]
+    Storage --> Alert["🔔 Alerting / SRE"]
+
+    classDef signal fill:#e0f2fe,stroke:#0284c7,stroke-width:2px,color:#0c4a6e
+    classDef storage fill:#dcfce7,stroke:#16a34a,stroke-width:2px,color:#14532d
+    classDef alert fill:#fee2e2,stroke:#dc2626,stroke-width:3px,color:#7f1d1d
+    classDef database fill:#fef08a,stroke:#ca8a04,stroke-width:2px,color:#713f12
+    
+    class Logs,Errors,Metrics,Health,Perf signal
+    class LogStore,ErrorDashboard,CostDashboard,HealthEndpoint,PerfDashboard storage
+    class Alert alert
+    class LogStore database
 ```
 
 - `pino` structured logging (already installed, wire up)
