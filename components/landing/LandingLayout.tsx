@@ -24,7 +24,7 @@ const translations = {
     subtitle: "Unify workforce operations to improve employee experience, control cost, and move work faster.",
     cta: {
       title: "Ready to see it in action?",
-      subtitle: "Join 2,500+ Malaysian businesses running a more productive, compliant, and cost-efficient workforce.",
+      subtitle: "See how a unified workforce platform can make your HR and compliance operations clearer, faster, and easier to manage.",
       demo: "Request a tailored demo",
       contact: "Calculate your ROI",
     },
@@ -97,7 +97,7 @@ export function LandingLayout() {
         {/* 7. Government integration trust section */}
         <GovernmentIntegration
           title="Connected to Malaysian statutory authorities"
-          subtitle="Real-time integrations with every government body your workforce depends on"
+          subtitle="Bring statutory documents, deadlines, and submission workflows into one place"
           apis={governmentApis}
         />
 
