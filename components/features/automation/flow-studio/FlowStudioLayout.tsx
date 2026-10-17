@@ -78,7 +78,7 @@ templateQuickPick,
         {breakpoint === "desktop" && (
           <>
             {palette && (
-              <aside className="w-64 shrink-0 border-r bg-background/95 backdrop-blur-md z-10">
+              <aside className="w-[264px] shrink-0 border-r bg-background/95 backdrop-blur-md z-10">
                 {palette}
               </aside>
             )}
@@ -87,7 +87,7 @@ templateQuickPick,
               {templateQuickPick}
             </main>
             {properties && (
-              <aside className="w-80 shrink-0 border-l bg-background/95 backdrop-blur-md z-10">
+              <aside className="w-[340px] shrink-0 border-l bg-background/95 backdrop-blur-md z-10">
                 {properties}
               </aside>
             )}

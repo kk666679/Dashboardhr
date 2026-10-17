@@ -80,6 +80,54 @@ export const nodePaletteItems: NodePaletteItem[] = [
     defaultData: { condition: "wait until" },
   },
 
+  // Triggers from Automation Studio
+  {
+    id: "cron",
+    type: "trigger",
+    label: "Cron Schedule",
+    description: "Run hourly, daily, or weekly",
+    icon: "⏰",
+    category: "triggers",
+    favorite: true,
+    defaultData: { event: "cron", schedule: "0 9 * * 1-5", trigger: "schedule" },
+  },
+  {
+    id: "webhook",
+    type: "trigger",
+    label: "Webhook",
+    description: "Receive an inbound signed event",
+    icon: "⇢",
+    category: "triggers",
+    defaultData: { event: "webhook", path: "/api/hooks/workflow", trigger: "webhook" },
+  },
+  {
+    id: "event-subscription",
+    type: "trigger",
+    label: "Event Subscription",
+    description: "Listen for internal domain events",
+    icon: "⟴",
+    category: "triggers",
+    defaultData: { event: "employee.created", trigger: "event" },
+  },
+  {
+    id: "manual-trigger",
+    type: "trigger",
+    label: "Manual Trigger",
+    description: "Start when a user clicks Run",
+    icon: "▶",
+    category: "triggers",
+    defaultData: { event: "manual", trigger: "manual" },
+  },
+  {
+    id: "expiry-trigger",
+    type: "trigger",
+    label: "Expiry Watcher",
+    description: "Fire before an employee or permit expires",
+    icon: "◷",
+    category: "triggers",
+    defaultData: { event: "expiry", daysBefore: 30, trigger: "expiry" },
+  },
+
   // Actions
   {
     id: "action",
@@ -222,6 +270,12 @@ export const nodePaletteItems: NodePaletteItem[] = [
 
 // Categories
 export const nodeCategories: NodePaletteCategory[] = [
+  {
+    id: "triggers",
+    label: "Triggers",
+    icon: <Clock className="h-4 w-4" />,
+    items: nodePaletteItems.filter((item) => item.category === "triggers"),
+  },
   {
     id: "control",
     label: "Control",
