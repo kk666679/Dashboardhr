@@ -1,4 +1,4 @@
-// Main layout
+ex// Main layout
 export { default as LandingPage } from '../landing/LandingLayout';
 
 // Layout components
@@ -9,7 +9,8 @@ export { NavigationBar } from '../landing/NavigationBar';
 export { PlatformOverviewModule } from '../landing/PlatformOverviewModule';
 export { EnterpriseCapabilitiesModule } from '../landing/EnterpriseCapabilitiesModule';
 export { WorkforceModule } from '../landing/WorkforceModule';
-export { AutomationModule } from '../landing/AutomationModule';
+export { AutomationModule } from '../landing/AiFWMSWorkflow';   // ← changed
+export { AiFWMSWorkflow } from '../landing/AiFWMSWorkflow';     // ← added (optional, for direct use)
 export { IntegrationsModule } from '../landing/IntegrationsModule';
 export { SecurityModule } from '../landing/SecurityModule';
 export { PricingPreviewModule } from '../landing/PricingPreviewModule';
