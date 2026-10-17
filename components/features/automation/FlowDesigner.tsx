@@ -15,7 +15,7 @@
 
 "use client";
 
-import { useState, useCallback, useEffect, useMemo, type ReactNode } from "react";
+import { useState, useCallback, useEffect, useMemo, useRef, type ReactNode } from "react";
 import { ReactFlowProvider, useReactFlow } from "@xyflow/react";
 import type { Node, Edge, NodeTypes, EdgeTypes } from "@xyflow/react";
 
@@ -162,6 +162,7 @@ const currentId = useWorkflowStore((s) => s.currentId);
   const [showSearch, setShowSearch] = useState(false);
   const [showLayers, setShowLayers] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const sidebarCollapsedRef = useRef(false);
   const [highlightedNode, setHighlightedNode] = useState<string | null>(null);
 
   // Edit dialog state
@@ -365,16 +366,13 @@ const currentId = useWorkflowStore((s) => s.currentId);
                 collapsedSize={0}
                 collapsible
                 onResize={(size) => {
-                  if (size.asPercentage === 0) {
-                    setSidebarCollapsed(true);
-                  } else {
-                    setSidebarCollapsed(false);
+                  const collapsed = size.asPercentage === 0;
+                  if (sidebarCollapsedRef.current !== collapsed) {
+                    sidebarCollapsedRef.current = collapsed;
+                    setSidebarCollapsed(collapsed);
                   }
                 }}
-                className={cn(
-                  "border-r bg-background",
-                  sidebarCollapsed ? "min-w-[40px]" : "min-w-[200px]"
-                )}
+                className="border-r bg-background overflow-hidden"
               >
                 <div className="flex flex-col h-full relative">
                   <button
