@@ -163,6 +163,7 @@ const currentId = useWorkflowStore((s) => s.currentId);
   const [showLayers, setShowLayers] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const sidebarCollapsedRef = useRef(false);
+  const resizeFrameRef = useRef<number | null>(null);
   const [highlightedNode, setHighlightedNode] = useState<string | null>(null);
 
   // Edit dialog state
@@ -172,6 +173,16 @@ const currentId = useWorkflowStore((s) => s.currentId);
   const [editDescription, setEditDescription] = useState("");
 
   // ─── Effects ─────────────────────────────────────────────────────────────
+  // Panel resize notifications can fire during layout. Defer the React state
+  // update to the next frame so it cannot mutate layout during the observer loop.
+  useEffect(() => {
+    return () => {
+      if (resizeFrameRef.current !== null) {
+        cancelAnimationFrame(resizeFrameRef.current);
+      }
+    };
+  }, []);
+
   // Expose viewport API to the store
   useEffect(() => {
     setFlowViewportApi({
@@ -367,10 +378,16 @@ const currentId = useWorkflowStore((s) => s.currentId);
                 collapsible
                 onResize={(size) => {
                   const collapsed = size.asPercentage === 0;
-                  if (sidebarCollapsedRef.current !== collapsed) {
-                    sidebarCollapsedRef.current = collapsed;
-                    setSidebarCollapsed(collapsed);
+                  if (sidebarCollapsedRef.current === collapsed) return;
+
+                  sidebarCollapsedRef.current = collapsed;
+                  if (resizeFrameRef.current !== null) {
+                    cancelAnimationFrame(resizeFrameRef.current);
                   }
+                  resizeFrameRef.current = requestAnimationFrame(() => {
+                    resizeFrameRef.current = null;
+                    setSidebarCollapsed(collapsed);
+                  });
                 }}
                 className="border-r bg-background overflow-hidden"
               >
