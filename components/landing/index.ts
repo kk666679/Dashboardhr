@@ -9,7 +9,7 @@ export { NavigationBar } from '../landing/NavigationBar';
 export { PlatformOverviewModule } from '../landing/PlatformOverviewModule';
 export { EnterpriseCapabilitiesModule } from '../landing/EnterpriseCapabilitiesModule';
 export { WorkforceModule } from '../landing/WorkforceModule';
-export { AutomationModule } from '../landing/AutomationModule';
+export { AutomationModule } from '../landing/AutomatoinModule';   // ← changed
 export { IntegrationsModule } from '../landing/IntegrationsModule';
 export { SecurityModule } from '../landing/SecurityModule';
 export { PricingPreviewModule } from '../landing/PricingPreviewModule';

@@ -1,9 +1,24 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Zap, TrendingDown, ShieldCheck, BarChart3, Star, Puzzle } from "lucide-react";
+import {
+  Zap,
+  TrendingDown,
+  ShieldCheck,
+  BarChart3,
+  Star,
+  Puzzle,
+  type LucideIcon,
+} from "lucide-react";
 
-const OUTCOMES = [
+type Outcome = {
+  icon: LucideIcon;
+  metric: string;
+  label: string;
+  color: string;
+};
+
+const OUTCOMES: Outcome[] = [
   {
     icon: Zap,
     metric: "Faster productivity",
@@ -42,14 +57,19 @@ const OUTCOMES = [
   },
 ];
 
-export function OutcomesBar() {
+type OutcomesBarProps = {
+  className?: string;
+};
+
+export function OutcomesBar({ className = "" }: OutcomesBarProps) {
   return (
-    <section className="border-y bg-muted/20 py-14 px-4">
-      <div className="max-w-6xl mx-auto">
-        <p className="text-center text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-10">
+    <section className={`border-y bg-muted/20 py-14 px-4 ${className}`}>
+      <div className="mx-auto max-w-6xl">
+        <p className="mb-10 text-center text-xs font-semibold uppercase tracking-widest text-muted-foreground">
           Six outcomes that matter to enterprise buyers
         </p>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 text-center">
+
+        <div className="grid grid-cols-2 gap-6 text-center md:grid-cols-3 lg:grid-cols-6">
           {OUTCOMES.map((item, i) => (
             <motion.div
               key={item.metric}
@@ -60,8 +80,12 @@ export function OutcomesBar() {
               className="flex flex-col items-center gap-2"
             >
               <item.icon className={`h-6 w-6 ${item.color}`} />
-              <div className="text-sm font-semibold text-foreground leading-tight">{item.metric}</div>
-              <div className="text-xs text-muted-foreground leading-snug">{item.label}</div>
+              <div className="text-sm font-semibold leading-tight text-foreground">
+                {item.metric}
+              </div>
+              <div className="text-xs leading-snug text-muted-foreground">
+                {item.label}
+              </div>
             </motion.div>
           ))}
         </div>
@@ -69,3 +93,5 @@ export function OutcomesBar() {
     </section>
   );
 }
+
+export default OutcomesBar;
