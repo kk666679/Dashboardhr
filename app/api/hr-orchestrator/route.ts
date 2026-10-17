@@ -12,6 +12,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { getCurrentSession } from "@/lib/server/auth";
 import { ragQuery } from "@/lib/rag";
+import { runHrOrchestrator } from "@/lib/orchestrator/hr-orchestrator";
 import { sanitizePrompt } from "@/lib/security/prompt";
 
 export const runtime = "nodejs";
@@ -42,48 +43,32 @@ export async function POST(req: NextRequest) {
   const tenantId = body.tenantId ?? session.tenantId;
   const sanitizedMessage = sanitizePrompt(message);
 
-  // Lazy-import the agent registry to avoid build-time side effects
-  const { AGENT_REGISTRY, orchestratorAgent } = await import(
-    "@/.openclaw/agents/orchestrator.agent"
-  );
-
-  const agentContext = {
-    sessionId,
-    tenantId,
-    userId: session.userId,
-  };
-
-  const agentInput = {
-    query:      sanitizedMessage,
-    employeeId: employeeId ?? session.employeeId,
-    tenantId,
-  };
-
-  // If caller requests a specific agent, dispatch directly
-  const targetAgent = body.agentId
-    ? AGENT_REGISTRY.get(body.agentId)
-    : orchestratorAgent;
-
-  if (!targetAgent) {
+  if (body.agentId) {
     return NextResponse.json(
-      { error: `Agent '${body.agentId}' not found in registry` },
-      { status: 404 }
+      { error: "Direct agent routing is not supported by the current orchestrator" },
+      { status: 400 },
     );
   }
 
   try {
-    const result = await targetAgent.process(agentInput, agentContext);
+    const results = await runHrOrchestrator(
+      sanitizedMessage,
+      tenantId,
+      employeeId ?? session.employeeId,
+    );
+    const result = results[0] as Record<string, unknown> | undefined;
 
     return NextResponse.json({
-      agent:   targetAgent.id,
-      type:    result.type,
-      summary: result.summary,
-      data:    result.data,
-      actions: result.actions,
-      confidence:          result.confidence,
-      requiresApproval:    result.requiresHumanApproval,
-      complianceScore:     result.complianceScore ?? null,
-      citations:           result.citations ?? [],
+      agent: "hr-orchestrator",
+      type: result?.type ?? "SYSTEM",
+      summary: result?.summary ?? result?.data ?? "No result returned",
+      data: result?.data ?? null,
+      actions: result?.actions ?? [],
+      confidence: result?.confidence ?? 0.5,
+      requiresApproval: result?.requiresHumanApproval ?? false,
+      complianceScore: result?.complianceScore ?? null,
+      citations: result?.citations ?? [],
+      sessionId,
     });
   } catch (err) {
     console.error("[hr-orchestrator]", err);
@@ -116,13 +101,24 @@ export async function GET(_req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { AGENT_REGISTRY } = await import("@/.openclaw/agents/orchestrator.agent");
-
-  const agents = Array.from(AGENT_REGISTRY.values()).map((a) => ({
-    id:     a.id,
-    name:   a.name,
-    domain: a.domain,
-  }));
+  const agents = [
+    { id: "PAYROLL", name: "Payroll", domain: "Payroll and statutory deductions" },
+    { id: "LEAVE", name: "Leave", domain: "Leave and time off" },
+    { id: "IMMIGRATION", name: "Immigration", domain: "Permits and immigration" },
+    { id: "FOMEMA", name: "FOMEMA", domain: "Medical examinations" },
+    { id: "LEVY", name: "Levy", domain: "Foreign worker levy" },
+    { id: "TALENT_ACQUISITION", name: "Talent Acquisition", domain: "Recruitment and hiring" },
+    { id: "COMPENSATION_BENEFITS", name: "Compensation and Benefits", domain: "Pay and benefits" },
+    { id: "EMPLOYEE_RELATIONS", name: "Employee Relations", domain: "Employee relations" },
+    { id: "LEARNING_DEVELOPMENT", name: "Learning and Development", domain: "Training and development" },
+    { id: "INDUSTRIAL_RELATIONS", name: "Industrial Relations", domain: "Industrial relations" },
+    { id: "HR_ANALYTICS", name: "HR Analytics", domain: "People analytics" },
+    { id: "SUCCESSION_PLANNING", name: "Succession Planning", domain: "Succession planning" },
+    { id: "HR_COMPLIANCE", name: "HR Compliance", domain: "Compliance and policy" },
+    { id: "HR_QUALITY_MANAGEMENT", name: "HR Quality Management", domain: "Quality management" },
+    { id: "EMPLOYER_BRANDING", name: "Employer Branding", domain: "Employer brand" },
+    { id: "FOREIGN_WORKER_EXPATRIATE", name: "Foreign Worker and Expatriate", domain: "Foreign worker management" },
+  ];
 
   return NextResponse.json({ agents, total: agents.length });
 }
