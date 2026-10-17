@@ -1,4 +1,4 @@
-ex// Main layout
+// Main layout
 export { default as LandingPage } from '../landing/LandingLayout';
 
 // Layout components
