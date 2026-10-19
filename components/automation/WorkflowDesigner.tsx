@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useStore } from "zustand";
 import {
   ReactFlow,
   ReactFlowProvider,
@@ -106,10 +107,11 @@ export const useWorkflowStore = create<WorkflowState>()(
 );
 
 export function useUndoRedo() {
-  const undo = useWorkflowStore.temporal((s) => s.undo);
-  const redo = useWorkflowStore.temporal((s) => s.redo);
-  const canUndo = useWorkflowStore.temporal((s) => s.pastStates.length > 0);
-  const canRedo = useWorkflowStore.temporal((s) => s.futureStates.length > 0);
+  const temporal = useWorkflowStore.temporal;
+  const undo = useStore(temporal, (state) => state.undo);
+  const redo = useStore(temporal, (state) => state.redo);
+  const canUndo = useStore(temporal, (state) => state.pastStates.length > 0);
+  const canRedo = useStore(temporal, (state) => state.futureStates.length > 0);
   return { undo, redo, canUndo, canRedo };
 }
 
@@ -476,7 +478,7 @@ function DesignerInner({ initialNodes = [], initialEdges = [] }: DesignerProps) 
           <Panel position="top-left" className="!m-3 flex gap-1.5">
             <button
               type="button"
-              onClick={undo}
+              onClick={() => undo()}
               disabled={!canUndo}
               className="rounded-md border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-medium text-slate-600 disabled:opacity-40"
             >
@@ -484,7 +486,7 @@ function DesignerInner({ initialNodes = [], initialEdges = [] }: DesignerProps) 
             </button>
             <button
               type="button"
-              onClick={redo}
+              onClick={() => redo()}
               disabled={!canRedo}
               className="rounded-md border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-medium text-slate-600 disabled:opacity-40"
             >
