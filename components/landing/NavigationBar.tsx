@@ -107,7 +107,7 @@ const NAV_SECTIONS: NavSection[] = [
 
 export function NavigationBar() {
   const pathname = usePathname();
-  const { href: localizedHref, locale } = useLocalizedHref();
+  const { href: localizedHref } = useLocalizedHref();
   const [expandedSection, setExpandedSection] = useState<string | null>(null);
   const [expandedPage, setExpandedPage] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
