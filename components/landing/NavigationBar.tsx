@@ -26,254 +26,81 @@ interface NavSection {
 
 const NAV_SECTIONS: NavSection[] = [
   {
-    label: "AI Platform",
+    label: "Solutions",
     pages: [
-      {
-        label: "AI Hub",
-        href: "/ai",
-        subs: [
-          { label: "Chat Hub", href: "/ai/chat-hub" },
-          { label: "Knowledge Base", href: "/ai/kb-chat" },
-          { label: "Semantic Search", href: "/ai/semantic-search" },
-          { label: "HR Orchestrator", href: "/ai/hr-orchestrator" },
-        ],
-      },
-      {
-        label: "AI Tools",
-        href: "/ai/doc-generator",
-        subs: [
-          { label: "Document Generator", href: "/ai/doc-generator" },
-          { label: "Compliance AI", href: "/ai/compliance" },
-          { label: "Payroll AI", href: "/ai/payroll" },
-          { label: "Recruitment AI", href: "/ai/recruitment" },
-          { label: "Employee AI", href: "/ai/employee" },
-          { label: "Expat AI", href: "/ai/expat" },
-        ],
-      },
+      { label: "Improve Employee Experience", href: "/employees", subs: [
+        { label: "Employee Directory", href: "/employees" },
+        { label: "Employee Self-Service", href: "/ess" },
+      ] },
+      { label: "Reduce Workforce Cost and Risk", href: "/dashboard/analytics", subs: [
+        { label: "Analytics and Decision Intelligence", href: "/dashboard/analytics" },
+        { label: "Compliance", href: "/dashboard/compliance" },
+      ] },
+      { label: "Streamline HR Operations", href: "/automation", subs: [
+        { label: "Workflow Automation", href: "/automation" },
+        { label: "Payroll", href: "/accounting/payroll" },
+      ] },
+      { label: "Run Efficient Workplace Operations", href: "/dashboard/accommodation", subs: [
+        { label: "Accommodation", href: "/dashboard/accommodation" },
+        { label: "Geolocation", href: "/dashboard/geolocation" },
+      ] },
+      { label: "Ensure Foreign Worker Compliance", href: "/employees/foreign-workers", subs: [
+        { label: "Foreign Workers", href: "/employees/foreign-workers" },
+        { label: "Permits and Medical", href: "/employees/permits" },
+      ] },
     ],
   },
   {
-    label: "HR & Workforce",
+    label: "Platform",
     pages: [
-      {
-        label: "HR Management",
-        href: "/employees",
-        subs: [
-          { label: "All Employees", href: "/employees" },
-          { label: "New Employee", href: "/employees/new" },
-          { label: "Onboarding", href: "/employees/onboarding" },
-          { label: "Offboarding", href: "/employees/offboarding" },
-          { label: "Compensation", href: "/dashboard/compensation" },
-          { label: "Recruitment", href: "/dashboard/recruitment" },
-          { label: "Performance", href: "/dashboard/performance" },
-        ],
-      },
-      {
-        label: "Foreign Workers",
-        href: "/employees/foreign-workers",
-        subs: [
-          { label: "Dashboard", href: "/dashboard" },
-          { label: "Permits & Visas", href: "/employees/permits" },
-          { label: "Medical / FOMEMA", href: "/employees/medical" },
-          { label: "Accommodation", href: "/dashboard/accommodation" },
-          { label: "Geolocation", href: "/dashboard/geolocation" },
-          { label: "Scheduling", href: "/dashboard/scheduling" },
-        ],
-      },
-      {
-        label: "Expatriates",
-        href: "/employees/expatriates",
-        subs: [
-          { label: "Expat Dashboard", href: "/employees/expatriates" },
-          { label: "Visa Management", href: "/employees/permits" },
-        ],
-      },
-      {
-        label: "ESS",
-        href: "/ess",
-        subs: [
-          { label: "Dashboard", href: "/ess" },
-          { label: "Profile", href: "/ess/profile" },
-          { label: "Payslips", href: "/ess/payslips" },
-          { label: "Leave", href: "/ess/leave" },
-          { label: "Claims", href: "/ess/claims" },
-          { label: "Training", href: "/ess/training" },
-        ],
-      },
-      {
-        label: "MSS",
-        href: "/mss",
-        subs: [
-          { label: "Dashboard", href: "/mss" },
-          { label: "Team", href: "/mss/team" },
-          { label: "Approvals", href: "/mss/approvals" },
-          { label: "Attendance", href: "/mss/attendance" },
-          { label: "Performance", href: "/mss/performance" },
-        ],
-      },
+      { label: "Workflow Automation", href: "/automation", subs: [
+        { label: "Workflow Engine", href: "/automation/workflow-engine" },
+        { label: "Flow Designer", href: "/automation/designer" },
+      ] },
+      { label: "Analytics and Decision Intelligence", href: "/dashboard/analytics", subs: [
+        { label: "Analytics Dashboard", href: "/dashboard/analytics" },
+        { label: "Automation Analytics", href: "/automation/analytics" },
+      ] },
+      { label: "Integrations", href: "/integrations", subs: [
+        { label: "Integration Hub", href: "/integrations" },
+        { label: "Accounting", href: "/dashboard/integrations/accounting" },
+      ] },
+      { label: "Security, Privacy, and Governance", href: "/dashboard/security", subs: [
+        { label: "Security", href: "/dashboard/security" },
+        { label: "Data Governance", href: "/dashboard/data-governance" },
+      ] },
+      { label: "Developer Platform", href: "/integrations", subs: [
+        { label: "API Platform", href: "/integrations" },
+        { label: "API Reference", href: "/integrations" },
+      ] },
     ],
   },
   {
-    label: "Finance",
+    label: "By Role",
     pages: [
-      {
-        label: "Accounting",
-        href: "/accounting",
-        subs: [
-          { label: "Dashboard", href: "/accounting" },
-          { label: "Invoices", href: "/accounting/invoices" },
-          { label: "E-Invoice", href: "/accounting/e-invoice" },
-          { label: "Credit Notes", href: "/accounting/credit-notes" },
-          { label: "Delivery Orders", href: "/accounting/delivery-orders" },
-        ],
-      },
-      {
-        label: "Payroll",
-        href: "/accounting/payroll",
-        subs: [
-          { label: "Payroll Dashboard", href: "/accounting/payroll" },
-          { label: "Payroll Calculator", href: "/accounting/payroll-calculator" },
-          { label: "Tax Calculator", href: "/accounting/tax-calculator" },
-        ],
-      },
-      {
-        label: "Reports",
-        href: "/accounting/reports",
-        subs: [
-          { label: "Financial Reports", href: "/accounting/reports" },
-          { label: "Government Submissions", href: "/accounting/government-submissions" },
-          { label: "Enhanced Dashboard", href: "/accounting/enhanced" },
-        ],
-      },
-      {
-        label: "CAPEX",
-        href: "/capex",
-        subs: [
-          { label: "Overview", href: "/capex" },
-          { label: "Assets", href: "/capex/assets" },
-          { label: "Projects", href: "/capex/projects" },
-          { label: "Budget", href: "/capex/budget" },
-          { label: "ROI Analysis", href: "/capex/roi" },
-        ],
-      },
-      {
-        label: "OPEX",
-        href: "/opex",
-        subs: [
-          { label: "Overview", href: "/opex" },
-          { label: "Lean", href: "/opex/lean" },
-          { label: "Six Sigma", href: "/opex/six-sigma" },
-          { label: "Kaizen", href: "/opex/kaizen" },
-          { label: "Kanban", href: "/opex/kanban" },
-          { label: "Analytics", href: "/opex/analytics" },
-        ],
-      },
+      { label: "HR Leaders", href: "/dashboard/dashboards/hr" },
+      { label: "Finance Leaders", href: "/dashboard/dashboards/payroll" },
+      { label: "Operations Leaders", href: "/dashboard/dashboards/executive" },
+      { label: "IT Leaders", href: "/dashboard/security" },
+      { label: "Developers", href: "/integrations" },
     ],
   },
   {
-    label: "Operations",
+    label: "Customers",
     pages: [
-      {
-        label: "Automation",
-        href: "/automation",
-        subs: [
-          { label: "Overview", href: "/automation" },
-          { label: "Flow Designer", href: "/automation/designer" },
-          { label: "Workflow Engine", href: "/automation/workflow-engine" },
-          { label: "QMS / Quality", href: "/automation/qms" },
-          { label: "SOP Workflows", href: "/automation/sops" },
-          { label: "Templates", href: "/automation/templates" },
-          { label: "Analytics", href: "/automation/analytics" },
-        ],
-      },
-      {
-        label: "ISO/QMS",
-        href: "/iso",
-        subs: [
-          { label: "Dashboard", href: "/iso" },
-          { label: "Audit Checklist", href: "/iso/audit-checklist" },
-          { label: "Create Audit Plan", href: "/iso/audit-create-plan" },
-          { label: "Generate Audit", href: "/iso/audit-generate" },
-          { label: "CAPA", href: "/iso/capa-create" },
-          { label: "Compliance Check", href: "/iso/compliance-check" },
-          { label: "Gap Analysis", href: "/iso/gap-analysis" },
-          { label: "Fishbone", href: "/iso/fishbone" },
-        ],
-      },
-      {
-        label: "Compliance",
-        href: "/dashboard/compliance",
-        subs: [
-          { label: "Compliance Dashboard", href: "/dashboard/compliance" },
-          { label: "New Audit", href: "/dashboard/compliance/audit/new" },
-          { label: "Compliance AI", href: "/ai/compliance" },
-        ],
-      },
-      {
-        label: "Security",
-        href: "/dashboard/security",
-        subs: [
-          { label: "Security Dashboard", href: "/dashboard/security" },
-          { label: "Audit Trail", href: "/dashboard/audit-trail" },
-          { label: "Data Governance", href: "/dashboard/data-governance" },
-        ],
-      },
-      {
-        label: "Documents",
-        href: "/dashboard/documents",
-        subs: [
-          { label: "Document Manager", href: "/dashboard/documents" },
-          { label: "PDF Generator", href: "/dashboard/pdf-generator" },
-          { label: "AI Document Generator", href: "/ai/doc-generator" },
-        ],
-      },
+      { label: "Customer Stories", href: "/" },
+      { label: "Industries", href: "/" },
+      { label: "ROI and Outcomes", href: "/dashboard/analytics" },
     ],
   },
   {
-    label: "Analytics",
+    label: "Resources",
     pages: [
-      {
-        label: "Analytics",
-        href: "/dashboard/analytics",
-        subs: [
-          { label: "Analytics Dashboard", href: "/dashboard/analytics" },
-          { label: "Automation Analytics", href: "/automation/analytics" },
-          { label: "Compliance Dashboard", href: "/iso/compliance-dashboard" },
-          { label: "Compliance Score", href: "/iso/compliance-score" },
-          { label: "OPEX Analytics", href: "/opex/analytics" },
-        ],
-      },
-      {
-        label: "Reports",
-        href: "/accounting/reports",
-        subs: [
-          { label: "Financial Reports", href: "/accounting/reports" },
-          { label: "Audit Reports", href: "/iso/audit-generate" },
-        ],
-      },
-    ],
-  },
-  {
-    label: "Integrations & API",
-    pages: [
-      {
-        label: "Integrations",
-        href: "/integrations",
-        subs: [
-          { label: "Overview", href: "/integrations" },
-          { label: "Government APIs", href: "/integrations/government" },
-          { label: "Agencies Integration", href: "/integrations/government/agencies-integration" },
-        ],
-      },
-      {
-        label: "API Platform",
-        href: "/integrations",
-        subs: [
-          { label: "Integrations Hub", href: "/integrations" },
-          { label: "Government APIs", href: "/integrations/government" },
-          { label: "Agencies Integration", href: "/integrations/government/agencies-integration" },
-        ],
-      },
+      { label: "Guides and Reports", href: "/accounting/reports" },
+      { label: "Implementation Resources", href: "/automation/templates" },
+      { label: "Help Center & Documentation", href: "/dashboard/help" },
+      { label: "Malaysian Labor Law Guide", href: "/ai/kb-chat" },
+      { label: "API Reference", href: "/integrations" },
     ],
   },
 ];
@@ -285,7 +112,17 @@ export function NavigationBar() {
   const [expandedPage, setExpandedPage] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
 
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    setMounted(true);
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setExpandedSection(null);
+        setExpandedPage(null);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
 
   const isActive = (href: string) => {
     const localized = localizedHref(href);
@@ -317,6 +154,10 @@ export function NavigationBar() {
             onMouseLeave={() => setExpandedSection(null)}
           >
             <button
+              type="button"
+              aria-expanded={expandedSection === section.label}
+              aria-haspopup="true"
+              onClick={() => setExpandedSection(expandedSection === section.label ? null : section.label)}
               className={cn(
                 "px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-1.5",
                 "hover:bg-accent hover:text-accent-foreground",
@@ -336,7 +177,7 @@ export function NavigationBar() {
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: 6, scale: 0.97 }}
                   transition={{ duration: 0.15 }}
-                  className="absolute top-full left-0 mt-1 bg-popover border rounded-xl shadow-2xl overflow-hidden min-w-[600px] grid grid-cols-2 p-2 gap-1"
+                  className="absolute left-0 top-[calc(100%+0.25rem)] z-50 max-w-[min(42rem,calc(100vw-2rem))] min-w-[min(37.5rem,calc(100vw-2rem))] overflow-hidden rounded-xl border bg-popover p-2 shadow-2xl grid grid-cols-2 gap-1"
                 >
                   {section.pages.map((page) => (
                     <div key={page.href} className="rounded-lg p-2 hover:bg-accent/50 transition-colors">

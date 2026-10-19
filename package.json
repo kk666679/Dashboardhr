@@ -10,6 +10,7 @@
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
     "verify:automation-routes": "node scripts/check-automation-routes.mjs",
+    "check:routes": "node scripts/check-routes.mjs",
     "locale:report": "node scripts/locale-report.mjs",
     "locale:validate": "node scripts/validate-locales.mjs"
   },

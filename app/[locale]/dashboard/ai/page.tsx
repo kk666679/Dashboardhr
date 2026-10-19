@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 
 const AI_MODULES = [
-  { title: "AI Chat", description: "Conversational HR assistant", href: "ai/chat", icon: MessageSquare, badge: "Live", color: "text-blue-500" },
+  { title: "AI Chat", description: "Conversational HR assistant", href: "chat", icon: MessageSquare, badge: "Live", color: "text-blue-500" },
   { title: "Workflow Builder", description: "Design autonomous AI workflows", href: "ai/workflow-builder", icon: Workflow, badge: "Beta", color: "text-purple-500" },
   { title: "AI Recommendations", description: "Actionable insights from your data", href: "ai/recommendations", icon: Sparkles, badge: "New", color: "text-amber-500" },
   { title: "Compliance Advisor", description: "Regulatory compliance guidance", href: "ai/compliance-advisor", icon: Shield, badge: null, color: "text-green-500" },
