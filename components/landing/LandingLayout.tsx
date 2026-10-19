@@ -2,7 +2,7 @@
 
 import { EnterpriseHeader } from "../landing/EnterpriseHeader";
 import { WorkforceModule } from "../landing/WorkforceModule";
-import { AutomationModule } from "../landing/AutomationModule";
+import { AiFWMSWorkflow as AutomationModule } from "../landing/AutomationModule";
 import { SecurityModule } from "../landing/SecurityModule";
 import { FAQModule } from "../landing/FAQModule";
 import { PersonaRoutingSection } from "../landing/PersonaRoutingSection";
