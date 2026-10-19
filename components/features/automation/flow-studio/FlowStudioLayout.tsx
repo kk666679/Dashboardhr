@@ -4,6 +4,8 @@ import * as React from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { PanelLeft, PanelRight } from "lucide-react";
 
 export type StudioBreakpoint = "mobile" | "tablet" | "desktop";
 
@@ -60,6 +62,8 @@ templateQuickPick,
   const isMobile = useIsMobile();
   const isTablet = useMediaQuery("(min-width: 768px) and (max-width: 1023px)");
   const isDesktop = useMediaQuery("(min-width: 1024px)");
+  const [isPaletteCollapsed, setIsPaletteCollapsed] = React.useState(false);
+  const [isPropertiesCollapsed, setIsPropertiesCollapsed] = React.useState(false);
 
   const breakpoint: StudioBreakpoint = isMobile
     ? "mobile"
@@ -78,17 +82,49 @@ templateQuickPick,
         {breakpoint === "desktop" && (
           <>
             {palette && (
-              <aside className="w-[264px] shrink-0 border-r bg-background/95 backdrop-blur-md z-10">
-                {palette}
+              <aside
+                className={cn(
+                  "relative shrink-0 border-r bg-background/95 backdrop-blur-md transition-[width] duration-200 ease-out z-10",
+                  isPaletteCollapsed ? "w-11" : "w-[264px]"
+                )}
+              >
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="absolute right-1 top-2 z-20 size-8"
+                  onClick={() => setIsPaletteCollapsed((value) => !value)}
+                  aria-label={isPaletteCollapsed ? "Expand node palette" : "Collapse node palette"}
+                  aria-expanded={!isPaletteCollapsed}
+                >
+                  <PanelLeft className={cn("size-4 transition-transform", isPaletteCollapsed && "rotate-180")} />
+                </Button>
+                <div className={cn("h-full overflow-hidden", isPaletteCollapsed && "invisible")}>{palette}</div>
               </aside>
             )}
-            <main className="flex-1 relative min-w-0">
+            <main className="relative min-w-0 flex-1">
               {canvas}
               {templateQuickPick}
             </main>
             {properties && (
-              <aside className="w-[340px] shrink-0 border-l bg-background/95 backdrop-blur-md z-10">
-                {properties}
+              <aside
+                className={cn(
+                  "relative shrink-0 border-l bg-background/95 backdrop-blur-md transition-[width] duration-200 ease-out z-10",
+                  isPropertiesCollapsed ? "w-11" : "w-[340px]"
+                )}
+              >
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="absolute left-1 top-2 z-20 size-8"
+                  onClick={() => setIsPropertiesCollapsed((value) => !value)}
+                  aria-label={isPropertiesCollapsed ? "Expand properties panel" : "Collapse properties panel"}
+                  aria-expanded={!isPropertiesCollapsed}
+                >
+                  <PanelRight className={cn("size-4 transition-transform", isPropertiesCollapsed && "rotate-180")} />
+                </Button>
+                <div className={cn("h-full overflow-hidden", isPropertiesCollapsed && "invisible")}>{properties}</div>
               </aside>
             )}
           </>
