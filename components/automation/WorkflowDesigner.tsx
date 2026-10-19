@@ -27,6 +27,7 @@ import {
 import "@xyflow/react/dist/style.css";
 import { create } from "zustand";
 import { temporal } from "zundo";
+import { PanelLeft, PanelRight } from "lucide-react";
 
 /* ---------- Domain model ---------- */
 
@@ -399,6 +400,8 @@ function DesignerInner({ initialNodes = [], initialEdges = [] }: DesignerProps) 
   const { undo, redo, canUndo, canRedo } = useUndoRedo();
   const { fitView, screenToFlowPosition } = useReactFlow();
   const [issues, setIssues] = React.useState<ValidationIssue[]>([]);
+  const [isPaletteCollapsed, setIsPaletteCollapsed] = React.useState(false);
+  const [isInspectorCollapsed, setIsInspectorCollapsed] = React.useState(false);
 
   React.useEffect(() => {
     if (nodes.length === 0 && initialNodes.length > 0) {
@@ -446,9 +449,22 @@ function DesignerInner({ initialNodes = [], initialEdges = [] }: DesignerProps) 
 
   return (
     <div className="flex h-[720px] w-full overflow-hidden rounded-xl border border-slate-200 bg-slate-50">
-      <NodePalette onAdd={handleAdd} />
+      <aside className={isPaletteCollapsed ? "relative w-11 shrink-0 border-r border-slate-200 bg-white" : "relative w-56 shrink-0"}>
+        <button
+          type="button"
+          onClick={() => setIsPaletteCollapsed((value) => !value)}
+          aria-label={isPaletteCollapsed ? "Expand node palette" : "Collapse node palette"}
+          aria-expanded={!isPaletteCollapsed}
+          className="absolute right-1 top-2 z-20 inline-flex size-8 items-center justify-center rounded-md border border-slate-200 bg-white text-slate-500 shadow-sm transition hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+        >
+          <PanelLeft className={isPaletteCollapsed ? "size-4 rotate-180" : "size-4"} aria-hidden />
+        </button>
+        <div className={isPaletteCollapsed ? "invisible h-full overflow-hidden" : "h-full"}>
+          <NodePalette onAdd={handleAdd} />
+        </div>
+      </aside>
 
-      <div className="relative flex-1">
+      <div className="relative min-w-0 flex-1">
         <ReactFlow
           nodes={nodes}
           edges={edges}
@@ -526,7 +542,20 @@ function DesignerInner({ initialNodes = [], initialEdges = [] }: DesignerProps) 
         </ReactFlow>
       </div>
 
-      <Inspector />
+      <aside className={isInspectorCollapsed ? "relative w-11 shrink-0 border-l border-slate-200 bg-white" : "relative w-72 shrink-0"}>
+        <button
+          type="button"
+          onClick={() => setIsInspectorCollapsed((value) => !value)}
+          aria-label={isInspectorCollapsed ? "Expand inspector" : "Collapse inspector"}
+          aria-expanded={!isInspectorCollapsed}
+          className="absolute left-1 top-2 z-20 inline-flex size-8 items-center justify-center rounded-md border border-slate-200 bg-white text-slate-500 shadow-sm transition hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+        >
+          <PanelRight className={isInspectorCollapsed ? "size-4 rotate-180" : "size-4"} aria-hidden />
+        </button>
+        <div className={isInspectorCollapsed ? "invisible h-full overflow-hidden" : "h-full"}>
+          <Inspector />
+        </div>
+      </aside>
     </div>
   );
 }
