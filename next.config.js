@@ -4,9 +4,9 @@ const withBundleAnalyzer = require("@next/bundle-analyzer")({
 });
 
 const nextConfig = {
-  // Vercel performs its own server output tracing. Keeping Next's standalone
-  // output disabled prevents Vercel's build hook from looking for the
-  // standalone-only next-server.js.nft.json file.
+  // Vercel's build hook consumes Next's server trace manifest. Standalone
+  // output guarantees that next-server.js.nft.json is emitted consistently.
+  output: "standalone",
   allowedDevOrigins: ["127.0.0.1", "localhost"],
   images: {
     remotePatterns: [
